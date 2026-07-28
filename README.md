@@ -6,7 +6,13 @@ The public site for the Vera iOS app. Three static pages, no build step, no depe
 |---|---|
 | `index.html` | Landing page |
 | `privacy.html` | **Privacy Policy** — the URL submitted to App Store Connect, and linked from the app's paywall |
+| `terms.html` | **Terms of Service** — the EULA URL for App Store Connect, and linked from the app's paywall |
 | `support.html` | **Support** — the Support URL submitted to App Store Connect |
+| `contact.html` | Contact / who to write to |
+
+Governing law in `terms.html` is **Norwegian law**, and the operator is named as
+Nathaniel Fiskå, sole trader, Norway. If that ever changes, section 1 and section
+14 both need updating.
 
 ## Hosting
 
@@ -25,6 +31,9 @@ paywall. If either 404s, the app gets rejected.
 
 - Privacy Policy → also hardcoded in the app at `optimal tracker/DesignSystem.swift`
   (`AppBrand.privacyPolicyURL`). Change one, change the other.
+- Terms of Service → likewise `AppBrand.termsURL`. That constant currently points
+  at Apple's standard EULA; once this site is live it should point at
+  `terms.html`, which incorporates Apple's EULA by reference.
 - Support
 
 ## Before the app goes live
