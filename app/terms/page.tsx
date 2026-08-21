@@ -5,17 +5,17 @@ import { Prose, CONTACT_EMAIL, APPLE_EULA } from '@/components/site'
 export const metadata: Metadata = {
   title: 'Terms of Service',
   description:
-    'The terms you agree to when you use the Vera app, including subscription and billing terms.',
+    'The terms you agree to when you use the Optimally app, including subscription and billing terms.',
 }
 
 export default function Terms() {
   return (
     <Prose title="Terms of Service" effective>
       <div className="tldr">
-        Short version: Vera tells you what&rsquo;s in your food based on public
+        Short version: Optimally tells you what&rsquo;s in your food based on public
         ingredient data. It&rsquo;s an information tool, not medical advice, and
         the data isn&rsquo;t perfect — always check the physical label,
-        especially for allergies. Vera is a paid subscription billed by Apple,
+        especially for allergies. Optimally is a paid subscription billed by Apple,
         and you cancel it in iOS Settings.
       </div>
 
@@ -23,18 +23,18 @@ export default function Terms() {
       <p>
         These terms are an agreement between you and{' '}
         <strong>Nathaniel Fiskå</strong> (&ldquo;we&rdquo;, &ldquo;us&rdquo;), a
-        sole trader based in Norway, operator of the Vera iOS app and this
+        sole trader based in Norway, operator of the Optimally iOS app and this
         website. Contact:{' '}
         <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
       </p>
       <p>
-        By downloading or using Vera, you agree to these terms. If you
+        By downloading or using Optimally, you agree to these terms. If you
         don&rsquo;t agree, don&rsquo;t use the app.
       </p>
 
       <h2>2. Apple&rsquo;s terms also apply</h2>
       <p>
-        Vera is distributed through the App Store, so Apple&rsquo;s{' '}
+        Optimally is distributed through the App Store, so Apple&rsquo;s{' '}
         <a href={APPLE_EULA}>
           Licensed Application End User License Agreement
         </a>{' '}
@@ -44,35 +44,35 @@ export default function Terms() {
       </p>
       <p>
         You acknowledge that Apple is not a party to these terms, has no
-        obligation to provide support for Vera, and that any claim about the app
+        obligation to provide support for Optimally, and that any claim about the app
         itself is between you and us — not you and Apple. Apple is, however, a
         third-party beneficiary of these terms and may enforce them against you.
       </p>
 
-      <h2>3. Your licence to use Vera</h2>
+      <h2>3. Your licence to use Optimally</h2>
       <p>
         We grant you a personal, non-transferable, non-exclusive licence to use
-        Vera on Apple devices you own or control, for your own non-commercial
+        Optimally on Apple devices you own or control, for your own non-commercial
         use. You may not sell, rent, sublicense or redistribute the app;
         reverse-engineer, decompile or otherwise attempt to extract its source
         code except where that restriction is prohibited by law; or scrape,
         bulk-extract or resell the scores and ratings it produces.
       </p>
 
-      <h2>4. What Vera is — and what it is not</h2>
+      <h2>4. What Optimally is — and what it is not</h2>
       <p>
-        Vera reads publicly available ingredient data and applies a fixed set of
+        Optimally reads publicly available ingredient data and applies a fixed set of
         published rules to produce a score. That&rsquo;s it. Specifically:
       </p>
       <ul>
         <li>
-          <strong>Vera is not medical, nutritional or dietary advice.</strong> It
+          <strong>Optimally is not medical, nutritional or dietary advice.</strong> It
           does not diagnose, treat, cure or prevent any condition. If you have a
           medical condition, are pregnant, or are making a significant change to
           your diet, speak to a qualified professional.
         </li>
         <li>
-          <strong>Vera is not an allergen check.</strong> Never rely on it to
+          <strong>Optimally is not an allergen check.</strong> Never rely on it to
           decide whether a product is safe for an allergy or intolerance.
           Database records can be incomplete, out of date, or wrong, and
           manufacturers change recipes without notice.{' '}
@@ -107,7 +107,7 @@ export default function Terms() {
       <h2>6. Subscriptions and billing</h2>
       <ul>
         <li>
-          <strong>Vera is a paid app.</strong> After the introductory questions,
+          <strong>Optimally is a paid app.</strong> After the introductory questions,
           an active subscription is required to use it. There is no free tier and
           no ad-supported version.
         </li>
@@ -135,7 +135,7 @@ export default function Terms() {
         </li>
         <li>
           <strong>Cancel in iOS Settings</strong> &rarr; your name &rarr;
-          Subscriptions &rarr; Vera. Deleting the app does not cancel a
+          Subscriptions &rarr; Optimally. Deleting the app does not cancel a
           subscription. Step-by-step instructions are on our{' '}
           <Link href="/support/#cancel">Support page</Link>.
         </li>
@@ -162,16 +162,16 @@ export default function Terms() {
 
       <h2>8. Acceptable use</h2>
       <p>
-        Don&rsquo;t use Vera to break the law, don&rsquo;t try to disrupt or
+        Don&rsquo;t use Optimally to break the law, don&rsquo;t try to disrupt or
         overload our services or the third-party databases we rely on,
         don&rsquo;t attempt automated or bulk access to any endpoint the app
-        uses, and don&rsquo;t misrepresent Vera&rsquo;s scores as a safety
+        uses, and don&rsquo;t misrepresent Optimally&rsquo;s scores as a safety
         certification, a medical assessment, or an official rating of any kind.
       </p>
 
       <h2>9. Our content</h2>
       <p>
-        The Vera name, logo, design, scoring rules, written ratings and
+        The Optimally name, logo, design, scoring rules, written ratings and
         explanatory text are ours and are protected by copyright and trade mark
         law. Data sourced from Open Food Facts remains under the ODbL and is
         attributed as such. You&rsquo;re welcome to share individual scores and
@@ -180,7 +180,7 @@ export default function Terms() {
 
       <h2>10. Availability</h2>
       <p>
-        We aim to keep Vera working, but we don&rsquo;t promise uninterrupted
+        We aim to keep Optimally working, but we don&rsquo;t promise uninterrupted
         service. Features that depend on external services — product lookups,
         alternatives, recall checks — can fail when those services are down, and
         the app is designed to degrade gracefully when they do. We may change,
@@ -190,7 +190,7 @@ export default function Terms() {
 
       <h2>11. Disclaimers and liability</h2>
       <p>
-        Vera is provided &ldquo;as is&rdquo;. To the fullest extent permitted by
+        Optimally is provided &ldquo;as is&rdquo;. To the fullest extent permitted by
         law, we exclude implied warranties of merchantability, fitness for a
         particular purpose and non-infringement, and we are not liable for
         indirect or consequential loss, or for decisions you make based on a
@@ -208,7 +208,7 @@ export default function Terms() {
 
       <h2>12. Ending this agreement</h2>
       <p>
-        You can stop using Vera and delete the app at any time. We may suspend or
+        You can stop using Optimally and delete the app at any time. We may suspend or
         end your access if you materially breach these terms. Ending the
         agreement doesn&rsquo;t automatically refund a subscription — that goes
         through Apple.
@@ -218,7 +218,7 @@ export default function Terms() {
       <p>
         We may update these terms. We&rsquo;ll change the effective date at the
         top, and for material changes we&rsquo;ll flag it in the app. Continuing
-        to use Vera after a change means you accept the updated terms; if you
+        to use Optimally after a change means you accept the updated terms; if you
         don&rsquo;t, stop using the app and cancel any subscription.
       </p>
 
@@ -242,7 +242,7 @@ export default function Terms() {
         apply. Not enforcing a term isn&rsquo;t a waiver of it. These terms,
         together with our <Link href="/privacy/">Privacy Policy</Link> and
         Apple&rsquo;s standard EULA, are the whole agreement between us about
-        Vera.
+        Optimally.
       </p>
 
       <h2>16. Contact</h2>
@@ -253,7 +253,7 @@ export default function Terms() {
       </p>
 
       <div className="note">
-        Vera&rsquo;s scores are an information tool, not medical advice. Always
+        Optimally&rsquo;s scores are an information tool, not medical advice. Always
         check the physical packaging for allergen information — only the label in
         your hand is authoritative.
       </div>

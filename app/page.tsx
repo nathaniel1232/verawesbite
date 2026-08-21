@@ -6,25 +6,25 @@ import { asset } from '@/lib/asset'
 const SHOTS = [
   {
     src: '/shots/scan.jpg',
-    alt: 'Vera home screen: scan a product, search, and recent scans with scores',
+    alt: 'Optimally home screen: scan a product, search, and recent scans with scores',
     title: 'Scan or search',
     body: 'Point at a barcode, photograph a label, or type a product name. Recent scans keep their scores.',
   },
   {
     src: '/shots/verdict.jpg',
-    alt: 'Vera verdict screen showing a score of 22 with ultra-processed and seed oil flags',
+    alt: 'Optimally verdict screen showing a score of 22 with ultra-processed and seed oil flags',
     title: 'Read the verdict',
     body: 'A 0–100 score, the flags that drove it, and every key ingredient rated with a reason.',
   },
   {
     src: '/shots/research.jpg',
-    alt: 'Vera research screen listing seed oils, ultra-processing, added sugar and refined grain',
+    alt: 'Optimally research screen listing seed oils, ultra-processing, added sugar and refined grain',
     title: 'Check our work',
     body: 'Each rule links the paper behind it, and shows how many of your own scans it touched.',
   },
   {
     src: '/shots/progress.jpg',
-    alt: 'Vera progress screen showing ultra-processed share and a Clean Score trend',
+    alt: 'Optimally progress screen showing ultra-processed share and a Clean Score trend',
     title: 'See the pattern',
     body: 'What share of your scans are ultra-processed, and whether your Clean Score is moving.',
   },
@@ -54,7 +54,7 @@ export default function Home() {
                     and change .l1 to "Download on the". */}
                 <span
                   className="appstore"
-                  aria-label="Vera is coming soon to the App Store"
+                  aria-label="Optimally is coming soon to the App Store"
                 >
                   <svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
                     <path d="M16.365 1.43c.09 1.02-.32 2.02-.98 2.74-.7.77-1.85 1.37-2.96 1.28-.11-1 .38-2.03 1.02-2.7.7-.75 1.94-1.32 2.92-1.32zM20.5 17.05c-.55 1.27-.81 1.84-1.52 2.96-.99 1.57-2.39 3.53-4.12 3.55-1.54.01-1.94-1-4.03-.99-2.09.01-2.52 1.01-4.06.99-1.73-.02-3.05-1.78-4.04-3.35C-.36 16.9-.65 11.7 1.02 8.94c1.16-1.93 2.98-3.06 4.7-3.06 1.75 0 2.85 1 4.29 1 1.4 0 2.25-1 4.28-1 1.53 0 3.16.83 4.32 2.27-3.8 2.08-3.18 7.5.89 8.9z" />
@@ -73,7 +73,7 @@ export default function Home() {
 
             <Phone
               src="/shots/verdict.jpg"
-              alt="Vera scoring a bag of potato chips 22 out of 100, flagged ultra-processed and contains seed oils"
+              alt="Optimally scoring a bag of potato chips 22 out of 100, flagged ultra-processed and contains seed oils"
               tilt
               priority
             />
@@ -83,11 +83,11 @@ export default function Home() {
         {/* ---------------- why ---------------- */}
         <section className="band wrap" id="why">
           <div className="section-head">
-            <span className="eyebrow">Why Vera</span>
-            <h2>Other scanners guess. Vera shows its work.</h2>
+            <span className="eyebrow">Why Optimally</span>
+            <h2>Other scanners guess. Optimally shows its work.</h2>
             <p>
               Most food scanners send your product to an AI that will happily
-              give you a different answer if you ask twice. Vera runs a fixed
+              give you a different answer if you ask twice. Optimally runs a fixed
               set of published rules — so the score means something, and you can
               audit it.
             </p>
@@ -172,7 +172,7 @@ export default function Home() {
               <h2>Built for the ten seconds you have in the aisle.</h2>
               <p>
                 You&rsquo;re standing in front of forty products and the front of
-                every box is marketing. Vera reads the back instead.
+                every box is marketing. Optimally reads the back instead.
               </p>
               <ul className="checks">
                 <li>
@@ -210,7 +210,7 @@ export default function Home() {
             <span className="eyebrow">Inside the app</span>
             <h2>Four screens, no dashboard theatre.</h2>
             <p>
-              Real screenshots from the app. The products shown are Vera&rsquo;s
+              Real screenshots from the app. The products shown are Optimally&rsquo;s
               own demo items, so nothing here is a brand we were paid to
               flatter.
             </p>
@@ -233,7 +233,7 @@ export default function Home() {
               <span className="eyebrow">What it&rsquo;s looking for</span>
               <h2>Two bars in the same aisle. Not the same food.</h2>
               <p>
-                Both are sold as protein. Vera doesn&rsquo;t care what the front
+                Both are sold as protein. Optimally doesn&rsquo;t care what the front
                 of the pack calls it — it reads the ingredient list and the
                 degree of processing.
               </p>
@@ -257,7 +257,7 @@ export default function Home() {
                   </div>
                   <p>
                     A short list of recognisable foods, minimally processed.
-                    Vera has very little to flag, and the score reflects that.
+                    Optimally has very little to flag, and the score reflects that.
                   </p>
                 </div>
               </div>
@@ -279,7 +279,7 @@ export default function Home() {
                   </div>
                   <p>
                     Refined syrups, industrial oils and additives that only
-                    exist to survive a warehouse. Vera names each one and links
+                    exist to survive a warehouse. Optimally names each one and links
                     the evidence.
                   </p>
                 </div>
@@ -295,7 +295,7 @@ export default function Home() {
               <span className="eyebrow">Receipts</span>
               <h2>Every rule has a paper behind it.</h2>
               <p>
-                Vera&rsquo;s Research tab is not a blog. Each article states the
+                Optimally&rsquo;s Research tab is not a blog. Each article states the
                 claim, links the evidence, and shows the exact rule it drives —
                 read straight out of the scoring engine, so the explanation can
                 never drift from what actually scored your food.
@@ -340,15 +340,15 @@ export default function Home() {
           <div className="wrap">
             <div className="section-head">
               <span className="eyebrow">Pricing</span>
-              <h2>Vera is a paid app. That&rsquo;s the whole business model.</h2>
+              <h2>Optimally is a paid app. That&rsquo;s the whole business model.</h2>
               <p>
                 There is no free tier and no ad-supported version. Subscribers
-                are the only people Vera answers to — which is exactly why no
+                are the only people Optimally answers to — which is exactly why no
                 brand can buy a better score.
               </p>
             </div>
             <div className="pricecard">
-              <h3>Vera Pro</h3>
+              <h3>Optimally Pro</h3>
               <div className="sub">
                 A subscription, sold through the App Store. You&rsquo;ll see the
                 exact price in your own currency — and the length of any free
@@ -384,7 +384,7 @@ export default function Home() {
               </ul>
               <div className="finewarn">
                 <strong>The honest version:</strong> after the intro questions,
-                Vera asks you to subscribe before you can scan anything. If a
+                Optimally asks you to subscribe before you can scan anything. If a
                 free trial is offered to you, cancelling before it ends costs
                 you nothing. Subscriptions renew automatically until you cancel,
                 which you do in iOS Settings — not in the app.{' '}
@@ -402,7 +402,7 @@ export default function Home() {
             </span>
             <h2>No brand can pay for a better score. Ever.</h2>
             <p>
-              Vera earns money one way: people paying for it. No ads, no
+              Optimally earns money one way: people paying for it. No ads, no
               sponsored placements, no affiliate deals on the swaps, and no data
               sold to anyone. That is what keeps the scores worth reading.
             </p>

@@ -16,15 +16,15 @@ export function SiteHeader() {
       <div className="wrap bar">
         <Link className="brand" href="/">
           <Image src={asset('/veramark.png')} alt="" width={30} height={30} priority />
-          Vera
+          Optimally
         </Link>
         <nav className="navlinks">
           <Link href="/#how">How it works</Link>
-          <Link href="/#why">Why Vera</Link>
+          <Link href="/#why">Why Optimally</Link>
           <Link href="/#pricing">Pricing</Link>
           <Link href="/support/">Support</Link>
           <Link className="btn" href="/#get">
-            Get Vera
+            Get Optimally
           </Link>
         </nav>
       </div>
@@ -39,7 +39,7 @@ export function SiteFooter() {
         <div className="foot">
           <Link className="brand" href="/" style={{ textDecoration: 'none' }}>
             <Image src={asset('/veramark.png')} alt="" width={26} height={26} />
-            Vera
+            Optimally
           </Link>
           <div className="links">
             <Link href="/support/">Support</Link>
@@ -49,10 +49,10 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="copyright">
-          © 2026 Vera. Product data from Open Food Facts, used under the ODbL.
+          © 2026 Optimally. Product data from Open Food Facts, used under the ODbL.
         </div>
         <div className="disclaimer">
-          Vera&rsquo;s scores are an information tool, not medical advice. Always
+          Optimally&rsquo;s scores are an information tool, not medical advice. Always
           check the physical packaging for allergen information — only the label
           in your hand is authoritative.
         </div>

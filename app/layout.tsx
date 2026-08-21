@@ -13,17 +13,17 @@ const siteUrl =
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Vera — Know what's really in your food",
-    template: '%s — Vera',
+    default: "Optimally — Know what's really in your food",
+    template: '%s — Optimally',
   },
   description:
-    'Vera scans any barcode and returns a 0–100 ingredient score. Deterministic, cited, private. A paid subscription app with no ads and no brand money.',
+    'Optimally scans any barcode and returns a 0–100 ingredient score. Deterministic, cited, private. A paid subscription app with no ads and no brand money.',
   icons: {
     icon: asset('/veramark.png'),
     apple: asset('/appicon.png'),
   },
   openGraph: {
-    title: "Vera — Know what's really in your food",
+    title: "Optimally — Know what's really in your food",
     description:
       'An honest, cited food scanner. Same ingredient, same rating — every time.',
     images: [asset('/appicon.png')],

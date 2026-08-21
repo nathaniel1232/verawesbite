@@ -4,34 +4,34 @@ import { Prose, CONTACT_EMAIL } from '@/components/site'
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description:
-    'How Vera handles your data. Short version: your scans stay on your device, and we never sell your data.',
+    'How Optimally handles your data. Short version: your scans stay on your device, and we never sell your data.',
 }
 
 export default function Privacy() {
   return (
     <Prose title="Privacy Policy" effective>
       <div className="tldr">
-        Short version: Vera keeps your scans, profile and lists{' '}
+        Short version: Optimally keeps your scans, profile and lists{' '}
         <strong>on your device</strong>. There are no accounts, we don&rsquo;t
         sell your data, and there are no ads or advertising trackers.
       </div>
 
       <h2>Who we are</h2>
       <p>
-        Vera is an iOS app that scans food and personal-care products and shows
+        Optimally is an iOS app that scans food and personal-care products and shows
         an ingredient-based score. This policy explains exactly what data the app
-        handles and where it goes. It applies to the Vera iOS app and to this
+        handles and where it goes. It applies to the Optimally iOS app and to this
         website.
       </p>
       <p>
-        Vera is operated by Nathaniel Fiskå, a sole trader based in Norway. For
+        Optimally is operated by Nathaniel Fiskå, a sole trader based in Norway. For
         any privacy question, email{' '}
         <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
       </p>
 
       <h2>No account, ever</h2>
       <p>
-        Vera does not have accounts. We never ask for your name, email address,
+        Optimally does not have accounts. We never ask for your name, email address,
         phone number or date of birth, and there is nothing to sign in to.
       </p>
 
@@ -39,7 +39,7 @@ export default function Privacy() {
       <p>
         Your profile answers, scan history, saved items and shopping list are
         stored <strong>locally on your device</strong> and are not uploaded to
-        any Vera server. You can erase all of it at any time in{' '}
+        any Optimally server. You can erase all of it at any time in{' '}
         <strong>Settings &rarr; Reset everything</strong>, or by deleting the
         app.
       </p>
@@ -77,7 +77,7 @@ export default function Privacy() {
             </tr>
             <tr>
               <td>
-                <strong>Vera swap service</strong>
+                <strong>Optimally swap service</strong>
                 <br />
                 (our Cloudflare Worker)
               </td>
@@ -104,7 +104,7 @@ export default function Privacy() {
                 <strong>Apple</strong>
               </td>
               <td>Your purchase, handled entirely by Apple</td>
-              <td>To sell and manage Vera subscriptions</td>
+              <td>To sell and manage Optimally subscriptions</td>
             </tr>
             <tr>
               <td>
@@ -146,7 +146,7 @@ export default function Privacy() {
 
       <h2>Analytics — specifically</h2>
       <p>
-        Vera sends a small number of anonymous usage events to{' '}
+        Optimally sends a small number of anonymous usage events to{' '}
         <a href="https://posthog.com">PostHog</a>, hosted in the{' '}
         <strong>European Union</strong>, so we can see where people get stuck and
         improve the app.
@@ -176,13 +176,13 @@ export default function Privacy() {
         no precise location.
       </p>
       <p>
-        We do not track you across other apps or websites, and Vera does not
+        We do not track you across other apps or websites, and Optimally does not
         integrate any advertising SDK.
       </p>
 
       <h2>Subscriptions</h2>
       <p>
-        Vera is sold as a subscription through Apple&rsquo;s App Store. Apple
+        Optimally is sold as a subscription through Apple&rsquo;s App Store. Apple
         processes your payment and manages your subscription —{' '}
         <strong>we never see your card or payment details</strong>. We use
         RevenueCat to tell the app whether your subscription is active;
@@ -208,7 +208,7 @@ export default function Privacy() {
 
       <h2>Your rights</h2>
       <p>
-        Because Vera has no accounts, we hold no file on you that could be looked
+        Because Optimally has no accounts, we hold no file on you that could be looked
         up, exported or corrected — there is no name or email to search by.
         Everything personal to you lives on your device, and{' '}
         <strong>Settings &rarr; Reset everything</strong> erases it immediately
@@ -230,7 +230,7 @@ export default function Privacy() {
 
       <h2>Children</h2>
       <p>
-        Vera is not directed at children under 13, and we do not knowingly
+        Optimally is not directed at children under 13, and we do not knowingly
         collect data from them. If you believe a child has provided us data,
         email us and we will remove it.
       </p>
@@ -249,7 +249,7 @@ export default function Privacy() {
       </p>
 
       <div className="note">
-        Vera&rsquo;s scores are an information tool, not medical advice, and not
+        Optimally&rsquo;s scores are an information tool, not medical advice, and not
         a substitute for guidance from a qualified professional.
       </div>
     </Prose>

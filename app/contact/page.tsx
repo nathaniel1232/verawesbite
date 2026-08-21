@@ -5,7 +5,7 @@ import { Prose, CONTACT_EMAIL } from '@/components/site'
 export const metadata: Metadata = {
   title: 'Contact',
   description:
-    'How to reach the person who makes Vera: support, data corrections, privacy requests, press and partnerships.',
+    'How to reach the person who makes Optimally: support, data corrections, privacy requests, press and partnerships.',
 }
 
 const TOPICS = [
@@ -19,7 +19,7 @@ const TOPICS = [
   },
   {
     h: 'You disagree with a score',
-    p: 'Genuinely welcome. Tell me the ingredient and why. Every rule Vera applies is published with the research behind it, and I’d rather be corrected than consistent-and-wrong.',
+    p: 'Genuinely welcome. Tell me the ingredient and why. Every rule Optimally applies is published with the research behind it, and I’d rather be corrected than consistent-and-wrong.',
   },
   {
     h: 'Press, partnerships and creators',
@@ -31,7 +31,7 @@ export default function Contact() {
   return (
     <Prose title="Contact">
       <p>
-        Vera is made by one person. There&rsquo;s no ticket queue and no support
+        Optimally is made by one person. There&rsquo;s no ticket queue and no support
         bot — your email goes straight to me.
       </p>
 
@@ -46,7 +46,7 @@ export default function Contact() {
       <h2>Who you&rsquo;re writing to</h2>
       <p>
         <strong>Nathaniel Fiskå</strong> — sole trader, based in Norway. I build
-        Vera, write the scoring rules, and answer the email.
+        Optimally, write the scoring rules, and answer the email.
       </p>
 
       <h2>What to write about</h2>
@@ -85,16 +85,16 @@ export default function Contact() {
         </li>
         <li>
           <strong>Medical or dietary advice.</strong> I&rsquo;m not qualified to
-          give it, and Vera isn&rsquo;t either. Please talk to a professional.
+          give it, and Optimally isn&rsquo;t either. Please talk to a professional.
         </li>
         <li>
           <strong>Confirming a product is safe for an allergy.</strong> Never
-          rely on Vera or on me for that — read the physical packaging.
+          rely on Optimally or on me for that — read the physical packaging.
         </li>
       </ul>
 
       <div className="note">
-        Vera&rsquo;s scores are an information tool, not medical advice. Always
+        Optimally&rsquo;s scores are an information tool, not medical advice. Always
         check the physical packaging for allergen information — only the label in
         your hand is authoritative.
       </div>
