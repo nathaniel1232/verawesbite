@@ -137,11 +137,26 @@ export default function Privacy() {
 
       <h2>Camera and photos</h2>
       <p>
-        The camera is used only to read barcodes and product labels. When you
-        scan a label as a photo, the image is processed{' '}
-        <strong>on your device</strong> to read the text — the photo itself is
-        never uploaded to us or to anyone else. Saving a share card to your
-        Photos happens only when you tap to save it.
+        Barcodes are read <strong>entirely on your device</strong>. The barcode
+        scanner never uploads an image.
+      </p>
+      <p>
+        When you photograph a product or a meal, that photo{' '}
+        <strong>is uploaded</strong> to our server and passed to{' '}
+        <a href="https://openai.com/policies/api-data-usage-policies">OpenAI</a>,
+        which identifies what is in the picture and sends the answer back. This
+        is the only way the photo scanner can work, and it is the only feature
+        that sends an image anywhere. We send the photo and nothing else: no
+        name, no email, no account, no advertising identifier and no location.
+        We do not keep the photo after the answer comes back, and under OpenAI&rsquo;s
+        API terms it is not used to train their models.
+      </p>
+      <p>
+        If you would rather no image ever left your phone, use the barcode
+        scanner, which gives an exact answer without uploading anything.
+      </p>
+      <p>
+        Saving a share card to your Photos happens only when you tap to save it.
       </p>
 
       <h2>Analytics — specifically</h2>
@@ -171,9 +186,11 @@ export default function Privacy() {
         the paywall was shown or a purchase was made.
       </p>
       <p>
-        <strong>What is never sent:</strong> no barcodes, no product names, no
-        photos, no scan history, no name or email, no advertising identifier, and
-        no precise location.
+        <strong>What is never sent to analytics:</strong> no barcodes, no
+        product names, no photos, no scan history, no name or email, no
+        advertising identifier, and no precise location. Photos are never sent
+        to analytics; the photo scanner sends them to OpenAI instead, and only
+        for as long as it takes to answer. See Camera and photos above.
       </p>
       <p>
         We do not track you across other apps or websites, and Optimally does not
