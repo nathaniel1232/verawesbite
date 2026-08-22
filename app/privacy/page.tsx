@@ -148,8 +148,31 @@ export default function Privacy() {
         is the only way the photo scanner can work, and it is the only feature
         that sends an image anywhere. We send the photo and nothing else: no
         name, no email, no account, no advertising identifier and no location.
-        We do not keep the photo after the answer comes back, and under OpenAI&rsquo;s
-        API terms it is not used to train their models.
+        We do not keep the photo after the answer comes back. Under OpenAI&rsquo;s
+        API terms the image is not used to train their models, and they may
+        retain it for up to 30 days for abuse monitoring before deleting it.
+      </p>
+      <p>
+        <strong>How we collect it, and what it is used for.</strong> The image
+        is collected only at the moment you press the shutter on the photo
+        scanner, never in the background and never from your photo library
+        unless you pick a picture yourself. It is used for exactly one purpose,
+        identifying the food in the picture so it can be scored. It is not used
+        for advertising, not used to build a profile of you, not sold, and not
+        shared with anyone other than OpenAI for that single purpose.
+      </p>
+      <p>
+        <strong>Third-party protection.</strong> OpenAI processes this image
+        under their API data usage policies, which commit them to a standard of
+        protection equal to the one described on this page: no training on your
+        content, no sale of it, use limited to returning the result, and
+        deletion after the retention window above. We do not share your images
+        with any other third party.
+      </p>
+      <p>
+        You are asked for permission inside the app before the first photo is
+        ever sent, and the barcode scanner remains fully on-device for anyone
+        who declines.
       </p>
       <p>
         If you would rather no image ever left your phone, use the barcode
