@@ -7,7 +7,7 @@
 <title>Optimally Clip Studio</title>
 
 <link rel="stylesheet" href="satoshi.css">
-<script src="clip-engine.js"></script>
+<script src="clip-engine.js?v=2026-09-07 181bb31"></script>
 
 <style>
   /* CONTRAST, BECAUSE THE FIRST VERSION FAILED IT BADLY.
@@ -137,6 +137,22 @@
   #bar{width:min(560px,100%);height:4px;background:var(--panel2);border-radius:3px;overflow:hidden;
     margin-top:6px;display:none}
   #bar i{display:block;height:100%;background:var(--accent);width:0}
+
+  /* The finished file. Deliberately the loudest thing on the page once it
+     exists, because the alternative failure mode is a person staring at an
+     empty Downloads folder. */
+  #saved{margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    justify-content:center}
+  #saved .savebtn{background:var(--good);color:#08120C;border-radius:10px;
+    padding:11px 20px;font-weight:800;font-size:13.5px;text-decoration:none;
+    display:inline-block}
+  #saved .savebtn:hover{filter:brightness(1.08)}
+  #saved .savemeta{color:var(--ink3);font-size:12.5px}
+
+  /* Which build is in front of you. A stale page served from cache is
+     indistinguishable from a bug that was never fixed, and this is the one
+     line that tells the two apart. */
+  #build{margin-top:18px;font-size:11.5px;color:var(--ink3);letter-spacing:.04em}
 </style>
 </head>
 <body>
@@ -236,7 +252,13 @@
       <button id="copyLink" class="ghost">Copy link</button>
     </div>
     <div id="bar"><i></i></div>
+    <!-- The finished file goes HERE, as a link the size of a button, and it
+         stays until the next export replaces it. It used to be the tail of a
+         sentence in the log, which is invisible when you are looking at a
+         Downloads folder wondering why it is empty. -->
+    <div id="saved" hidden></div>
     <div id="log"></div>
+    <div id="build"></div>
   </main>
 </div>
 
@@ -696,6 +718,28 @@ var FPS = 30;
 function log(msg, warn) {
   $("log").innerHTML = warn ? '<span class="warn">' + msg + "</span>" : msg;
 }
+
+/* THE SAVE, SHOWN AS A THING YOU CAN CLICK.
+ *
+ * A programmatic `a.click()` several seconds after the button was pressed is
+ * outside the user gesture that started it, and every browser is entitled to
+ * drop it: Chrome blocks the second and later files under "automatic
+ * downloads" with nothing but an address-bar icon, and Firefox can be set to
+ * ask first and then quietly not. The failure is silent and total. The log
+ * says the file was written and the Downloads folder is empty.
+ *
+ * So the blob is always kept and always offered. Clicking THIS is a gesture,
+ * so it cannot be refused. */
+function showSaved(url, filename, size) {
+  var el = $("saved");
+  el.hidden = false;
+  el.innerHTML =
+    '<a class="savebtn" href="' + url + '" download="' + filename + '">Save ' +
+    filename.split(".").pop().toUpperCase() + "</a>" +
+    '<span class="savemeta">' + filename + " (" +
+    (size / 1048576).toFixed(1) + " MB)</span>";
+}
+function clearSaved() { var el = $("saved"); el.hidden = true; el.innerHTML = ""; }
 function progress(p) {
   var bar = $("bar");
   if (p === null) { bar.style.display = "none"; return; }
@@ -703,6 +747,7 @@ function progress(p) {
   bar.firstElementChild.style.width = Math.round(p * 100) + "%";
 }
 function busy(on) {
+  if (on) clearSaved();
   Array.prototype.forEach.call(document.querySelectorAll("#exports button"), function (b) {
     b.disabled = on;
   });
@@ -728,12 +773,9 @@ function download(blob, filename) {
   return lastURL;
 }
 
-/** The manual link, for when the automatic save was ignored. */
-function saveLink(url, filename, size) {
-  var mb = (size / 1048576).toFixed(1);
-  return '<br><a href="' + url + '" download="' + filename + '">' + filename +
-         "</a> · " + mb + " MB — if it did not land in Downloads, click it.";
-}
+/** The visible save is `showSaved`, a button rather than the end of a
+    sentence. This stays so every caller can keep the same shape. */
+function saveLink(url, filename, size) { showSaved(url, filename, size); return ""; }
 
 /* WHY A TAINTED CANVAS IS CHECKED BEFORE EVERY EXPORT.
  *
@@ -793,9 +835,22 @@ function exportClip() {
  * N, the loop is driven by a counter rather than by a clock, and the file is
  * the same every time no matter what else the machine was doing.
  * ------------------------------------------------------------------- */
+/* THE MUXERS SHIP WITH THE PAGE. THEY ARE NOT FETCHED FROM A CDN.
+ *
+ * They used to come from jsdelivr on first click, which put four things
+ * between the button and a file that had nothing to do with encoding: being
+ * online, jsdelivr being up, the network not being captive, and no content
+ * blocker deciding a cdn.* script is an advert. uBlock Origin on Firefox is
+ * the common one, and every one of those failures arrives as "Could not load
+ * the MP4 muxer", which reads as "MP4 export is broken".
+ *
+ * 63 KB for both, so there is no reason to pay for that. `url` is now a path
+ * next to this page and `fallback` is the CDN, tried only if the local copy
+ * is missing — which is what a half-finished deploy looks like. */
 var MUXERS = {
   mp4: {
-    url: 'https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.1/build/mp4-muxer.min.js',
+    url: 'vendor/mp4-muxer.min.js',
+    fallback: 'https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.1/build/mp4-muxer.min.js',
     global: 'Mp4Muxer',
     ext: 'mp4',
     mime: 'video/mp4',
@@ -811,7 +866,8 @@ var MUXERS = {
     },
   },
   webm: {
-    url: 'https://cdn.jsdelivr.net/npm/webm-muxer@5.0.3/build/webm-muxer.min.js',
+    url: 'vendor/webm-muxer.min.js',
+    fallback: 'https://cdn.jsdelivr.net/npm/webm-muxer@5.0.3/build/webm-muxer.min.js',
     global: 'WebMMuxer',
     ext: 'webm',
     mime: 'video/webm',
@@ -833,6 +889,15 @@ function loadScript(url, globalName) {
     el.onload = function () { resolve(!!window[globalName]) }
     el.onerror = function () { resolve(false) }
     document.head.appendChild(el)
+  })
+}
+
+/** The bundled copy, then the CDN if it is not there. */
+function loadMuxer(spec) {
+  return loadScript(spec.url, spec.global).then(function (ok) {
+    if (ok || !spec.fallback) return ok
+    log('Loading the encoder from the CDN\u2026')
+    return loadScript(spec.fallback, spec.global)
   })
 }
 
@@ -867,7 +932,7 @@ function exportVideo(kind) {
   var W = ex.geometry.pxW, H = ex.geometry.pxH
   var total = Math.round(ex.duration * FPS)
 
-  loadScript(spec.url, spec.global)
+  loadMuxer(spec)
     .then(function (ok) {
       if (!ok) throw new Error('muxer')
       return Promise.all([ex.ready, pickCodec(spec.codecs, W, H)])
@@ -934,6 +999,16 @@ function exportVideo(kind) {
             progress(i / total)
             log('Encoding frame ' + i + ' of ' + total + '…')
           }
+          /* A REAL TURN OF THE EVENT LOOP, NOT JUST A MICROTASK.
+           *
+           * Promise callbacks all run inside one task, so a chain like this
+           * one holds the thread from frame 0 to the end and starves anything
+           * the browser wanted to do asynchronously — which is how ninety
+           * frames came out with no photograph in them (see `decoded` in the
+           * engine). The decode is awaited up front now, so this is belt and
+           * braces, but it also keeps the progress bar honest and the tab
+           * answering while a long clip encodes. */
+          if (i % 10 === 0) return new Promise(function (r) { setTimeout(r, 0) }).then(step)
           return step()
         })
       }
@@ -946,7 +1021,8 @@ function exportVideo(kind) {
       var m = e && e.message
       var why =
         m === 'muxer'
-          ? 'Could not load the ' + spec.ext.toUpperCase() + ' muxer. Offline?'
+          ? 'Could not load the ' + spec.ext.toUpperCase() + ' muxer \u2014 ' +
+            spec.url + ' is missing from this deploy.'
           : m === 'codec'
           ? 'No ' + spec.ext.toUpperCase() + ' encoder here accepts ' + W + 'x' + H + '.'
           : m === 'stall'
@@ -1099,6 +1175,21 @@ function copyLink() {
  * canvas the browser will not read back — and none of them announced itself
  * until a five-second export produced nothing. Now the answer is on screen
  * before anything is clicked, and it names which one. */
+/* WHICH BUILD AM I LOOKING AT.
+ *
+ * GitHub Pages caches, browsers cache, and a page that is one deploy behind
+ * fails in exactly the way the bug that was just fixed failed. There is no way
+ * to tell those apart by looking at the screen, which turned one fixed bug
+ * into a second round of "it still doesn't work". This line answers it: read
+ * the stamp, compare it to the last deploy, and the question is closed before
+ * anybody reads any code. `sync.py` writes it; unstamped means running from
+ * source. */
+var BUILD = "2026-09-07 181bb31";
+function showBuild() {
+  var b = /^__/.test(BUILD) ? "dev (unstamped, running from source)" : BUILD;
+  $("build").textContent = "build " + b;
+}
+
 function reportCapabilities() {
   if (location.protocol === "file:") {
     log("Opened <b>from a file</b>, so no export can work — the browser will "
@@ -1128,6 +1219,7 @@ function reportCapabilities() {
 }
 
 function wireExports() {
+  showBuild();
   $("expMp4").addEventListener("click", exportMp4);
   $("expWebm").addEventListener("click", exportWebm);
   $("expFrames").addEventListener("click", exportFrames);

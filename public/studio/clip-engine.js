@@ -557,7 +557,7 @@
       sweepUp:   [10, 10],       // off. Kept so nothing downstream needs a guard.
       readout:   [0.10, 0.90],
       lock:      [0.86, 1.02],
-      flash:     [0.96, 1.08],   // the hard beat: colour pop + slice tear
+      flash:     [0.96, 1.08],   // the reveal beat: one short colour pop
       cut:        1.00
     };
     if (spec.format === "tier") {
@@ -633,6 +633,32 @@
   /* ================================================================== *
    *  Image loading
    * ================================================================== */
+  /* `load` IS NOT ENOUGH. IT HAS TO BE DECODED, AND THAT COST AN EXPORT.
+   *
+   * `onload` fires when the BYTES have arrived. Turning those bytes into a
+   * bitmap is a separate step, and whether `drawImage` waits for it is a
+   * per-browser decision:
+   *
+   *   Chromium  decodes synchronously inside drawImage. Nothing to do.
+   *   Firefox   kicks off an ASYNC decode and draws NOTHING in the meantime.
+   *
+   * The preview never showed this, because it renders one frame per animation
+   * frame and the decode lands between two of them. The EXPORT is a tight
+   * promise chain — ninety frames with no macrotask turn anywhere in it — so
+   * the decoder is starved from frame 0 to frame 89 and every single frame is
+   * drawn without the photograph. An MP4 of the right length, the right size
+   * and the right everything else, with an empty placeholder box where the
+   * product should be. Only in Firefox, only on export, never in the preview:
+   * three good reasons it survived this long.
+   *
+   * `decode()` is the promise that says the bitmap is ready. Await it and the
+   * starvation cannot happen, whatever the loop does afterwards. A rejection
+   * is not fatal — resolve with the image and let drawImage do its best. */
+  function decoded(img, resolve) {
+    if (!img.decode) { resolve(img); return; }
+    img.decode().then(function () { resolve(img); }, function () { resolve(img); });
+  }
+
   function loadImage(src) {
     return new Promise(function (resolve) {
       if (!src) { resolve(null); return; }
@@ -641,13 +667,13 @@
       // packshot; a failure here resolves null and the clip draws its
       // placeholder rather than dying.
       img.crossOrigin = "anonymous";
-      img.onload = function () { resolve(img); };
+      img.onload = function () { decoded(img, resolve); };
       img.onerror = function () {
         // Retry once WITHOUT the CORS attribute: a server that sends no
         // Access-Control-Allow-Origin refuses the request outright, and a
         // tainted canvas is still better than no photograph in a preview.
         var plain = new Image();
-        plain.onload = function () { resolve(plain); };
+        plain.onload = function () { decoded(plain, resolve); };
         plain.onerror = function () { resolve(null); };
         plain.src = src;
       };
@@ -926,8 +952,8 @@
     var hud = { x: box.x + inset, y: box.y + inset, w: box.w - inset * 2, h: box.h - inset * 2 };
 
     var lockP = span(t, T.lock[0], T.lock[1]);
-    // Out fast, and finished before the tear: a HUD still dissolving over the
-    // reveal is the app appearing not to have finished thinking.
+    // Out fast, and finished before the reveal: a HUD still dissolving over
+    // the verdict is the app appearing not to have finished thinking.
     // Finished before the card starts travelling, not during it. A lattice
     // being compressed as the photograph shrinks under it is a second thing
     // happening in the same frames as the biggest gesture in the film.
@@ -1175,70 +1201,51 @@
    *  Presentation
    *
    *  Every frame is drawn to an offscreen at design size and then blitted.
-   *  That is what buys the reveal beat: a two-frame white pop, a horizontal
-   *  slice displacement, and a chromatic split, all applied to a finished
-   *  frame rather than smeared through the drawing code.
    *
-   *  THE BEAT IS THE WHOLE POINT. The old clip went from scanning to verdict
-   *  on a crossfade, which is a transition. A hard flash and a 4-frame
-   *  shudder is a cut, and a cut is what stops a thumb.
-   * ================================================================== */
+   *  THERE IS NO GLITCH ON THE REVEAL, AND THAT WAS ASKED FOR DIRECTLY.
+   *  Earlier cuts tore the frame into displaced horizontal slices over the
+   *  flash beat, on the reasoning that a hard cut stops a thumb where a
+   *  crossfade does not. It does stop a thumb, but it stops it on "this app
+   *  is broken": the product being scanned is the thing on screen, and
+   *  shredding it for four frames reads as a rendering fault rather than as
+   *  an edit. A scanner has to look like it works.
+   *
+   *  The beat is carried by the motion instead — the photograph's 0.54s
+   *  travel and the word landing on it — with one short flash to punctuate
+   *  the moment the verdict arrives. Everything else is a clean blit. */
   function present(dst, off, g, t) {
     var T = g.T, W = g.W, H = g.H;
     var ctx = dst;
     var fp = span(t, T.flash[0], T.flash[1]);
-    var glitching = fp > 0 && fp < 1 && g.spec.intensity > 0;
+    var flashing = fp > 0 && fp < 1 && g.spec.intensity > 0;
 
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, g.pxW, g.pxH);
     ctx.scale(g.k, g.k);
 
-    if (!glitching) {
-      ctx.drawImage(off, 0, 0, W, H);
-      ctx.restore();
-      return;
-    }
-
-    /* THE CLEAN FRAME FIRST, ALWAYS.
-     *
-     * The first cut drew two half-transparent offset copies UNDER the frame to
-     * fake a chromatic split. Over a bone background two 55%-alpha copies of a
-     * near-white frame is just fog: the reveal beat came out as four frames of
-     * flat grey, which is worse than no glitch at all. The displacement below
-     * moves slices of the finished frame instead, which is a cut rather than a
-     * veil. */
+    // The frame, whole and unmodified. Nothing is ever displaced, torn,
+    // offset or split; the only thing `present` adds is the flash below.
     ctx.drawImage(off, 0, 0, W, H);
 
-    // Slice displacement. Seeded off the FRAME INDEX, not Math.random: a
-    // glitch that re-rolls every time the clip is rendered makes two exports
-    // of the same spec different files, and the capture script's
-    // restart-and-resume would splice two different glitches together.
-    var frame = Math.round(t * 1000);
-    var rand = mulberry32(g.spec.seed ^ (frame * 2654435761));
-    var slices = 9;
-    for (var i = 0; i < slices; i++) {
-      if (rand() > 0.72 - fp * 0.45) continue;
-      var sy = rand() * H;
-      var sh = H * (0.010 + rand() * 0.045);
-      var dx = (rand() - 0.5) * W * 0.09 * (1 - fp);
-      // The slice is redrawn over itself displaced, so the band tears sideways
-      // and the frame under it stays intact. Black behind the gap it leaves is
-      // the tell that it is a tear and not a blur.
-      ctx.fillStyle = rgba(C.night, 0.85 * (1 - fp));
-      ctx.fillRect(0, sy, W, sh);
-      ctx.drawImage(off, 0, sy, W, sh, dx, sy, W, sh);
-    }
+    if (!flashing) { ctx.restore(); return; }
 
-    // The pop. Short and bright: two frames at 30fps, in the band colour
-    // rather than white, so the flash itself announces the answer.
+    /* THE FLASH, AND WHY IT IS THE ONLY EFFECT LEFT.
+     *
+     * A single brightening over ~4 frames, in the band colour, on the frame
+     * the verdict arrives. It punctuates without deforming: the pack, the
+     * score and the wordmark all stay exactly where they are and stay
+     * readable the whole way through, which is the difference between an edit
+     * and a fault.
+     *
+     * The alpha is deliberately low. On the DARK stage the earliest drafts
+     * used, a strong pop read as a camera flash; on Brand.bg, which is nearly
+     * white already, the same alpha is a wash over a pale frame and reads as
+     * a colour error. Kept in the band colour rather than white so the flash
+     * itself carries the answer. */
     var pop = clamp01(1 - Math.abs(fp - 0.15) / 0.30);
     if (pop > 0) {
-      // Half what it was. On the DARK stage the earlier drafts used, a strong
-      // pop was a flash; on Brand.bg it is a pink wash over an already-pale
-      // frame, and two frames of that reads as a colour fault rather than a
-      // cut. The slice tear carries the beat now.
-      ctx.globalAlpha = pop * pop * 0.42;
+      ctx.globalAlpha = pop * pop * 0.34 * g.spec.intensity;
       ctx.fillStyle = mix("#FFFFFF", g.band, 0.30);
       ctx.fillRect(0, 0, W, H);
       ctx.globalAlpha = 1;
@@ -2182,8 +2189,8 @@
     canvas.width = Math.round(W * k);
     canvas.height = Math.round(H * k);
 
-    // The offscreen the frame is composed on, so `present` can shove slices of
-    // a FINISHED frame around without reading the canvas it is writing to.
+    // The offscreen the frame is composed on, so `present` blits a FINISHED
+    // frame rather than reading back the canvas it is writing to.
     var off = document.createElement("canvas");
     off.width = canvas.width; off.height = canvas.height;
     var octx = off.getContext("2d");
