@@ -1,6 +1,10 @@
 /**
  * REAL PRODUCTS, AND EVERY FIGURE IS THE APP'S OWN OUTPUT.
  *
+ * Regenerated 7 Sep 2026 after `ScoringEngine.labelCeiling` was added: the
+ * olive oil used to read 100 and now reads 92, because an ingredient list is
+ * not evidence that a food could not have been better. Nothing else moved.
+ *
  * Captured with `-productAudit <barcodes> GB` (ProductAudit.swift in the app
  * project), which does a LIVE Open Food Facts lookup and runs the shipping
  * scoring engine over the result. Names, brands, scores, the summary sentence,
@@ -47,7 +51,7 @@ export const PRODUCTS: Product[] = [
     name: 'Extra Virgin Olive Oil',
     brand: 'Tesco',
     category: 'Product',
-    score: 100,
+    score: 92,
     band: 'excellent',
     summary: 'An excellent choice. It features quality ingredients like extra virgin olive oil and a short 1-ingredient label with nothing concerning on the label.',
     img: '5031021679253.jpg',
