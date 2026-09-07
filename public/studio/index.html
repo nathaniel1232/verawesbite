@@ -7,7 +7,7 @@
 <title>Optimally Clip Studio</title>
 
 <link rel="stylesheet" href="satoshi.css">
-<script src="clip-engine.js?v=2026-09-07.181bb31"></script>
+<script src="clip-engine.js?v=2026-09-07.1387292"></script>
 
 <style>
   /* CONTRAST, BECAUSE THE FIRST VERSION FAILED IT BADLY.
@@ -935,7 +935,21 @@ function exportVideo(kind) {
   loadMuxer(spec)
     .then(function (ok) {
       if (!ok) throw new Error('muxer')
-      return Promise.all([ex.ready, pickCodec(spec.codecs, W, H)])
+      /* NOTHING IN HERE IS ALLOWED TO HANG SILENTLY.
+       *
+       * `ex.ready` waits on fonts and photographs, and browsers are perfectly
+       * willing to leave one of those promises pending forever — a hidden
+       * tab's image decode is the case that actually happened. Sitting on
+       * "Loading the encoder…" with no error is the single worst thing this
+       * page can do, because it looks exactly like the export being broken.
+       * Time it out and say so instead. */
+      var ready = Promise.race([
+        ex.ready,
+        new Promise(function (_, rej) {
+          setTimeout(function () { rej(new Error('ready')) }, 20000)
+        }),
+      ])
+      return Promise.all([ready, pickCodec(spec.codecs, W, H)])
     })
     .then(function (r) {
       var codec = r[1]
@@ -1002,12 +1016,10 @@ function exportVideo(kind) {
           /* A REAL TURN OF THE EVENT LOOP, NOT JUST A MICROTASK.
            *
            * Promise callbacks all run inside one task, so a chain like this
-           * one holds the thread from frame 0 to the end and starves anything
-           * the browser wanted to do asynchronously — which is how ninety
-           * frames came out with no photograph in them (see `decoded` in the
-           * engine). The decode is awaited up front now, so this is belt and
-           * braces, but it also keeps the progress bar honest and the tab
-           * answering while a long clip encodes. */
+           * one would otherwise hold the thread from frame 0 to the end and
+           * starve anything the browser wanted to do asynchronously — an
+           * image decode, most of all. Yielding keeps the progress bar honest
+           * and the tab answering while a long clip encodes. */
           if (i % 10 === 0) return new Promise(function (r) { setTimeout(r, 0) }).then(step)
           return step()
         })
@@ -1027,6 +1039,9 @@ function exportVideo(kind) {
           ? 'No ' + spec.ext.toUpperCase() + ' encoder here accepts ' + W + 'x' + H + '.'
           : m === 'stall'
           ? 'The encoder stopped responding. Reload the page and try again.'
+          : m === 'ready'
+          ? 'The fonts or the photograph never finished loading. If this tab '
+            + 'was in the background, bring it to the front and try again.'
           : (spec.ext.toUpperCase() + ' export failed: ' + m)
       log(why + ' Try the other format, or PNG frames.', true)
       busy(false); progress(null)
@@ -1184,7 +1199,7 @@ function copyLink() {
  * the stamp, compare it to the last deploy, and the question is closed before
  * anybody reads any code. `sync.py` writes it; unstamped means running from
  * source. */
-var BUILD = "2026-09-07.181bb31";
+var BUILD = "2026-09-07.1387292";
 function showBuild() {
   var b = /^__/.test(BUILD) ? "dev (unstamped, running from source)" : BUILD;
   $("build").textContent = "build " + b;

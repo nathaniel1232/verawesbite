@@ -633,30 +633,32 @@
   /* ================================================================== *
    *  Image loading
    * ================================================================== */
-  /* `load` IS NOT ENOUGH. IT HAS TO BE DECODED, AND THAT COST AN EXPORT.
+  /* `load` MEANS THE BYTES ARRIVED, NOT THAT THERE IS A BITMAP.
    *
-   * `onload` fires when the BYTES have arrived. Turning those bytes into a
-   * bitmap is a separate step, and whether `drawImage` waits for it is a
-   * per-browser decision:
+   * Decoding is a separate step, and whether `drawImage` waits for it is a
+   * per-browser decision: Chromium decodes synchronously inside drawImage,
+   * Firefox can decode asynchronously and draw nothing in the meantime. The
+   * export is a promise chain with no macrotask turn in it, so in principle an
+   * async decoder can be starved for a whole encode. `decode()` is the promise
+   * that says the bitmap is ready, so it is awaited before the clip reports
+   * itself ready.
    *
-   *   Chromium  decodes synchronously inside drawImage. Nothing to do.
-   *   Firefox   kicks off an ASYNC decode and draws NOTHING in the meantime.
-   *
-   * The preview never showed this, because it renders one frame per animation
-   * frame and the decode lands between two of them. The EXPORT is a tight
-   * promise chain — ninety frames with no macrotask turn anywhere in it — so
-   * the decoder is starved from frame 0 to frame 89 and every single frame is
-   * drawn without the photograph. An MP4 of the right length, the right size
-   * and the right everything else, with an empty placeholder box where the
-   * product should be. Only in Firefox, only on export, never in the preview:
-   * three good reasons it survived this long.
-   *
-   * `decode()` is the promise that says the bitmap is ready. Await it and the
-   * starvation cannot happen, whatever the loop does afterwards. A rejection
-   * is not fatal — resolve with the image and let drawImage do its best. */
+   * IT IS RACED AGAINST A TIMEOUT, AND THAT PART IS NOT OPTIONAL.
+   * `img.decode()` NEVER SETTLES on a backgrounded tab in Chromium — measured,
+   * not assumed: `onload` fires, `complete` is true, `naturalWidth` is right,
+   * and the promise simply never resolves or rejects. Awaiting it flatly is
+   * how an export in a hidden tab hangs on "Loading the encoder…" forever,
+   * which is a worse bug than the one this guards against. So: take the decode
+   * if it comes promptly, and otherwise carry on with an image that has loaded
+   * and let drawImage deal with it, exactly as before this existed. */
+  var DECODE_MS = 1500;
+
   function decoded(img, resolve) {
     if (!img.decode) { resolve(img); return; }
-    img.decode().then(function () { resolve(img); }, function () { resolve(img); });
+    var done = false;
+    function finish() { if (!done) { done = true; resolve(img); } }
+    img.decode().then(finish, finish);
+    setTimeout(finish, DECODE_MS);
   }
 
   function loadImage(src) {
