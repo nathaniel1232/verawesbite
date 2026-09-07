@@ -20,9 +20,10 @@ export function SiteHeader() {
           Optimally
         </Link>
         <nav className="navlinks">
-          <Link href="/#how">How it works</Link>
-          <Link href="/#why">Why Optimally</Link>
-          <Link href="/#pricing">Pricing</Link>
+          {/* The #how and #why sections were removed with the pricing one;
+              a nav link to an anchor that no longer exists just does nothing
+              when clicked. */}
+          <Link href="/#method">How it works</Link>
           <Link href="/support/">Support</Link>
           {/* Straight to the store, not to an anchor that scrolls to a
               button that goes to the store. The header CTA is the most-clicked
@@ -58,7 +59,7 @@ export function SiteFooter() {
         </div>
         <div className="disclaimer">
           Optimally&rsquo;s scores are an information tool, not medical advice. Always
-          check the physical packaging for allergen information — only the label
+          check the physical packaging for allergen information. Only the label
           in your hand is authoritative.
         </div>
       </div>

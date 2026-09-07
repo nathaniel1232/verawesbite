@@ -14,7 +14,7 @@ export default function Terms() {
       <div className="tldr">
         Short version: Optimally tells you what&rsquo;s in your food based on public
         ingredient data. It&rsquo;s an information tool, not medical advice, and
-        the data isn&rsquo;t perfect — always check the physical label,
+        the data isn&rsquo;t perfect. Always check the physical label,
         especially for allergies. Optimally is a paid subscription billed by Apple,
         and you cancel it in iOS Settings.
       </div>
@@ -45,7 +45,7 @@ export default function Terms() {
       <p>
         You acknowledge that Apple is not a party to these terms, has no
         obligation to provide support for Optimally, and that any claim about the app
-        itself is between you and us — not you and Apple. Apple is, however, a
+        itself is between you and us, not you and Apple. Apple is, however, a
         third-party beneficiary of these terms and may enforce them against you.
       </p>
 
@@ -59,7 +59,7 @@ export default function Terms() {
         bulk-extract or resell the scores and ratings it produces.
       </p>
 
-      <h2>4. What Optimally is — and what it is not</h2>
+      <h2>4. What Optimally is, and what it is not</h2>
       <p>
         Optimally reads publicly available ingredient data and applies a fixed set of
         published rules to produce a score. That&rsquo;s it. Specifically:
@@ -100,7 +100,7 @@ export default function Terms() {
       <p>
         We don&rsquo;t control that data and we don&rsquo;t guarantee it is
         accurate, complete or current. If a product&rsquo;s entry is wrong, the
-        score built on it will be wrong too. Please tell us — see{' '}
+        score built on it will be wrong too. Please tell us. See{' '}
         <Link href="/support/">Support</Link>.
       </p>
 
@@ -114,7 +114,7 @@ export default function Terms() {
         <li>
           Prices are shown in the app in your local currency before you buy, and{' '}
           <strong>all payments are processed by Apple</strong> through your Apple
-          ID — we never see or handle your card details.
+          ID. We never see or handle your card details.
         </li>
         <li>
           Subscriptions <strong>renew automatically</strong> at the end of each
@@ -123,7 +123,7 @@ export default function Terms() {
           renewal.
         </li>
         <li>
-          <strong>Free trials are offered where you are eligible</strong> —
+          <strong>Free trials are offered where you are eligible.</strong>
           eligibility is determined by Apple, and someone who has already used an
           introductory offer in this subscription group will not be offered
           another. Where a trial is offered, its exact length and the price after
@@ -140,7 +140,7 @@ export default function Terms() {
           <Link href="/support/#cancel">Support page</Link>.
         </li>
         <li>
-          <strong>Refunds are handled by Apple</strong>, not by us — we have no
+          <strong>Refunds are handled by Apple</strong>, not by us. We have no
           ability to issue one. Request one at{' '}
           <a href="https://reportaproblem.apple.com">reportaproblem.apple.com</a>
           .
@@ -175,14 +175,14 @@ export default function Terms() {
         explanatory text are ours and are protected by copyright and trade mark
         law. Data sourced from Open Food Facts remains under the ODbL and is
         attributed as such. You&rsquo;re welcome to share individual scores and
-        score cards — that&rsquo;s what they&rsquo;re for.
+        score cards. That&rsquo;s what they&rsquo;re for.
       </p>
 
       <h2>10. Availability</h2>
       <p>
         We aim to keep Optimally working, but we don&rsquo;t promise uninterrupted
-        service. Features that depend on external services — product lookups,
-        alternatives, recall checks — can fail when those services are down, and
+        service. Features that depend on external services (product lookups,
+        alternatives, recall checks) can fail when those services are down, and
         the app is designed to degrade gracefully when they do. We may change,
         suspend or discontinue features, and if we discontinue a paid feature
         entirely we&rsquo;ll act reasonably about any subscription affected.
@@ -200,7 +200,7 @@ export default function Terms() {
         <strong>
           Nothing in these terms limits liability that cannot lawfully be limited
         </strong>{' '}
-        — including liability for death or personal injury caused by negligence,
+        including liability for death or personal injury caused by negligence,
         for fraud, or for any right you have as a consumer under Norwegian or EEA
         law. Where our liability can be limited, it is limited to the amount you
         paid us in the twelve months before the claim arose.
@@ -210,7 +210,7 @@ export default function Terms() {
       <p>
         You can stop using Optimally and delete the app at any time. We may suspend or
         end your access if you materially breach these terms. Ending the
-        agreement doesn&rsquo;t automatically refund a subscription — that goes
+        agreement doesn&rsquo;t automatically refund a subscription. That goes
         through Apple.
       </p>
 
@@ -254,7 +254,7 @@ export default function Terms() {
 
       <div className="note">
         Optimally&rsquo;s scores are an information tool, not medical advice. Always
-        check the physical packaging for allergen information — only the label in
+        check the physical packaging for allergen information. Only the label in
         your hand is authoritative.
       </div>
     </Prose>

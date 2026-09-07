@@ -48,8 +48,8 @@ export default function Privacy() {
       <p>
         When you scan a barcode or search for a product name, that barcode or
         search term is sent to{' '}
-        <a href="https://world.openfoodfacts.org">Open Food Facts</a> — and, for
-        personal-care items, Open Beauty Facts — to retrieve the product&rsquo;s
+        <a href="https://world.openfoodfacts.org">Open Food Facts</a> (and, for
+        personal-care items, Open Beauty Facts) to retrieve the product&rsquo;s
         details. These are free, open, community-built databases. The request
         contains the barcode or search term only; it carries no identifier for
         you or your device. See the{' '}
@@ -124,7 +124,7 @@ export default function Privacy() {
               <td>
                 <strong>PostHog</strong> (EU region)
               </td>
-              <td>Anonymous usage events — see below</td>
+              <td>Anonymous usage events (see below)</td>
               <td>Product analytics</td>
             </tr>
           </tbody>
@@ -182,7 +182,7 @@ export default function Privacy() {
         Saving a share card to your Photos happens only when you tap to save it.
       </p>
 
-      <h2>Analytics — specifically</h2>
+      <h2>Analytics, in detail</h2>
       <p>
         Optimally sends a small number of anonymous usage events to{' '}
         <a href="https://posthog.com">PostHog</a>, hosted in the{' '}
@@ -223,7 +223,7 @@ export default function Privacy() {
       <h2>Subscriptions</h2>
       <p>
         Optimally is sold as a subscription through Apple&rsquo;s App Store. Apple
-        processes your payment and manages your subscription —{' '}
+        processes your payment and manages your subscription.{' '}
         <strong>we never see your card or payment details</strong>. We use
         RevenueCat to tell the app whether your subscription is active;
         RevenueCat identifies your purchase with an anonymous ID, not with your
@@ -249,7 +249,7 @@ export default function Privacy() {
       <h2>Your rights</h2>
       <p>
         Because Optimally has no accounts, we hold no file on you that could be looked
-        up, exported or corrected — there is no name or email to search by.
+        up, exported or corrected. There is no name or email to search by.
         Everything personal to you lives on your device, and{' '}
         <strong>Settings &rarr; Reset everything</strong> erases it immediately
         and permanently.

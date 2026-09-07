@@ -23,7 +23,7 @@ const TOPICS = [
   },
   {
     h: 'Press, partnerships and creators',
-    p: 'Same address. Note that no brand can pay for a better score, or for placement — that isn’t a negotiating position, it’s the product.',
+    p: 'Same address. Note that no brand can pay for a better score, or for placement. That isn’t a negotiating position, it’s the product.',
   },
 ]
 
@@ -32,7 +32,7 @@ export default function Contact() {
     <Prose title="Contact">
       <p>
         Optimally is made by one person. There&rsquo;s no ticket queue and no support
-        bot — your email goes straight to me.
+        bot. Your email goes straight to me.
       </p>
 
       <div className="bigcontact">
@@ -45,7 +45,7 @@ export default function Contact() {
 
       <h2>Who you&rsquo;re writing to</h2>
       <p>
-        <strong>Nathaniel Fiskå</strong> — sole trader, based in Norway. I build
+        <strong>Nathaniel Fiskå</strong>, sole trader, based in Norway. I build
         Optimally, write the scoring rules, and answer the email.
       </p>
 
@@ -60,7 +60,7 @@ export default function Contact() {
         <div className="row">
           <h3>Billing, refunds or restoring a purchase</h3>
           <p>
-            Check <Link href="/support/">Support</Link> first — most of these are
+            Check <Link href="/support/">Support</Link> first. Most of these are
             handled by Apple rather than by me, and it&rsquo;s faster. If
             it&rsquo;s still stuck, write.
           </p>
@@ -70,7 +70,7 @@ export default function Contact() {
           <p>
             Deletion or questions about data. See the{' '}
             <Link href="/privacy/">Privacy Policy</Link> for what&rsquo;s
-            actually held — it&rsquo;s very little, and there are no accounts.
+            actually held. It&rsquo;s very little, and there are no accounts.
           </p>
         </div>
       </div>
@@ -89,13 +89,13 @@ export default function Contact() {
         </li>
         <li>
           <strong>Confirming a product is safe for an allergy.</strong> Never
-          rely on Optimally or on me for that — read the physical packaging.
+          rely on Optimally or on me for that. Read the physical packaging.
         </li>
       </ul>
 
       <div className="note">
         Optimally&rsquo;s scores are an information tool, not medical advice. Always
-        check the physical packaging for allergen information — only the label in
+        check the physical packaging for allergen information. Only the label in
         your hand is authoritative.
       </div>
     </Prose>

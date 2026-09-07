@@ -7,20 +7,22 @@ import { StoreLinkLocaliser } from '@/components/store-link'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  /* NO EM DASHES, INCLUDING HERE. These are user-visible: the title shows in
+     the browser tab and the og: pair is what every link preview renders. The
+     house rule applies to them like any other copy. */
   title: {
-    default: "Optimally — Know what's really in your food",
-    template: '%s — Optimally',
+    default: "Optimally: know what's really in your food",
+    template: '%s · Optimally',
   },
   description:
-    'Optimally scans any barcode and returns a 0–100 ingredient score. Deterministic, cited, private. A paid subscription app with no ads and no brand money.',
+    'Scan a barcode and get a score out of 100, built from the ingredient list. The same ingredient gets the same rating every time, and every rule links the study behind it.',
   icons: {
     icon: asset('/veramark.png'),
     apple: asset('/appicon.png'),
   },
   openGraph: {
-    title: "Optimally — Know what's really in your food",
-    description:
-      'An honest, cited food scanner. Same ingredient, same rating — every time.',
+    title: "Optimally: know what's really in your food",
+    description: 'Same ingredient, same rating, every time.',
     images: [asset('/appicon.png')],
     type: 'website',
   },

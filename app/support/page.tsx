@@ -13,7 +13,7 @@ export default function Support() {
     <Prose title="Support">
       <p>
         A real person reads every message. If something in the app is wrong,
-        telling us is genuinely useful — a lot of Optimally&rsquo;s accuracy comes
+        telling us is genuinely useful. A lot of Optimally&rsquo;s accuracy comes
         from people reporting bad data.
       </p>
 
@@ -32,7 +32,7 @@ export default function Support() {
 
       <h3 id="cancel">How do I cancel?</h3>
       <p>
-        Optimally is billed by Apple, so it is cancelled in iOS Settings — not inside
+        Optimally is billed by Apple, so it is cancelled in iOS Settings, not inside
         the app:
       </p>
       <ol>
@@ -49,7 +49,7 @@ export default function Support() {
       </ol>
       <p>
         You keep access until the end of the period you already paid for. If you
-        cancel during a free trial, you are not charged — but do it at least 24
+        cancel during a free trial, you are not charged, but do it at least 24
         hours before the trial ends, because Apple bills at the moment the trial
         expires.
       </p>
@@ -60,7 +60,7 @@ export default function Support() {
         you&rsquo;ll be asked to subscribe before you can scan. We&rsquo;d rather
         say that plainly here than have you find out after downloading. If a free
         trial is offered to you, its length and the price afterwards are shown
-        before anything is charged — and cancelling during it costs you nothing.
+        before anything is charged, and cancelling during it costs you nothing.
       </p>
       <p>
         The reason is boring but real: subscribers are the only people Optimally
@@ -81,7 +81,7 @@ export default function Support() {
       <h3>I want a refund</h3>
       <p>
         All Optimally purchases are processed by Apple, so refunds go through Apple
-        rather than us — we have no ability to issue one. Request it at{' '}
+        rather than us. We have no ability to issue one. Request it at{' '}
         <a href="https://reportaproblem.apple.com">reportaproblem.apple.com</a>{' '}
         with the Apple ID you purchased with. If the reason is that Optimally did
         something wrong, email us too, so we can fix it.
@@ -103,7 +103,7 @@ export default function Support() {
         <a href="https://world.openfoodfacts.org">Open Food Facts</a>, an open
         database built by volunteers. It is very large but not complete, and
         coverage varies by country. If your product isn&rsquo;t there, the
-        verdict screen has a link to add it — that takes a couple of minutes and
+        verdict screen has a link to add it. That takes a couple of minutes and
         means the next person who scans it gets a real score. You can also try
         the app&rsquo;s manual product search.
       </p>
@@ -116,7 +116,7 @@ export default function Support() {
       <ul>
         <li>
           <strong>The ingredients are wrong or missing.</strong> That&rsquo;s the
-          underlying database, and it&rsquo;s fixable — the verdict screen has a
+          underlying database, and it&rsquo;s fixable. The verdict screen has a
           &ldquo;report a data issue&rdquo; link that emails us with the barcode
           attached.
         </li>
@@ -143,7 +143,7 @@ export default function Support() {
       <p>
         Because most scanners score differently on purpose. Optimally weights
         industrial seed oils, additives and degree of processing heavily, and it
-        applies fixed rules rather than asking an AI — so Optimally gives the same
+        applies fixed rules rather than asking an AI, so Optimally gives the same
         product the same score every time, and shows you every ingredient that
         moved it. Whether you agree with those weightings is a fair question, and
         the research behind each one is in the app.
@@ -161,7 +161,7 @@ export default function Support() {
 
       <h3>What do you collect?</h3>
       <p>
-        Very little, and never your name or email — there are no accounts. The
+        Very little, and never your name or email. There are no accounts. The
         full detail, service by service, is in the{' '}
         <Link href="/privacy/">Privacy Policy</Link>.
       </p>
@@ -169,7 +169,7 @@ export default function Support() {
       <h2>Everything else</h2>
       <p>
         Feature requests, bug reports, press, partnerships, or you just think we
-        got something wrong —{' '}
+        got something wrong.{' '}
         <a href={`mailto:${CONTACT_EMAIL}`}>email us</a>.
       </p>
 
@@ -177,7 +177,7 @@ export default function Support() {
         Optimally&rsquo;s scores are an information tool, not medical advice. If you
         have a medical condition, an allergy, or you&rsquo;re making a
         significant change to your diet, talk to a qualified professional. Always
-        check the physical packaging for allergen information — database records
+        check the physical packaging for allergen information. Database records
         can be out of date, and only the label in your hand is authoritative.
       </div>
     </Prose>

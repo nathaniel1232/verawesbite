@@ -110,7 +110,7 @@ const SHOTS = [
     src: '/shots/progress.jpg',
     alt: 'Optimally Today screen: a weighted score of 36 for four things logged, calories and macros, and what share of the day was industrially formulated',
     title: 'See the pattern',
-    body: 'Everything you logged today, weighted by how much of each you ate — with the share that was industrially formulated, and which items brought seed oils.',
+    body: 'Everything you logged today, weighted by how much of each you ate, with the share that was industrially formulated and which items brought seed oils.',
   },
 ]
 
@@ -127,10 +127,9 @@ export default function Home() {
               <span className="eyebrow">Seed-oil &amp; ultra-processed scanner</span>
               <h1>Know what&rsquo;s really in your food.</h1>
               <p className="lede muted">
-                Scan any barcode for a 0–100 score built from the ingredient
-                list. Every rating is deterministic and cited — the same
-                ingredient gets the same verdict, every time. No AI guesswork,
-                no brand money.
+                Scan a barcode and get a score out of 100, built from the
+                ingredient list. The same ingredient gets the same rating
+                every time, and every rule links the study behind it.
               </p>
               <div className="cta-row" id="get">
                 <AppStoreButton />
@@ -149,190 +148,16 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ---------------- why ---------------- */}
-        <section className="band wrap" id="why">
-          <div className="section-head">
-            <span className="eyebrow">Why Optimally</span>
-            <h2>Other scanners guess. Optimally shows its work.</h2>
-            <p>
-              Most food scanners send your product to an AI that will happily
-              give you a different answer if you ask twice. Optimally runs a fixed
-              set of published rules — so the score means something, and you can
-              audit it.
-            </p>
-          </div>
-          <div className="pillars">
-            <div className="pcard">
-              <div className="ic">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.1"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M9 12l2 2 4-4" />
-                  <circle cx="12" cy="12" r="9" />
-                </svg>
-              </div>
-              <h3>Deterministic</h3>
-              <p>
-                Same ingredient, same rating — every time, on every phone. Fixed
-                rules, not a model that contradicts itself between scans.
-              </p>
-            </div>
-            <div className="pcard">
-              <div className="ic">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.1"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M4 5h11M4 10h11M4 15h7" />
-                  <path d="M17.5 13.5l2 2 3-3.5" />
-                </svg>
-              </div>
-              <h3>Cited</h3>
-              <p>
-                Every flag traces to a published paper you can open and read.
-                Where the evidence is thin, the app says so instead of
-                pretending.
-              </p>
-            </div>
-            <div className="pcard">
-              <div className="ic">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.1"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z" />
-                </svg>
-              </div>
-              <h3>Private</h3>
-              <p>
-                No account, no email, no ads. Your scans, profile and lists stay
-                on your device — and we never sell your data.
-              </p>
-            </div>
-          </div>
-        </section>
 
-        {/* ---------------- how / shelf ---------------- */}
-        <section className="band alt" id="how">
-          <div className="wrap split">
-            <div className="split-photo">
-              <Image
-                src={asset('/photos/shelf.jpg')}
-                alt="Holding a phone up to a chilled supermarket shelf"
-                width={1000}
-                height={1250}
-              />
-            </div>
-            <div>
-              <span className="eyebrow">How it works</span>
-              <h2>Built for the ten seconds you have in the aisle.</h2>
-              <p>
-                You&rsquo;re standing in front of forty products and the front of
-                every box is marketing. Optimally reads the back instead.
-              </p>
-              <ul className="checks">
-                <li>
-                  <Check />
-                  <span>
-                    <strong>Scan the barcode.</strong> No barcode, or it
-                    won&rsquo;t read? Photograph the ingredients — the text is
-                    processed on your device.
-                  </span>
-                </li>
-                <li>
-                  <Check />
-                  <span>
-                    <strong>Read the verdict.</strong> A score out of 100, the
-                    flags behind it, and every key ingredient rated with a
-                    one-line reason.
-                  </span>
-                </li>
-                <li>
-                  <Check />
-                  <span>
-                    <strong>Find something better.</strong> See cleaner
-                    alternatives in the same category and build a shopping list
-                    from them.
-                  </span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* ---------------- how the number is made ---------------- */}
-        <section className="band wrap" id="method">
-          <div className="section-head">
-            <span className="eyebrow">The method</span>
-            <h2>How the number is made.</h2>
-            <p>
-              Four steps, the same four every time. Nothing here is a model
-              deciding how it feels about your yoghurt.
-            </p>
-          </div>
-
-          <ol className="steps">
-            <li>
-              <h3>Read the label</h3>
-              <p>
-                The barcode goes to Open Food Facts and comes back with the
-                ingredient list and the nutrition panel. No barcode, or it
-                won&rsquo;t read? Photograph the ingredients instead.
-              </p>
-            </li>
-            <li>
-              <h3>Rate every ingredient</h3>
-              <p>
-                Each one is matched against a bundled taxonomy and given a
-                rating. A rating is written <strong>once</strong> and then
-                frozen — so the same ingredient scores the same for you, for
-                everyone else, and next year.
-              </p>
-            </li>
-            <li>
-              <h3>Apply the rules</h3>
-              <p>
-                Industrial seed oils, degree of processing, flagged additives,
-                and what the nutrition panel actually says. Every rule links
-                the paper behind it, and tells you how many of your own scans
-                it has touched.
-              </p>
-            </li>
-            <li>
-              <h3>Land on a number</h3>
-              <p>
-                Out of 100, and the band is fixed:{' '}
-                <b className="excellent">75 and over</b> is very optimal,{' '}
-                <b className="good">50–74</b> good, <b className="poor">25–49</b>{' '}
-                poor, <b className="bad">under 25</b> very bad. No curve, no
-                comparison to other users.
-              </p>
-            </li>
-          </ol>
-        </section>
 
         {/* ---------------- what it says about real products ---------------- */}
         <section className="band wrap">
           <div className="section-head">
-            <span className="eyebrow">Six things off one shelf</span>
-            <h2>The same aisle, six different answers.</h2>
+            <span className="eyebrow">Real scans</span>
+            <h2>Six things from one shelf.</h2>
             <p>
-              Every number below came out of the app&rsquo;s own scoring engine, and
-              the line under each one is the app&rsquo;s own wording — not a summary
-              written for this page.
+              These scores and these sentences came out of the app itself,
+              unedited.
             </p>
           </div>
 
@@ -367,22 +192,64 @@ export default function Home() {
           </ol>
 
           <p className="ledger-note">
-            These are Optimally&rsquo;s own demo products, which is why we can show
-            you their packaging. Scan a real one and the engine does exactly the
-            same thing.
+            The packs are Optimally&rsquo;s own demo products, which is why we can
+            show you their packaging. A real one goes through the same rules.
           </p>
+        </section>
+
+        {/* ---------------- how the number is made ---------------- */}
+        <section className="band wrap" id="method">
+          <div className="section-head">
+            <span className="eyebrow">The method</span>
+            <h2>How the number is made.</h2>
+            <p>Four steps, and the same four every time.</p>
+          </div>
+
+          <ol className="steps">
+            <li>
+              <h3>Read the label</h3>
+              <p>
+                The barcode goes to Open Food Facts and comes back with the
+                ingredient list and the nutrition panel. No barcode, or it
+                won&rsquo;t read? Photograph the ingredients instead.
+              </p>
+            </li>
+            <li>
+              <h3>Rate every ingredient</h3>
+              <p>
+                Each one is matched against a bundled taxonomy and given a
+                rating. A rating is written <strong>once</strong> and then
+                frozen, so the same ingredient scores the same for you, for
+                everyone else, and next year.
+              </p>
+            </li>
+            <li>
+              <h3>Apply the rules</h3>
+              <p>
+                Industrial seed oils, degree of processing, flagged additives,
+                and what the nutrition panel says. Every rule links the study
+                behind it, and counts how many of your own scans it touched.
+              </p>
+            </li>
+            <li>
+              <h3>Land on a number</h3>
+              <p>
+                Out of 100, and the band is fixed:{' '}
+                <b className="excellent">75 and over</b> is very optimal,{' '}
+                <b className="good">50–74</b> good, <b className="poor">25–49</b>{' '}
+                poor, <b className="bad">under 25</b> very bad. No curve, no
+                comparison to other users.
+              </p>
+            </li>
+          </ol>
         </section>
 
         {/* ---------------- screenshots ---------------- */}
         <section className="band wrap">
           <div className="section-head">
             <span className="eyebrow">Inside the app</span>
-            <h2>Four screens, no dashboard theatre.</h2>
-            <p>
-              Real screenshots from the app. The products shown are Optimally&rsquo;s
-              own demo items, so nothing here is a brand we were paid to
-              flatter.
-            </p>
+            <h2>The four screens you will actually use.</h2>
+            <p>Screenshots from the current version.</p>
           </div>
           <div className="shots">
             {SHOTS.map((s) => (
@@ -400,11 +267,10 @@ export default function Home() {
           <div className="wrap">
             <div className="section-head">
               <span className="eyebrow">What it&rsquo;s looking for</span>
-              <h2>Two bars in the same aisle. Not the same food.</h2>
+              <h2>Two protein bars, eighty-two points apart.</h2>
               <p>
-                Both are sold as protein. Optimally doesn&rsquo;t care what the front
-                of the pack calls it — it reads the ingredient list and the
-                degree of processing.
+                Optimally ignores the front of the pack and reads the
+                ingredient list.
               </p>
             </div>
             <div className="compare">
@@ -462,12 +328,12 @@ export default function Home() {
           <div className="split">
             <div>
               <span className="eyebrow">Receipts</span>
-              <h2>Every rule has a paper behind it.</h2>
+              <h2>Every rule has a study behind it.</h2>
               <p>
-                Optimally&rsquo;s Research tab is not a blog. Each article states the
-                claim, links the evidence, and shows the exact rule it drives —
-                read straight out of the scoring engine, so the explanation can
-                never drift from what actually scored your food.
+                Each article states the claim, links the evidence, and prints
+                the exact rule it drives, read straight out of the scoring
+                engine. The explanation cannot drift from what scored your
+                food.
               </p>
               <ul className="checks">
                 <li>
@@ -480,8 +346,8 @@ export default function Home() {
                 <li>
                   <Check />
                   <span>
-                    Honest about weak evidence — animal-only findings are
-                    labelled as such.
+                    Animal-only findings are labelled as such, rather than
+                    quoted as if they were human trials.
                   </span>
                 </li>
                 <li>
@@ -504,85 +370,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ---------------- pricing (honest) ---------------- */}
-        <section className="band alt" id="pricing">
-          <div className="wrap">
-            <div className="section-head">
-              <span className="eyebrow">Pricing</span>
-              <h2>Optimally is a paid app. That&rsquo;s the whole business model.</h2>
-              <p>
-                There is no free tier and no ad-supported version. Subscribers
-                are the only people Optimally answers to — which is exactly why no
-                brand can buy a better score.
-              </p>
-            </div>
-            <div className="pricecard">
-              <h3>Optimally Pro</h3>
-              <div className="sub">
-                A subscription, sold through the App Store. You&rsquo;ll see the
-                exact price in your own currency — and the length of any free
-                trial you&rsquo;re eligible for — inside the app, before
-                anything is charged.
-              </div>
-              <ul>
-                <li>
-                  <Check />
-                  <span>Unlimited barcode, photo and search scans</span>
-                </li>
-                <li>
-                  <Check />
-                  <span>
-                    The full 0–100 score, flags and ingredient-by-ingredient
-                    breakdown
-                  </span>
-                </li>
-                <li>
-                  <Check />
-                  <span>Cleaner alternatives, and a shopping list</span>
-                </li>
-                <li>
-                  <Check />
-                  <span>The cited research behind every rule</span>
-                </li>
-                <li>
-                  <Check />
-                  <span>
-                    A daily log of what you ate, weighted by how much of each
-                  </span>
-                </li>
-              </ul>
-              <div className="finewarn">
-                <strong>The honest version:</strong> after the intro questions,
-                Optimally asks you to subscribe before you can scan anything. If a
-                free trial is offered to you, cancelling before it ends costs
-                you nothing. Subscriptions renew automatically until you cancel,
-                which you do in iOS Settings — not in the app.{' '}
-                <Link href="/support/#cancel">Here&rsquo;s how</Link>.
-              </div>
-            </div>
-          </div>
-        </section>
 
-        {/* ---------------- trust ---------------- */}
-        <section className="band wrap">
-          <div className="trust">
-            <span className="eyebrow" style={{ color: '#9FD3B0' }}>
-              Independent by design
-            </span>
-            <h2>No brand can pay for a better score. Ever.</h2>
-            <p>
-              Optimally earns money one way: people paying for it. No ads, no
-              sponsored placements, no affiliate deals on the swaps, and no data
-              sold to anyone. That is what keeps the scores worth reading.
-            </p>
-            <div className="row">
-              <span className="chip">No ads</span>
-              <span className="chip">No brand money</span>
-              <span className="chip">No data selling</span>
-              <span className="chip">Cited &amp; deterministic</span>
-            </div>
-          </div>
-        </section>
       </main>
 
       <SiteFooter />
