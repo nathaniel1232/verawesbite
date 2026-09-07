@@ -92,25 +92,21 @@ const SHOTS = [
     src: '/shots/scan.jpg',
     alt: 'Optimally home screen: scan button, product search, barcode entry, and recent scans each showing their score',
     title: 'Scan or search',
-    body: 'Point at a barcode, photograph a label, or type a product name. Everything you have scanned keeps its score and stays one tap away.',
   },
   {
     src: '/shots/verdict.jpg',
     alt: 'Optimally verdict screen scoring Sour Cream Potato Chips 19 out of 100, very bad, flagged ultra-processed and contains seed oils',
     title: 'Read the verdict',
-    body: 'A 0–100 score, the flags that drove it, and every key ingredient rated with a reason.',
   },
   {
     src: '/shots/research.jpg',
     alt: 'Optimally research screen listing seed oils, ultra-processing, added sugar and refined grain',
     title: 'Check our work',
-    body: 'Each rule links the paper behind it, and shows how many of your own scans it touched.',
   },
   {
     src: '/shots/progress.jpg',
     alt: 'Optimally Today screen: a weighted score of 36 for four things logged, calories and macros, and what share of the day was industrially formulated',
     title: 'See the pattern',
-    body: 'Everything you logged today, weighted by how much of each you ate, with the share that was industrially formulated and which items brought seed oils.',
   },
 ]
 
@@ -133,9 +129,6 @@ export default function Home() {
               </p>
               <div className="cta-row" id="get">
                 <AppStoreButton />
-                <span className="paidnote">
-                  Paid subscription. Price and trial shown before you pay.
-                </span>
               </div>
             </div>
 
@@ -155,10 +148,7 @@ export default function Home() {
           <div className="section-head">
             <span className="eyebrow">Real scans</span>
             <h2>Six things from one shelf.</h2>
-            <p>
-              These scores and these sentences came out of the app itself,
-              unedited.
-            </p>
+            <p>Straight out of the app, unedited.</p>
           </div>
 
           <ol className="ledger">
@@ -192,8 +182,8 @@ export default function Home() {
           </ol>
 
           <p className="ledger-note">
-            The packs are Optimally&rsquo;s own demo products, which is why we can
-            show you their packaging. A real one goes through the same rules.
+            Optimally&rsquo;s own demo products. A real one goes through the same
+            rules.
           </p>
         </section>
 
@@ -202,7 +192,6 @@ export default function Home() {
           <div className="section-head">
             <span className="eyebrow">The method</span>
             <h2>How the number is made.</h2>
-            <p>Four steps, and the same four every time.</p>
           </div>
 
           <ol className="steps">
@@ -227,8 +216,7 @@ export default function Home() {
               <h3>Apply the rules</h3>
               <p>
                 Industrial seed oils, degree of processing, flagged additives,
-                and what the nutrition panel says. Every rule links the study
-                behind it, and counts how many of your own scans it touched.
+                and what the nutrition panel says.
               </p>
             </li>
             <li>
@@ -249,14 +237,12 @@ export default function Home() {
           <div className="section-head">
             <span className="eyebrow">Inside the app</span>
             <h2>The four screens you will actually use.</h2>
-            <p>Screenshots from the current version.</p>
           </div>
           <div className="shots">
             {SHOTS.map((s) => (
               <div className="shot" key={s.src}>
                 <Phone src={s.src} alt={s.alt} />
                 <h3>{s.title}</h3>
-                <p>{s.body}</p>
               </div>
             ))}
           </div>
@@ -285,15 +271,10 @@ export default function Home() {
                 </div>
                 <div className="cmp-body">
                   <h3>Three ingredients you can name</h3>
-                  <div className="brandline">Illustration</div>
                   <div className="cmp-tags">
                     <span className="tagpill ok">WHOLE-FOOD BASE</span>
                     <span className="tagpill ok">NO SEED OILS</span>
                   </div>
-                  <p>
-                    A short list of recognisable foods, minimally processed.
-                    Optimally has very little to flag, and the score reflects that.
-                  </p>
                 </div>
               </div>
               <div className="cmp">
@@ -307,16 +288,10 @@ export default function Home() {
                 </div>
                 <div className="cmp-body">
                   <h3>A long list, mostly not food</h3>
-                  <div className="brandline">Illustration</div>
                   <div className="cmp-tags">
                     <span className="tagpill no">ULTRA-PROCESSED</span>
                     <span className="tagpill no">REFINED SYRUPS</span>
                   </div>
-                  <p>
-                    Refined syrups, industrial oils and additives that only
-                    exist to survive a warehouse. Optimally names each one and links
-                    the evidence.
-                  </p>
                 </div>
               </div>
             </div>
@@ -331,9 +306,8 @@ export default function Home() {
               <h2>Every rule has a study behind it.</h2>
               <p>
                 Each article states the claim, links the evidence, and prints
-                the exact rule it drives, read straight out of the scoring
-                engine. The explanation cannot drift from what scored your
-                food.
+                the exact rule it drives, read out of the scoring engine
+                itself.
               </p>
               <ul className="checks">
                 <li>

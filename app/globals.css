@@ -218,12 +218,6 @@ img {
   font-weight: 700;
   line-height: 1.15;
 }
-.paidnote {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--sub);
-  max-width: 22ch;
-}
 
 /* ---------- phone frame ---------- */
 .phone {
