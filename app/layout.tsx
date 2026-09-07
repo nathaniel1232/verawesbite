@@ -3,6 +3,7 @@ import { asset } from '@/lib/asset'
 import './globals.css'
 
 import { SITE_URL } from '@/lib/site'
+import { StoreLinkLocaliser } from '@/components/store-link'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -36,7 +37,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <StoreLinkLocaliser />
+      </body>
     </html>
   )
 }

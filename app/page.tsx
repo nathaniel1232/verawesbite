@@ -6,13 +6,13 @@ import { asset } from '@/lib/asset'
 const SHOTS = [
   {
     src: '/shots/scan.jpg',
-    alt: 'Optimally home screen: scan a product, search, and recent scans with scores',
-    title: 'Scan or search',
-    body: 'Point at a barcode, photograph a label, or type a product name. Recent scans keep their scores.',
+    alt: 'Optimally home screen: The Lab feed with a food safety alert, a cited finding and a recent scan, above the scan button and search field',
+    title: 'Open it and there is news',
+    body: 'The Lab carries live safety notices, the research behind a flag, and what your own scans turned up. Scan or search from the same screen.',
   },
   {
     src: '/shots/verdict.jpg',
-    alt: 'Optimally verdict screen showing a score of 22 with ultra-processed and seed oil flags',
+    alt: 'Optimally verdict screen scoring Sour Cream Potato Chips 19 out of 100, very bad, flagged ultra-processed and contains seed oils',
     title: 'Read the verdict',
     body: 'A 0–100 score, the flags that drove it, and every key ingredient rated with a reason.',
   },
@@ -24,9 +24,9 @@ const SHOTS = [
   },
   {
     src: '/shots/progress.jpg',
-    alt: 'Optimally progress screen showing ultra-processed share and a Clean Score trend',
+    alt: 'Optimally Today screen: a weighted score of 36 for four things logged, calories and macros, and what share of the day was industrially formulated',
     title: 'See the pattern',
-    body: 'What share of your scans are ultra-processed, and whether your Clean Score is moving.',
+    body: 'Everything you logged today, weighted by how much of each you ate — with the share that was industrially formulated, and which items brought seed oils.',
   },
 ]
 
@@ -58,7 +58,7 @@ export default function Home() {
 
             <Phone
               src="/shots/verdict.jpg"
-              alt="Optimally scoring a bag of potato chips 22 out of 100, flagged ultra-processed and contains seed oils"
+              alt="Optimally scoring a bag of potato chips 19 out of 100, flagged ultra-processed and contains seed oils"
               tilt
               priority
             />
@@ -363,7 +363,7 @@ export default function Home() {
                 <li>
                   <Check />
                   <span>
-                    Your Clean Score trend and ultra-processed share over time
+                    A daily log of what you ate, weighted by how much of each
                   </span>
                 </li>
               </ul>

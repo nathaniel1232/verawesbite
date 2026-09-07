@@ -13,8 +13,57 @@
  */
 export const APP_STORE_ID = '6794813704'
 
-/** The canonical short link. Apple resolves it to the localised listing. */
-export const APP_STORE_URL = `https://apps.apple.com/app/id${APP_STORE_ID}`
+/**
+ * The listing link, with the app's slug and NO country segment.
+ *
+ * WHY THE SLUG. `apps.apple.com/app/id<id>` and the slug form both 301 to
+ * `/us/…` when Apple cannot work out a storefront from the request — measured,
+ * not assumed. Landing a non-US visitor on a US product URL is what produces
+ * "an error occurred" when the App Store app opens it against their own
+ * account. The slug form is what Apple's own Copy Link produces and is the one
+ * their geo-redirect handles best; `localised()` below improves on it further
+ * when the browser will tell us where it is.
+ *
+ * VERIFIED AVAILABLE in us, no, gb, de, se and dk storefronts, so a wrong
+ * storefront is the only thing that can be erroring.
+ */
+export const APP_STORE_URL =
+  `https://apps.apple.com/app/optimally-food-scanner/id${APP_STORE_ID}`
+
+/**
+ * The same listing in a specific storefront.
+ *
+ * `navigator.language` is often just `"nb"` with no region — measured on the
+ * machine this was written on — so splitting on the hyphen finds nothing and
+ * a naive version of this silently did nothing at all. `Intl.Locale.maximize()`
+ * is the right tool: it applies CLDR's likely-subtags, so `nb` -> `NO`,
+ * `sv` -> `SE`, `de` -> `DE`, `en` -> `US`. An explicit region in
+ * `navigator.languages` still wins over the guess.
+ *
+ * Anything unresolvable returns the country-less URL and Apple decides, which
+ * is exactly where we started — so this can only improve on the default.
+ */
+export function localisedAppStoreUrl(locales: readonly string[]): string {
+  const region = resolveRegion(locales)
+  if (!region) return APP_STORE_URL
+  return `https://apps.apple.com/${region.toLowerCase()}/app/optimally-food-scanner/id${APP_STORE_ID}`
+}
+
+function resolveRegion(locales: readonly string[]): string | null {
+  for (const l of locales) {
+    const explicit = l.split('-')[1]
+    if (explicit && /^[A-Za-z]{2}$/.test(explicit)) return explicit
+  }
+  for (const l of locales) {
+    try {
+      const r = new Intl.Locale(l).maximize().region
+      if (r && /^[A-Za-z]{2}$/.test(r)) return r
+    } catch {
+      // an unparseable tag is not worth a thrown error on a marketing page
+    }
+  }
+  return null
+}
 
 /** Exactly as it reads on the store listing, capital S and all. */
 export const APP_STORE_NAME = 'Optimally: Food Scanner'
