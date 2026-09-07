@@ -772,186 +772,193 @@ function exportClip() {
   return K.create(c, spec(), { scale: 1 });
 }
 
-/* ---- MP4, frame by frame, through WebCodecs -------------------------
+/* ---- Video, frame by frame, through WebCodecs -----------------------
  *
- * NOT MediaRecorder. MediaRecorder captures a canvas in REAL TIME: it drops
- * frames when a render takes longer than 33ms and duplicates them when it is
- * quick, so the exported file's timing depends on how busy the laptop was.
- * The whole engine is built so that frame N is a pure function of N; encoding
- * it frame by frame is the only export that preserves that.
+ * NEITHER FORMAT USES MediaRecorder ANY MORE, and that is the fix rather than
+ * a preference.
+ *
+ * MediaRecorder captures a canvas in REAL TIME off a requestAnimationFrame
+ * loop, which means the browser decides whether the export finishes. Hide the
+ * tab, put the window behind another, let the machine get busy, and rAF stops
+ * firing: the loop never reaches the end, `rec.stop()` is never called and the
+ * page sits on "Recording…" forever. Reproduced exactly that way. When rAF
+ * merely SLOWS instead of stopping, the recorder keeps rolling against the
+ * wall clock while the canvas holds its last frame, so a three second
+ * animation comes out as a six second file with three seconds of freeze in it
+ * — which is what was reported. WebM out of MediaRecorder also carries no
+ * duration in its header, so players disagree about how long it is even when
+ * the capture went perfectly.
+ *
+ * Encoding frame by frame removes all of that. Frame N is a pure function of
+ * N, the loop is driven by a counter rather than by a clock, and the file is
+ * the same every time no matter what else the machine was doing.
  * ------------------------------------------------------------------- */
-var MUXER_URL = "https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.1/build/mp4-muxer.min.js";
-function loadMuxer() {
-  if (window.Mp4Muxer) return Promise.resolve(true);
+var MUXERS = {
+  mp4: {
+    url: 'https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.1/build/mp4-muxer.min.js',
+    global: 'Mp4Muxer',
+    ext: 'mp4',
+    mime: 'video/mp4',
+    // High 5.2 first, then progressively less demanding profiles. Baseline is
+    // last and is the one a browser refusing everything else will still take.
+    codecs: ['avc1.640034', 'avc1.640033', 'avc1.4d0034', 'avc1.42E01E'],
+    make: function (W, H) {
+      return new Mp4Muxer.Muxer({
+        target: new Mp4Muxer.ArrayBufferTarget(),
+        video: { codec: 'avc', width: W, height: H },
+        fastStart: 'in-memory',
+      })
+    },
+  },
+  webm: {
+    url: 'https://cdn.jsdelivr.net/npm/webm-muxer@5.0.3/build/webm-muxer.min.js',
+    global: 'WebMMuxer',
+    ext: 'webm',
+    mime: 'video/webm',
+    codecs: ['vp09.00.10.08', 'vp8'],
+    make: function (W, H) {
+      return new WebMMuxer.Muxer({
+        target: new WebMMuxer.ArrayBufferTarget(),
+        video: { codec: 'V_VP9', width: W, height: H, frameRate: FPS },
+      })
+    },
+  },
+}
+
+function loadScript(url, globalName) {
+  if (window[globalName]) return Promise.resolve(true)
   return new Promise(function (resolve) {
-    var s = document.createElement("script");
-    s.src = MUXER_URL;
-    s.onload = function () { resolve(!!window.Mp4Muxer); };
-    s.onerror = function () { resolve(false); };
-    document.head.appendChild(s);
-  });
+    var el = document.createElement('script')
+    el.src = url
+    el.onload = function () { resolve(!!window[globalName]) }
+    el.onerror = function () { resolve(false) }
+    document.head.appendChild(el)
+  })
 }
 
-function pickCodec(w, h) {
-  // High 5.2 first, then progressively less demanding profiles. A machine
-  // whose hardware encoder refuses 1080x1920 High will usually take Main.
-  var candidates = ["avc1.640034", "avc1.640033", "avc1.4d0034", "avc1.42003e"];
+/** The first codec in `list` this machine will actually encode at W x H. */
+function pickCodec(list, W, H) {
   return (function next(i) {
-    if (i >= candidates.length) return Promise.resolve(null);
+    if (i >= list.length) return Promise.resolve(null)
     return VideoEncoder.isConfigSupported({
-      codec: candidates[i], width: w, height: h, bitrate: 14000000, framerate: FPS
-    }).then(function (r) {
-      return r.supported ? candidates[i] : next(i + 1);
-    }).catch(function () { return next(i + 1); });
-  })(0);
+      codec: list[i], width: W, height: H, bitrate: 14000000, framerate: FPS,
+    })
+      .then(function (r) { return r.supported ? list[i] : next(i + 1) })
+      .catch(function () { return next(i + 1) })
+  })(0)
 }
 
-function exportMp4() {
-  if (typeof VideoEncoder === "undefined") {
-    log("This browser has no WebCodecs. Use <b>Export WebM</b>, or PNG frames and the Mac encoder.", true);
-    return;
+function exportVideo(kind) {
+  var spec = MUXERS[kind]
+  if (typeof VideoEncoder === 'undefined') {
+    log(
+      'This browser has no WebCodecs, so it cannot encode video here. ' +
+        'Chrome or Edge can. Use <b>PNG frames</b> and the Mac encoder instead.',
+      true,
+    )
+    return
   }
-  busy(true); stop(); log("Loading the encoder…"); progress(0);
-  var ex = exportClip();
-  var blocked = exportBlocked(ex.canvas);
-  if (blocked) { log(blocked, true); busy(false); progress(null); return; }
-  var W = ex.geometry.pxW, H = ex.geometry.pxH;
-  var total = Math.round(ex.duration * FPS);
+  busy(true); stop(); log('Loading the encoder…'); progress(0)
 
-  loadMuxer().then(function (ok) {
-    if (!ok) throw new Error("muxer");
-    return Promise.all([ex.ready, pickCodec(W, H)]);
-  }).then(function (r) {
-    var codec = r[1];
-    if (!codec) throw new Error("codec");
-    var muxer = new Mp4Muxer.Muxer({
-      target: new Mp4Muxer.ArrayBufferTarget(),
-      video: { codec: "avc", width: W, height: H },
-      fastStart: "in-memory"
-    });
-    var failed = null;
-    var enc = new VideoEncoder({
-      output: function (chunk, meta) { muxer.addVideoChunk(chunk, meta); },
-      error: function (e) { failed = e; }
-    });
-    enc.configure({ codec: codec, width: W, height: H, bitrate: 14000000, framerate: FPS });
+  var ex = exportClip()
+  var blocked = exportBlocked(ex.canvas)
+  if (blocked) { log(blocked, true); busy(false); progress(null); return }
 
-    /* BACK-PRESSURE, ON THE ENCODER'S OWN EVENT.
-     *
-     * The first version polled `encodeQueueSize` on a setTimeout(0). That is
-     * a spin loop wearing a queue check's clothes: when the queue stops
-     * draining it never notices, and a second export in the same page hung at
-     * frame 112 forever with a progress bar that looked alive. It hung because
-     * the FIRST export's encoder was never closed — a hardware H.264 session
-     * is a real resource and the browser hands out very few of them — so
-     * `enc.close()` below is the actual fix, and this is the belt to its
-     * braces: wait on `dequeue`, and give up with a message rather than
-     * spinning if nothing moves for eight seconds. */
-    var STALL_MS = 8000;
-    function room() {
-      if (enc.encodeQueueSize < 8) return Promise.resolve();
-      return new Promise(function (res, rej) {
-        var settled = false, t0 = Date.now();
-        function check() {
-          if (settled) return;
-          if (enc.encodeQueueSize < 8) { settled = true; cleanup(); res(); }
-          else if (Date.now() - t0 > STALL_MS) { settled = true; cleanup(); rej(new Error("stall")); }
-        }
-        var iv = setInterval(check, 120);
-        function cleanup() { clearInterval(iv); enc.removeEventListener("dequeue", check); }
-        enc.addEventListener("dequeue", check);
-      });
-    }
+  var W = ex.geometry.pxW, H = ex.geometry.pxH
+  var total = Math.round(ex.duration * FPS)
 
-    var i = 0;
-    function step() {
-      if (failed) return Promise.reject(failed);
-      if (i >= total) {
-        return enc.flush().then(function () {
-          enc.close();
-          muxer.finalize();
-          var blob = new Blob([muxer.target.buffer], { type: "video/mp4" });
-          var name = slug() + ".mp4";
-          var url = download(blob, name);
-          log("Wrote " + total + " frames at " + FPS + " fps, "
-              + ex.duration.toFixed(2) + "s." + saveLink(url, name, blob.size));
-          busy(false); progress(null);
-        });
+  loadScript(spec.url, spec.global)
+    .then(function (ok) {
+      if (!ok) throw new Error('muxer')
+      return Promise.all([ex.ready, pickCodec(spec.codecs, W, H)])
+    })
+    .then(function (r) {
+      var codec = r[1]
+      if (!codec) throw new Error('codec')
+      var muxer = spec.make(W, H)
+      var failed = null
+      var enc = new VideoEncoder({
+        output: function (chunk, meta) { muxer.addVideoChunk(chunk, meta) },
+        error: function (e) { failed = e },
+      })
+      enc.configure({ codec: codec, width: W, height: H, bitrate: 14000000, framerate: FPS })
+
+      /* Back-pressure on the encoder's own `dequeue` event. Polling
+         encodeQueueSize on a setTimeout is a spin loop that never notices when
+         the queue stops draining; this gives up with a message after eight
+         idle seconds instead. */
+      var STALL_MS = 8000
+      function room() {
+        if (enc.encodeQueueSize < 8) return Promise.resolve()
+        return new Promise(function (res, rej) {
+          var settled = false, t0 = Date.now()
+          function check() {
+            if (settled) return
+            if (enc.encodeQueueSize < 8) { settled = true; cleanup(); res() }
+            else if (Date.now() - t0 > STALL_MS) { settled = true; cleanup(); rej(new Error('stall')) }
+          }
+          var iv = setInterval(check, 120)
+          function cleanup() { clearInterval(iv); enc.removeEventListener('dequeue', check) }
+          enc.addEventListener('dequeue', check)
+        })
       }
-      return room().then(function () {
-        ex.render(i / FPS);
-        var frame = new VideoFrame(ex.canvas, {
-          timestamp: Math.round(i * 1e6 / FPS), duration: Math.round(1e6 / FPS)
-        });
-        // A keyframe every second keeps the file scrubbable in an editor.
-        enc.encode(frame, { keyFrame: i % FPS === 0 });
-        frame.close();
-        i++;
-        if (i % 6 === 0 || i === total) {
-          progress(i / total);
-          log("Encoding frame " + i + " of " + total + "…");
+
+      var i = 0
+      function step() {
+        if (failed) return Promise.reject(failed)
+        if (i >= total) {
+          return enc.flush().then(function () {
+            enc.close()
+            muxer.finalize()
+            var blob = new Blob([muxer.target.buffer], { type: spec.mime })
+            var name = slug() + '.' + spec.ext
+            var url = download(blob, name)
+            log(
+              'Wrote ' + total + ' frames at ' + FPS + ' fps, ' +
+                ex.duration.toFixed(2) + 's.' + saveLink(url, name, blob.size),
+            )
+            busy(false); progress(null)
+          })
         }
-        return step();
-      });
-    }
-    return step().catch(function (e) {
-      try { enc.close(); } catch (x) {}
-      throw e;
-    });
-  }).catch(function (e) {
-    var why = e && e.message === "muxer"
-      ? "Could not load the MP4 muxer (offline?)."
-      : e && e.message === "codec"
-      ? "No H.264 encoder here accepts " + W + "x" + H + "."
-      : e && e.message === "stall"
-      ? "The H.264 encoder stopped responding. Reload the page and try again."
-      : "MP4 export failed: " + (e && e.message);
-    log(why + " Falling back to <b>WebM</b> or PNG frames.", true);
-    busy(false); progress(null);
-  });
+        return room().then(function () {
+          ex.render(i / FPS)
+          var frame = new VideoFrame(ex.canvas, {
+            timestamp: Math.round((i * 1e6) / FPS),
+            duration: Math.round(1e6 / FPS),
+          })
+          // A keyframe a second keeps the file scrubbable in an editor.
+          enc.encode(frame, { keyFrame: i % FPS === 0 })
+          frame.close()
+          i++
+          if (i % 6 === 0 || i === total) {
+            progress(i / total)
+            log('Encoding frame ' + i + ' of ' + total + '…')
+          }
+          return step()
+        })
+      }
+      return step().catch(function (e) {
+        try { enc.close() } catch (x) {}
+        throw e
+      })
+    })
+    .catch(function (e) {
+      var m = e && e.message
+      var why =
+        m === 'muxer'
+          ? 'Could not load the ' + spec.ext.toUpperCase() + ' muxer. Offline?'
+          : m === 'codec'
+          ? 'No ' + spec.ext.toUpperCase() + ' encoder here accepts ' + W + 'x' + H + '.'
+          : m === 'stall'
+          ? 'The encoder stopped responding. Reload the page and try again.'
+          : (spec.ext.toUpperCase() + ' export failed: ' + m)
+      log(why + ' Try the other format, or PNG frames.', true)
+      busy(false); progress(null)
+    })
 }
 
-/* ---- WebM, in real time -------------------------------------------- *
- * The fallback, and it is a real fallback rather than an equal: it records
- * the canvas as it plays, so a slow frame becomes a dropped one. Good enough
- * for a preview to send someone, not for the cut. */
-function exportWebm() {
-  busy(true); stop(); log("Recording…"); progress(0);
-  var ex = exportClip();
-  ex.ready.then(function () {
-    var blocked = exportBlocked(ex.canvas);
-    if (blocked) { log(blocked, true); busy(false); progress(null); return; }
-    var canvas = ex.canvas;
-    var stream = canvas.captureStream(FPS);
-    var types = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"];
-    var type = types.filter(function (x) {
-      return window.MediaRecorder && MediaRecorder.isTypeSupported(x);
-    })[0];
-    if (!type) { log("No MediaRecorder support here.", true); busy(false); progress(null); return; }
-    var rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 14000000 });
-    var parts = [];
-    rec.ondataavailable = function (e) { if (e.data.size) parts.push(e.data); };
-    rec.onstop = function () {
-      stream.getTracks().forEach(function (tr) { tr.stop(); });
-      var ext = type.indexOf("mp4") >= 0 ? "mp4" : "webm";
-      var blob = new Blob(parts, { type: type });
-      var name = slug() + "." + ext;
-      var url = download(blob, name);
-      log("Wrote a " + ext.toUpperCase() + ". Real-time capture, so check the "
-          + "timing before you cut with it." + saveLink(url, name, blob.size));
-      busy(false); progress(null);
-    };
-    rec.start();
-    var t0 = performance.now();
-    (function loop(now) {
-      var tt = (now - t0) / 1000;
-      progress(Math.min(1, tt / ex.duration));
-      if (tt >= ex.duration) { ex.render(ex.duration); setTimeout(function () { rec.stop(); }, 120); return; }
-      ex.render(tt);
-      requestAnimationFrame(loop);
-    })(t0);
-  });
-}
+function exportMp4() { exportVideo('mp4') }
+function exportWebm() { exportVideo('webm') }
 
 /* ---- PNG frames, zipped -------------------------------------------- *
  * The deliverable an editor actually wants: exact colour, no codec, imports
