@@ -1,24 +1,47 @@
-/* Optimally brand tokens — warm bone canvas, deep forest accent, drawn from the
-   leaf-V logo. Same palette the app ships with (DesignSystem.swift). */
+/* Optimally brand tokens — taken from the app's DesignSystem.swift, verified
+   value by value rather than remembered.
+
+   THE OLD COMMENT HERE SAID "same palette the app ships with" AND IT WAS NOT
+   TRUE. The site was a warm cream (#F4EFE6 ground, #FFFEFB cards, #E7E0D1
+   rules); Brand.bg is #F6F6F8 — a cool grey — with pure white cards. Side by
+   side the website looked like a different, yellower product, and the claim in
+   this comment is what let it sit that way. Every value below is the app's. */
 :root {
-  --bone: #f4efe6;
-  --bone-2: #efe9dd;
-  --card: #fffefb;
-  --stroke: #e7e0d1;
-  --forest: #2a5a3e;
-  --forest-deep: #1f4530;
-  --forest-soft: #eaf1ea;
-  --ink: #23261f;
-  --sub: #5f5e54;
-  --faint: #9a988c;
-  --good: #0fa968;
+  --bg: #f6f6f8;          /* Brand.bg */
+  --bg-2: #efeff2;        /* Brand.bgElevated */
+  --card: #ffffff;        /* Brand.card */
+  --stroke: #e6e6ea;      /* Brand.stroke */
+  --forest: #2a5a3e;      /* Brand.accent */
+  --forest-deep: #1f4530; /* Brand.accentDeep */
+  --forest-soft: #e9f2ec; /* Brand.accentSoft */
+  --ink: #1c1d19;         /* Brand.ink */
+  --ink-2: #23261f;       /* Brand.textPrimary */
+  --sub: #66655b;         /* Brand.textSecondary */
+  --faint: #78766b;       /* darkened from textTertiary #9A988C, which is
+                             2.4:1 on the ground and unreadable */
+  /* ScoreBand.color, all four, because the site shows real scores now. */
+  --excellent: #0fa968;
+  --good: #86c440;
+  --poor: #f5960a;
   --bad: #e5484d;
-  --shadow: 0 18px 40px -24px rgba(31, 53, 40, 0.35);
-  --shadow-lg: 0 40px 80px -40px rgba(31, 53, 40, 0.5);
+
+  /* Shadows on a cool grey ground: neutral, not the warm brown they were. */
+  --shadow: 0 18px 40px -24px rgba(28, 29, 25, 0.22);
+  --shadow-lg: 0 40px 80px -40px rgba(28, 29, 25, 0.34);
   --maxw: 1100px;
-  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
-    system-ui, sans-serif;
+
+  /* THE APP'S OWN TYPEFACE. The site was on the system stack, which is most of
+     why it read as generic next to the product it is selling. Satoshi is what
+     every screenshot on this page is set in. */
+  --sans: "Satoshi", -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "Segoe UI", system-ui, sans-serif;
 }
+
+/* THE @font-face IS IN app/layout.tsx, NOT HERE, and that is not a stylistic
+   choice: Next does not rewrite url() in CSS, so a `/fonts/…` path resolves to
+   the domain root and 404s on the GitHub Pages project deployment at
+   /verawesbite/. It has to go through lib/asset.ts like every other public
+   file — see the note there. */
 
 * {
   box-sizing: border-box;
@@ -28,7 +51,7 @@ html {
 }
 body {
   margin: 0;
-  background: var(--bone);
+  background: var(--bg);
   color: var(--ink);
   font-family: var(--sans);
   line-height: 1.55;
@@ -235,7 +258,7 @@ img {
   padding: 64px 0;
 }
 .band.alt {
-  background: var(--bone-2);
+  background: var(--bg-2);
   border-top: 1px solid var(--stroke);
   border-bottom: 1px solid var(--stroke);
 }
@@ -735,4 +758,203 @@ img {
   * {
     transition: none !important;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   The ledger — six real products, best to worst.
+
+   A RANKED LIST, NOT A CARD GRID, and that is the point of it. Three-across
+   cards of equal weight are the house style of every generated landing page on
+   the internet, and this page already uses that pattern twice. A numbered
+   column of real things with real numbers reads as evidence instead of as
+   decoration, and the eighty-two point drop from top to bottom is only visible
+   when they are stacked.
+   ------------------------------------------------------------------------ */
+.ledger {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--stroke);
+  border-radius: 20px;
+  background: var(--card);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.lrow {
+  display: grid;
+  grid-template-columns: 92px 1fr 132px;
+  gap: 20px;
+  align-items: center;
+  padding: 18px 22px;
+  border-top: 1px solid var(--stroke);
+}
+.lrow:first-child {
+  border-top: 0;
+}
+.lpack {
+  width: 92px;
+  height: 92px;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.lpack img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply; /* the packs are cut out on white */
+}
+.lbody h3 {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.lbrand {
+  display: block;
+  font-size: 13px;
+  color: var(--faint);
+  margin-top: 1px;
+}
+.lreason {
+  margin: 7px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--sub);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* A dot, in the tone the app itself gives that line. */
+.lreason::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--sub);
+}
+.lreason.good::before { background: var(--excellent); }
+.lreason.warn::before { background: var(--poor); }
+.lreason.bad::before  { background: var(--bad); }
+
+.lscore {
+  text-align: right;
+}
+.lscore b {
+  display: block;
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.lscore span {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-top: 4px;
+}
+/* The 0–100 rule, so the gap between 88 and 6 is a length and not just two
+   numbers the reader has to compare in their head. */
+.lscore i {
+  display: block;
+  height: 4px;
+  border-radius: 3px;
+  background: var(--bg-2);
+  margin-top: 9px;
+  overflow: hidden;
+}
+.lscore i em {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+}
+.excellent { color: var(--excellent); }
+.good      { color: var(--good); }
+.poor      { color: var(--poor); }
+.bad       { color: var(--bad); }
+em.excellent { background: var(--excellent); }
+em.good      { background: var(--good); }
+em.poor      { background: var(--poor); }
+em.bad       { background: var(--bad); }
+
+.ledger-note {
+  margin: 16px 2px 0;
+  font-size: 13.5px;
+  color: var(--faint);
+  max-width: 62ch;
+}
+
+@media (max-width: 640px) {
+  .lrow {
+    grid-template-columns: 64px 1fr 84px;
+    gap: 14px;
+    padding: 14px 16px;
+  }
+  .lpack { width: 64px; height: 64px; border-radius: 11px; }
+  .lbody h3 { font-size: 15.5px; }
+  .lreason { font-size: 13px; }
+  .lscore b { font-size: 26px; }
+}
+
+/* ---------------------------------------------------------------------------
+   The method — four numbered steps.
+
+   Numerals in the margin rather than a fourth row of ticked bullets. This page
+   already has two checklists and a card grid; a third would be the pattern
+   that makes a landing page look assembled rather than written.
+   ------------------------------------------------------------------------ */
+.steps {
+  list-style: none;
+  counter-reset: step;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  background: var(--stroke);
+  border: 1px solid var(--stroke);
+  border-radius: 20px;
+  overflow: hidden;
+}
+@media (max-width: 760px) {
+  .steps { grid-template-columns: 1fr; }
+}
+.steps li {
+  counter-increment: step;
+  background: var(--card);
+  padding: 26px 28px 28px;
+  position: relative;
+}
+.steps li::before {
+  content: counter(step);
+  display: block;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: var(--forest);
+  margin-bottom: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.steps h3 {
+  margin: 0 0 8px;
+  font-size: 19px;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+}
+.steps p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: var(--sub);
+  max-width: 46ch;
+}
+.steps b {
+  font-weight: 800;
 }

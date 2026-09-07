@@ -3,12 +3,96 @@ import Link from 'next/link'
 import { SiteHeader, SiteFooter, Phone, Check, AppStoreButton } from '@/components/site'
 import { asset } from '@/lib/asset'
 
+/**
+ * REAL OUTPUT, NOT WRITTEN FOR THIS PAGE.
+ *
+ * Every score and every `reason` string below was printed by the shipping
+ * scoring engine via `-catalogDump` (CatalogDump.swift in the app project) and
+ * pasted here unedited. Marketing may only print figures the engine really
+ * produces; `tools/score_audit.py` is a PORT and has disagreed with the app
+ * before, so it is not the source either.
+ *
+ * The products are the app's own fictional demo packs, which is the only
+ * reason their artwork can appear here at all.
+ *
+ * Ordered best to worst on purpose: the story is the SPREAD. Six things you
+ * would find within a few metres of each other, and the app separates them by
+ * eighty-two points.
+ *
+ * NOTE none of the chosen lines is about sugar. The engine does emit sugar
+ * findings, but this app's position is that sugar is an energy source and
+ * whether it counts against a food depends on the food — so a marketing page
+ * does not lead with it.
+ */
+const EXAMPLES = [
+  {
+    slug: 'almond-bar',
+    name: '3-Ingredient Almond Bar',
+    brand: 'Bare Bar',
+    score: 88,
+    band: 'excellent',
+    label: 'Very optimal',
+    tone: 'good',
+    reason: 'Whole, unprocessed food',
+  },
+  {
+    slug: 'oat-clusters',
+    name: 'No-Sugar-Added Oat Clusters',
+    brand: 'Morning Co.',
+    score: 65,
+    band: 'good',
+    label: 'Good',
+    tone: 'good',
+    reason: 'High fiber: 10g per 100g',
+  },
+  {
+    slug: 'strawberry-yogurt',
+    name: 'Strawberry Fruit Yogurt',
+    brand: 'DairyDream',
+    score: 37,
+    band: 'poor',
+    label: 'Poor',
+    tone: 'warn',
+    reason: 'Carmine, flagged additive',
+  },
+  {
+    slug: 'sour-cream-chips',
+    name: 'Sour Cream Potato Chips',
+    brand: 'Crunchland',
+    score: 19,
+    band: 'bad',
+    label: 'Very bad',
+    tone: 'bad',
+    reason: 'Very high sodium: 620mg per 100g',
+  },
+  {
+    slug: 'classic-cola',
+    name: 'Classic Cola',
+    brand: 'FizzCo',
+    score: 17,
+    band: 'bad',
+    label: 'Very bad',
+    tone: 'warn',
+    reason: 'Sulphite ammonia caramel, flagged additive',
+  },
+  {
+    slug: 'choc-chip-protein-bar',
+    name: 'Choc-Chip Protein Bar',
+    brand: 'GymFuel',
+    score: 6,
+    band: 'bad',
+    label: 'Very bad',
+    tone: 'bad',
+    reason: 'Made with industrial seed oils',
+  },
+]
+
 const SHOTS = [
   {
     src: '/shots/scan.jpg',
-    alt: 'Optimally home screen: The Lab feed with a food safety alert, a cited finding and a recent scan, above the scan button and search field',
-    title: 'Open it and there is news',
-    body: 'The Lab carries live safety notices, the research behind a flag, and what your own scans turned up. Scan or search from the same screen.',
+    alt: 'Optimally home screen: scan button, product search, barcode entry, and recent scans each showing their score',
+    title: 'Scan or search',
+    body: 'Point at a barcode, photograph a label, or type a product name. Everything you have scanned keeps its score and stays one tap away.',
   },
   {
     src: '/shots/verdict.jpg',
@@ -187,6 +271,106 @@ export default function Home() {
               </ul>
             </div>
           </div>
+        </section>
+
+        {/* ---------------- how the number is made ---------------- */}
+        <section className="band wrap" id="method">
+          <div className="section-head">
+            <span className="eyebrow">The method</span>
+            <h2>How the number is made.</h2>
+            <p>
+              Four steps, the same four every time. Nothing here is a model
+              deciding how it feels about your yoghurt.
+            </p>
+          </div>
+
+          <ol className="steps">
+            <li>
+              <h3>Read the label</h3>
+              <p>
+                The barcode goes to Open Food Facts and comes back with the
+                ingredient list and the nutrition panel. No barcode, or it
+                won&rsquo;t read? Photograph the ingredients instead.
+              </p>
+            </li>
+            <li>
+              <h3>Rate every ingredient</h3>
+              <p>
+                Each one is matched against a bundled taxonomy and given a
+                rating. A rating is written <strong>once</strong> and then
+                frozen — so the same ingredient scores the same for you, for
+                everyone else, and next year.
+              </p>
+            </li>
+            <li>
+              <h3>Apply the rules</h3>
+              <p>
+                Industrial seed oils, degree of processing, flagged additives,
+                and what the nutrition panel actually says. Every rule links
+                the paper behind it, and tells you how many of your own scans
+                it has touched.
+              </p>
+            </li>
+            <li>
+              <h3>Land on a number</h3>
+              <p>
+                Out of 100, and the band is fixed:{' '}
+                <b className="excellent">75 and over</b> is very optimal,{' '}
+                <b className="good">50–74</b> good, <b className="poor">25–49</b>{' '}
+                poor, <b className="bad">under 25</b> very bad. No curve, no
+                comparison to other users.
+              </p>
+            </li>
+          </ol>
+        </section>
+
+        {/* ---------------- what it says about real products ---------------- */}
+        <section className="band wrap">
+          <div className="section-head">
+            <span className="eyebrow">Six things off one shelf</span>
+            <h2>The same aisle, six different answers.</h2>
+            <p>
+              Every number below came out of the app&rsquo;s own scoring engine, and
+              the line under each one is the app&rsquo;s own wording — not a summary
+              written for this page.
+            </p>
+          </div>
+
+          <ol className="ledger">
+            {EXAMPLES.map((e) => (
+              <li key={e.slug} className="lrow">
+                <div className="lpack">
+                  <Image
+                    src={asset(`/packs/${e.slug}.jpg`)}
+                    alt=""
+                    width={130}
+                    height={130}
+                  />
+                </div>
+                <div className="lbody">
+                  <h3>{e.name}</h3>
+                  <span className="lbrand">{e.brand}</span>
+                  <p className={`lreason ${e.tone}`}>{e.reason}</p>
+                </div>
+                <div className="lscore">
+                  <b className={e.band}>{e.score}</b>
+                  <span>{e.label}</span>
+                  <i>
+                    <em
+                      className={e.band}
+                      style={{ width: `${e.score}%` }}
+                    />
+                  </i>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <p className="ledger-note">
+            These are Optimally&rsquo;s own demo products, which is why we can show
+            you their packaging. Scan a real one and the engine does exactly the
+            same thing.
+          </p>
         </section>
 
         {/* ---------------- screenshots ---------------- */}

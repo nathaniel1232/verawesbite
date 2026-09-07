@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#F4EFE6',
+  themeColor: '#F6F6F8',
 }
 
 export default function RootLayout({
@@ -37,6 +37,25 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* Through asset(), because Next leaves url() in CSS alone and a bare
+            /fonts/… 404s on the project-page deployment. Preloaded because it
+            is the face every heading is set in and swap-in is visible. */}
+        <link
+          rel="preload"
+          as="font"
+          type="font/woff2"
+          href={asset('/fonts/Satoshi-Variable.woff2')}
+          crossOrigin="anonymous"
+        />
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `@font-face{font-family:"Satoshi";src:url("${asset(
+              '/fonts/Satoshi-Variable.woff2',
+            )}") format("woff2-variations");font-weight:300 900;font-style:normal;font-display:swap}`,
+          }}
+        />
+      </head>
       <body>
         {children}
         <StoreLinkLocaliser />
