@@ -823,7 +823,7 @@
     // The App Store listing's own name, not just the brand: a search bar with
     // one word in it is a logo, and a search bar with a query in it tells
     // somebody exactly what to type.
-    var query = "Optimally: Food scanner";
+    var query = "Optimally: Food Scanner";
     var tx = cx + r * 1.9;
     var room = (x + w - h * 1.05) - tx;
     var fs = fitSize(ctx, query, room, Math.round(h * 0.38), 800, -0.4);
