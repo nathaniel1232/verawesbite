@@ -2,90 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { SiteHeader, SiteFooter, Phone, Check, AppStoreButton } from '@/components/site'
 import { asset } from '@/lib/asset'
+import { PRODUCTS, BAND_LABEL, leadReason } from '@/lib/products'
 
-/**
- * REAL OUTPUT, NOT WRITTEN FOR THIS PAGE.
- *
- * Every score and every `reason` string below was printed by the shipping
- * scoring engine via `-catalogDump` (CatalogDump.swift in the app project) and
- * pasted here unedited. Marketing may only print figures the engine really
- * produces; `tools/score_audit.py` is a PORT and has disagreed with the app
- * before, so it is not the source either.
- *
- * The products are the app's own fictional demo packs, which is the only
- * reason their artwork can appear here at all.
- *
- * Ordered best to worst on purpose: the story is the SPREAD. Six things you
- * would find within a few metres of each other, and the app separates them by
- * eighty-two points.
- *
- * NOTE none of the chosen lines is about sugar. The engine does emit sugar
- * findings, but this app's position is that sugar is an energy source and
- * whether it counts against a food depends on the food — so a marketing page
- * does not lead with it.
- */
-const EXAMPLES = [
-  {
-    slug: 'almond-bar',
-    name: '3-Ingredient Almond Bar',
-    brand: 'Bare Bar',
-    score: 88,
-    band: 'excellent',
-    label: 'Very optimal',
-    tone: 'good',
-    reason: 'Whole, unprocessed food',
-  },
-  {
-    slug: 'oat-clusters',
-    name: 'No-Sugar-Added Oat Clusters',
-    brand: 'Morning Co.',
-    score: 65,
-    band: 'good',
-    label: 'Good',
-    tone: 'good',
-    reason: 'High fiber: 10g per 100g',
-  },
-  {
-    slug: 'strawberry-yogurt',
-    name: 'Strawberry Fruit Yogurt',
-    brand: 'DairyDream',
-    score: 37,
-    band: 'poor',
-    label: 'Poor',
-    tone: 'warn',
-    reason: 'Carmine, flagged additive',
-  },
-  {
-    slug: 'sour-cream-chips',
-    name: 'Sour Cream Potato Chips',
-    brand: 'Crunchland',
-    score: 19,
-    band: 'bad',
-    label: 'Very bad',
-    tone: 'bad',
-    reason: 'Very high sodium: 620mg per 100g',
-  },
-  {
-    slug: 'classic-cola',
-    name: 'Classic Cola',
-    brand: 'FizzCo',
-    score: 17,
-    band: 'bad',
-    label: 'Very bad',
-    tone: 'warn',
-    reason: 'Sulphite ammonia caramel, flagged additive',
-  },
-  {
-    slug: 'choc-chip-protein-bar',
-    name: 'Choc-Chip Protein Bar',
-    brand: 'GymFuel',
-    score: 6,
-    band: 'bad',
-    label: 'Very bad',
-    tone: 'bad',
-    reason: 'Made with industrial seed oils',
-  },
-]
 
 const SHOTS = [
   {
@@ -147,43 +65,47 @@ export default function Home() {
         <section className="band wrap">
           <div className="section-head">
             <span className="eyebrow">Real scans</span>
-            <h2>Six things from one shelf.</h2>
-            <p>Straight out of the app, unedited.</p>
+            <h2>Ten things you can buy this afternoon.</h2>
+            <p>Straight out of the app, unedited. Tap any one of them.</p>
           </div>
 
-          <ol className="ledger">
-            {EXAMPLES.map((e) => (
-              <li key={e.slug} className="lrow">
-                <div className="lpack">
-                  <Image
-                    src={asset(`/packs/${e.slug}.jpg`)}
-                    alt=""
-                    width={130}
-                    height={130}
-                  />
-                </div>
-                <div className="lbody">
-                  <h3>{e.name}</h3>
-                  <span className="lbrand">{e.brand}</span>
-                  <p className={`lreason ${e.tone}`}>{e.reason}</p>
-                </div>
-                <div className="lscore">
-                  <b className={e.band}>{e.score}</b>
-                  <span>{e.label}</span>
-                  <i>
-                    <em
-                      className={e.band}
-                      style={{ width: `${e.score}%` }}
+          <ol className="ledger" id="scans">
+            {PRODUCTS.map((e) => (
+              <li key={e.code}>
+                {/* THE WHOLE ROW IS THE LINK. A "read more" at the end of a
+                    row is a smaller target and one more word on a page that
+                    just had a lot of words taken out of it. */}
+                <Link className="lrow" href={`/scan/${e.code}/`}>
+                  <div className="lpack">
+                    <Image
+                      src={asset(`/real/${e.img}`)}
+                      alt=""
+                      width={130}
+                      height={130}
                     />
-                  </i>
-                </div>
+                  </div>
+                  <div className="lbody">
+                    <h3>{e.name}</h3>
+                    <span className="lbrand">{e.brand}</span>
+                    <p className={`lreason ${leadReason(e).tone}`}>
+                      {leadReason(e).text}
+                    </p>
+                  </div>
+                  <div className="lscore">
+                    <b className={e.band}>{e.score}</b>
+                    <span>{BAND_LABEL[e.band]}</span>
+                    <i>
+                      <em className={e.band} style={{ width: `${e.score}%` }} />
+                    </i>
+                  </div>
+                </Link>
               </li>
             ))}
           </ol>
 
           <p className="ledger-note">
-            Optimally&rsquo;s own demo products. A real one goes through the same
-            rules.
+            Product data and photographs from Open Food Facts, used under the
+            ODbL and CC BY-SA 3.0.
           </p>
         </section>
 

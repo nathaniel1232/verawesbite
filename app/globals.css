@@ -774,7 +774,13 @@ img {
   overflow: hidden;
   box-shadow: var(--shadow);
 }
+.ledger > li + li .lrow {
+  border-top: 1px solid var(--stroke);
+}
 .lrow {
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.14s ease;
   display: grid;
   grid-template-columns: 92px 1fr 132px;
   gap: 20px;
@@ -782,9 +788,24 @@ img {
   padding: 18px 22px;
   border-top: 1px solid var(--stroke);
 }
-.lrow:first-child {
-  border-top: 0;
+.lrow:hover {
+  background: var(--bg);
 }
+/* The chevron only appears on a row you are pointing at, so ten of them are
+   not sitting there shouting on a page that is mostly numbers. */
+.lrow::after {
+  content: '›';
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--faint);
+  font-size: 20px;
+  opacity: 0;
+  transition: opacity 0.14s ease;
+}
+.lrow { position: relative; }
+.lrow:hover::after { opacity: 1; }
 .lpack {
   width: 92px;
   height: 92px;
@@ -951,4 +972,167 @@ em.bad       { background: var(--bad); }
 }
 .steps b {
   font-weight: 800;
+}
+
+
+/* ---------------------------------------------------------------------------
+   One product's verdict.
+   ------------------------------------------------------------------------ */
+.verdict { padding: 34px 24px 90px; }
+.backlink {
+  display: inline-block;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--sub);
+  text-decoration: none;
+  margin-bottom: 26px;
+}
+.backlink::before { content: '‹ '; }
+.backlink:hover { color: var(--ink); }
+
+.vhead {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 34px;
+  align-items: start;
+}
+@media (max-width: 700px) {
+  .vhead { grid-template-columns: 1fr; gap: 22px; }
+}
+.vpack {
+  background: var(--card);
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  padding: 18px;
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow);
+}
+.vpack img { width: 100%; height: auto; object-fit: contain; }
+.vhead h1 {
+  font-size: clamp(26px, 4vw, 38px);
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+.vbrand {
+  color: var(--faint);
+  font-size: 14px;
+  margin-top: 6px;
+}
+.vscore {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 20px;
+}
+.vscore b {
+  font-size: 58px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.vscore span {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.vbar {
+  height: 6px;
+  background: var(--bg-2);
+  border-radius: 4px;
+  margin-top: 14px;
+  overflow: hidden;
+  max-width: 420px;
+}
+.vbar i { display: block; height: 100%; border-radius: 4px; }
+.vbar i.excellent { background: var(--excellent); }
+.vbar i.good { background: var(--good); }
+.vbar i.poor { background: var(--poor); }
+.vbar i.bad { background: var(--bad); }
+.vsummary {
+  margin: 18px 0 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--sub);
+  max-width: 56ch;
+}
+
+.vcols {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+  margin-top: 44px;
+}
+@media (max-width: 700px) {
+  .vcols { grid-template-columns: 1fr; }
+}
+.vcols section {
+  background: var(--card);
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  padding: 22px 24px 24px;
+}
+.vcols h2 {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0 0 14px;
+}
+.vreasons, .vings { list-style: none; margin: 0; padding: 0; }
+.vreasons li {
+  font-size: 15px;
+  font-weight: 600;
+  padding: 9px 0 9px 20px;
+  position: relative;
+  border-top: 1px solid var(--stroke);
+}
+.vreasons li:first-child { border-top: 0; }
+.vreasons li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 17px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.vreasons li.good::before { background: var(--excellent); }
+.vreasons li.bad::before { background: var(--bad); }
+
+.vings li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: baseline;
+  font-size: 15px;
+  padding: 9px 0;
+  border-top: 1px solid var(--stroke);
+}
+.vings li:first-child { border-top: 0; }
+.vings b {
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.vings b.neutral { color: var(--faint); }
+
+.vfoot {
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.vfoot p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--faint);
+  max-width: 52ch;
+  line-height: 1.55;
 }
