@@ -14,6 +14,39 @@ NEXT_PUBLIC_SITE_URL=https://nathaniel1232.github.io npm run build
 npx serve out                   # or: python3 -m http.server -d out
 ```
 
+## Two hosts, on purpose
+
+| | serves | why it exists |
+| --- | --- | --- |
+| **Vercel** | `optimallyapp.com` | the public site |
+| **GitHub Pages** | `nathaniel1232.github.io/verawesbite/` | the iOS app's Privacy / Terms / Support links |
+
+Both build from `main` on every push and **both should stay on**. Pages costs
+nothing and keeps the URLs the shipped app points at alive; see the next
+section for why that matters.
+
+### Vercel needs no environment variables
+
+Unset, `NEXT_PUBLIC_SITE_URL` resolves to `https://optimallyapp.com` and
+`NEXT_PUBLIC_BASE_PATH` to `''` — exactly right for a domain root. **If a
+`NEXT_PUBLIC_*` variable exists in the Vercel dashboard but is blank, delete
+it rather than leaving it empty.** A blank one used to fail the build outright
+(`Invalid URL` on `/_not-found`); `lib/site.ts` now tolerates it, but an empty
+field is still a lie about intent.
+
+Do **not** set `NEXT_PUBLIC_BASE_PATH` on Vercel. `/verawesbite` there would
+404 every asset.
+
+### Pointing optimallyapp.com at Vercel
+
+1. Vercel → project → **Settings → Domains** → add `optimallyapp.com` and
+   `www.optimallyapp.com`.
+2. At the registrar, use whatever Vercel's panel shows — currently apex
+   `A 76.76.21.21`, and `www` → `CNAME cname.vercel-dns.com`.
+3. Wait for Vercel to mark both **Valid**. The certificate is automatic.
+4. Nothing in this repo changes. No `CNAME` file: that is a GitHub Pages
+   mechanism and committing one would hand the domain to Pages instead.
+
 ## The one thing that can break App Review
 
 `AppBrand` in the iOS app points at
@@ -27,7 +60,13 @@ https://nathaniel1232.github.io/verawesbite/support/
 **App Review opens these and rejects under 5.1.1 if they 404.** That has already
 happened once on this app. Everything below is ordered so they never go down.
 
-## Moving to optimallyapp.com — in this order
+## If you ever move the domain to GitHub Pages instead
+
+Not the current plan — the domain goes to Vercel, above. Kept because it is the
+route that breaks the App Review links if done in the wrong order, and that is
+worth having written down.
+
+### In this order
 
 **Do not commit a `CNAME` file and do not blank `NEXT_PUBLIC_BASE_PATH` yet.**
 Either one makes GitHub serve the site at a domain that does not resolve, and
