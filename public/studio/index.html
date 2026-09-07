@@ -7,7 +7,7 @@
 <title>Optimally Clip Studio</title>
 
 <link rel="stylesheet" href="satoshi.css">
-<script src="clip-engine.js?v=2026-09-07 181bb31"></script>
+<script src="clip-engine.js?v=2026-09-07.181bb31"></script>
 
 <style>
   /* CONTRAST, BECAUSE THE FIRST VERSION FAILED IT BADLY.
@@ -1184,7 +1184,7 @@ function copyLink() {
  * the stamp, compare it to the last deploy, and the question is closed before
  * anybody reads any code. `sync.py` writes it; unstamped means running from
  * source. */
-var BUILD = "2026-09-07 181bb31";
+var BUILD = "2026-09-07.181bb31";
 function showBuild() {
   var b = /^__/.test(BUILD) ? "dev (unstamped, running from source)" : BUILD;
   $("build").textContent = "build " + b;
