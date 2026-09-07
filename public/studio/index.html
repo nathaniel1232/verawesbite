@@ -1,0 +1,1134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Optimally Clip Studio</title>
+
+<link rel="stylesheet" href="satoshi.css">
+<script src="clip-engine.js"></script>
+
+<style>
+  /* CONTRAST, BECAUSE THE FIRST VERSION FAILED IT BADLY.
+     The note back was "on the website it's impossible to read some of the
+     text", and it was right: the muted greys were #5F675F on #141714, which
+     is 2.9:1 — under half the 4.5:1 a body size needs. Every value below is
+     checked against the surface it actually sits on:
+       ink   #F5F7F8 on #15171A  16.2:1
+       ink2  #C3CAD2 on #15171A  10.3:1
+       ink3  #929AA4 on #15171A   5.5:1   (never smaller than 12px)
+       accent#46C883 on #15171A   8.4:1
+     The greens also went neutral-cool to match the clip's own dark stage —
+     the old panel was a green-black that read olive next to the preview. */
+  :root{
+    --bg:#0B0C10; --panel:#15171A; --panel2:#1E2126; --line:#2E333A;
+    --ink:#F5F7F8; --ink2:#C3CAD2; --ink3:#929AA4;
+    --accent:#46C883; --accent2:#215B3C; --accent-ink:#062012;
+    --bad:#FF4D57; --poor:#FFA92E; --good:#A8DC4E; --excellent:#22D07E;
+    --sans:"Satoshi",-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none !important}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font:inherit;color:inherit}
+  a{color:var(--accent)}
+
+  /* ---------------- the gate ---------------- */
+  #gate{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);z-index:50}
+  #gate .box{width:min(400px,90vw);text-align:center}
+  #gate h1{font-size:22px;font-weight:900;letter-spacing:-.02em;margin:0 0 6px}
+  #gate p{margin:0 0 22px;color:var(--ink2);font-size:13.5px}
+  #gate .row{display:flex;gap:8px}
+  #gate input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:11px 13px;outline:none}
+  #gate input:focus{border-color:var(--accent)}
+  #gate button{background:var(--accent);border:none;border-radius:10px;padding:11px 20px;
+    font-weight:800;cursor:pointer;color:var(--accent-ink)}
+  #gate .err{color:var(--bad);font-size:13px;font-weight:600;margin-top:12px;min-height:20px}
+  #gate .mark{width:44px;height:44px;margin:0 auto 16px}
+
+  /* ---------------- shell ---------------- */
+  #app{display:grid;grid-template-columns:352px 1fr;height:100%}
+  @media(max-width:900px){#app{grid-template-columns:1fr;height:auto}}
+
+  #panel{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:20px 20px 72px}
+  /* A rule under each heading, so the panel reads as sections rather than as
+     a single column of controls with words scattered through it. */
+  #panel h2{font-size:11.5px;font-weight:900;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--ink2);margin:30px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  #panel h2:first-child{margin-top:2px}
+
+  .field{margin-bottom:10px}
+  .field label{display:block;font-size:12.5px;font-weight:700;color:var(--ink2);margin-bottom:6px}
+  .field input[type=text],.field input[type=number],.field select,.field textarea,
+  .rowline input,.rowline select{
+    width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:9px;
+    padding:9px 11px;outline:none;font-size:14px}
+  .field input::placeholder,.rowline input::placeholder{color:var(--ink3);opacity:1}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+
+  .seg{display:flex;flex-wrap:wrap;gap:5px}
+  .seg button{background:var(--panel2);border:1px solid var(--line);border-radius:8px;
+    padding:8px 12px;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--ink2)}
+  .seg button[aria-pressed=true]{background:var(--accent2);border-color:var(--accent);
+    color:#EEFBF3;box-shadow:inset 0 0 0 1px rgba(70,200,131,.35)}
+  .seg button:hover{border-color:var(--accent)}
+
+  .drop{border:1.5px dashed var(--line);border-radius:12px;padding:18px;text-align:center;
+    color:var(--ink2);cursor:pointer;font-size:13px;font-weight:600;
+    transition:border-color .15s,color .15s}
+  .drop:hover,.drop.over{border-color:var(--accent);color:var(--ink)}
+  .thumb{display:flex;gap:10px;align-items:center;margin-top:8px}
+  .thumb img{width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+  .thumb button{background:none;border:none;color:var(--ink2);cursor:pointer;font-size:12.5px;
+    font-weight:600;text-decoration:underline;padding:0}
+
+  .scorewrap{display:flex;align-items:center;gap:10px}
+  .scorewrap input[type=range]{flex:1;accent-color:var(--accent)}
+  .scorewrap input[type=number]{width:64px;text-align:center;font-weight:900;
+    background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 4px;outline:none}
+  .scorewrap input[type=number]:focus{border-color:var(--accent)}
+  .bandchip{font-size:11.5px;font-weight:900;letter-spacing:.09em;padding:6px 10px;border-radius:7px;
+    color:#08120C;white-space:nowrap}
+
+  .rowline{display:grid;grid-template-columns:92px 1fr;gap:7px;margin-bottom:7px}
+  .rowline.metric{grid-template-columns:1fr 76px}
+
+  .note{font-size:12.5px;color:var(--ink2);line-height:1.5;margin:10px 0 0;
+    background:rgba(255,255,255,.035);border-left:2px solid var(--accent2);
+    border-radius:0 8px 8px 0;padding:10px 12px}
+  .note b{color:var(--poor);font-weight:800}
+  .note code{font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:4px}
+
+  /* ---------------- stage ---------------- */
+  #stage{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    padding:18px;overflow-y:auto;background:
+      radial-gradient(120% 90% at 50% -10%, #1A1E1A 0%, var(--bg) 60%)}
+  #canvasWrap{position:relative;box-shadow:0 30px 70px -30px rgba(0,0,0,.9);border-radius:10px;
+    overflow:hidden;background:#000}
+  #canvas{display:block}
+
+  #transport{display:flex;align-items:center;gap:10px;margin-top:14px;width:100%;max-width:560px}
+  #transport button{background:var(--panel2);border:1px solid var(--line);border-radius:9px;
+    width:42px;height:38px;cursor:pointer;font-size:14px;color:var(--ink)}
+  #transport button:hover{border-color:var(--accent)}
+  #scrub{flex:1;accent-color:var(--accent)}
+  #tlabel{font-variant-numeric:tabular-nums;color:var(--ink2);font-size:13px;font-weight:600;
+    min-width:86px;text-align:right}
+
+  #exports{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;justify-content:center;max-width:620px}
+  #exports button{background:var(--accent);border:none;border-radius:10px;padding:11px 18px;
+    font-weight:800;font-size:13.5px;cursor:pointer;color:var(--accent-ink)}
+  #exports button.ghost{background:var(--panel2);border:1px solid var(--line);color:var(--ink)}
+  #exports button.ghost:hover{border-color:var(--accent)}
+  #exports button:disabled{opacity:.45;cursor:default}
+
+  #log{margin-top:14px;font-size:13px;color:var(--ink2);min-height:36px;text-align:center;
+    max-width:620px;line-height:1.55}
+  #log .warn{color:var(--poor);font-weight:600}
+  #log b{color:var(--ink)}
+  #log a{color:var(--accent);font-weight:700}
+  #log code{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:5px;font-size:12.5px}
+  #bar{width:min(560px,100%);height:4px;background:var(--panel2);border-radius:3px;overflow:hidden;
+    margin-top:6px;display:none}
+  #bar i{display:block;height:100%;background:var(--accent);width:0}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="box">
+    <svg class="mark" viewBox="0 0 100 100" aria-hidden="true">
+      <path d="M50 96C2 66 6 16 50 4c44 12 48 62 0 92z" fill="#2A5A3E"/>
+      <path d="M28 36 L50 74 L72 36" fill="none" stroke="#F2F3F1" stroke-width="7.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h1>Clip Studio</h1>
+    <p>Internal tool. Enter the password to continue.</p>
+    <form class="row" id="gateForm">
+      <input id="pw" type="password" placeholder="Password" autocomplete="current-password" autofocus>
+      <button type="submit">Enter</button>
+    </form>
+    <div class="err" id="gateErr"></div>
+  </div>
+</div>
+
+<div id="app" hidden>
+  <aside id="panel">
+
+    <h2>Preset</h2>
+    <div class="seg" id="presets"></div>
+
+    <h2>Format</h2>
+    <div class="seg" id="formats"></div>
+    <div class="seg" id="aspects" style="margin-top:6px"></div>
+
+    <h2>Product</h2>
+    <div class="drop" id="drop">Drop a photo here, or click to choose<input id="file" type="file"
+      accept="image/*" hidden></div>
+    <div class="thumb" id="thumbWrap" hidden><img id="thumb" alt=""><button id="clearImg">remove</button></div>
+    <div class="seg" id="fits" style="margin-top:8px"></div>
+    <div class="field" style="margin-top:10px"><label>Name</label><input id="name" type="text" placeholder="TRAIL BAR"></div>
+    <div class="field"><label>Brand (optional)</label><input id="brand" type="text"></div>
+
+    <h2>Score</h2>
+    <div class="scorewrap">
+      <input id="scoreRange" type="range" min="0" max="100" value="18">
+      <input id="scoreNum" type="number" min="0" max="100" value="18">
+      <span class="bandchip" id="bandChip">VERY BAD</span>
+    </div>
+
+    <h2>Tier wording</h2>
+    <div class="seg" id="tiers"></div>
+
+    <h2>Reasons</h2>
+    <div id="reasons"></div>
+    <p class="note">These should be the app's own sentences. Scan the product, read them off the
+      verdict screen, paste them here. The clip quotes the app; it does not paraphrase it.</p>
+
+    <h2>Metric bars</h2>
+    <div id="metrics"></div>
+    <p class="note"><b>The engine publishes no per-axis sub-scores.</b> Anything typed here is your
+      claim, not the app's output. Leave them at 0 and the <code>tier</code> format shows the
+      reasons instead.</p>
+
+    <h2>Comparison (versus)</h2>
+    <div class="drop" id="dropB" style="padding:12px">Drop the second photo<input id="fileB" type="file" accept="image/*" hidden></div>
+    <div class="thumb" id="thumbWrapB" hidden><img id="thumbB" alt=""><button id="clearImgB">remove</button></div>
+    <div class="row2" style="margin-top:8px">
+      <div class="field"><label>Name</label><input id="bname" type="text" placeholder="NORR"></div>
+      <div class="field"><label>Score</label><input id="bscore" type="number" min="0" max="100" value="94"></div>
+    </div>
+
+    <h2>Finish</h2>
+    <div class="field"><label>Length <span id="durOut">3.0s</span></label>
+      <input id="duration" type="range" min="2" max="9" step="0.2" value="3.0" style="width:100%"></div>
+    <p class="note">The whole film scales, so it keeps its proportions at any
+      length. <b>Extra hold</b> below adds dead frames on the end instead —
+      more time on the finished frame without slowing the count-up.</p>
+    <div class="row2" style="margin-top:12px">
+      <div class="field"><label>Scan method</label>
+        <select id="method"><option>barcode</option><option>photo</option><option>label</option><option>search</option></select></div>
+      <div class="field"><label>Extra hold (s)</label><input id="hold" type="number" min="0" max="4" step="0.2" value="0"></div>
+    </div>
+    <div class="field"><label>Scan intensity</label><input id="intensity" type="range" min="0" max="1" step="0.05" value="1" style="width:100%"></div>
+    <div class="seg" id="toggles"></div>
+
+  </aside>
+
+  <main id="stage">
+    <div id="canvasWrap"><canvas id="canvas"></canvas></div>
+    <div id="transport">
+      <button id="play" title="Play / pause">▶</button>
+      <input id="scrub" type="range" min="0" max="1000" value="0">
+      <span id="tlabel">0.00 / 0.00</span>
+    </div>
+    <div id="exports">
+      <button id="expMp4">Export MP4</button>
+      <button id="expWebm" class="ghost">Export WebM</button>
+      <button id="expFrames" class="ghost">PNG frames (.zip)</button>
+      <button id="expPoster" class="ghost">Poster PNG</button>
+      <button id="copyLink" class="ghost">Copy link</button>
+    </div>
+    <div id="bar"><i></i></div>
+    <div id="log"></div>
+  </main>
+</div>
+
+<script>
+"use strict";
+
+/* ==================================================================== *
+ *  THE GATE, AND WHAT IT IS NOT.
+ *
+ *  This is a STATIC PAGE. The check below runs in the visitor's browser
+ *  against a hash sitting in the source, so anyone who opens dev tools can
+ *  walk straight past it. It keeps the tool off the open web and out of
+ *  search; it does not keep a secret, and nothing secret may be put on this
+ *  page on the strength of it.
+ *
+ *  That is the right trade here — the studio calls no API, spends no money
+ *  and holds no data, so the only cost of a stranger finding it is a stranger
+ *  making an Optimally-branded clip. If that stops being true, move the check
+ *  to the Worker in server/ (it already gates /v1/* on X-Vera-Client) and have
+ *  it serve this file only on a correct password.
+ *
+ *  TO CHANGE THE PASSWORD, run:
+ *    python3 -c "import hashlib;print(hashlib.sha256((input('pw: ')+'optimally-clip-studio-v1').encode()).hexdigest())"
+ *  and paste the result into PW_HASH.
+ * ==================================================================== */
+var PW_SALT = "optimally-clip-studio-v1";
+var PW_HASH = "5241d87335d0eea2ea896be27eb745e5c2d1c869efca6ff0831bfb7212e77e4f";
+
+function sha256Hex(str) {
+  return crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)).then(function (buf) {
+    return Array.prototype.map.call(new Uint8Array(buf), function (b) {
+      return b.toString(16).padStart(2, "0");
+    }).join("");
+  });
+}
+
+var gate = document.getElementById("gate");
+var app = document.getElementById("app");
+
+function unlock() {
+  /* THE ENGINE IS A SEPARATE FILE AND DEPLOYS ARE WHERE IT GOES MISSING.
+     `website/` has to be copied WHOLE — studio.html, clip-engine.js,
+     satoshi.css and demo/. With clip-engine.js absent, `OptimallyClip` is
+     undefined and boot() throws on its first line, which renders as a page of
+     empty headings and no clue why. Say it instead. */
+  if (typeof window.OptimallyClip === "undefined") {
+    document.getElementById("gateErr").innerHTML =
+      "<b>clip-engine.js did not load.</b> Copy the whole website/ folder — "
+      + "studio.html, clip-engine.js, satoshi.css and demo/ — not just this page.";
+    return;
+  }
+  gate.remove();
+  app.hidden = false;
+  try { sessionStorage.setItem("optimally.studio", "1"); } catch (e) {}
+  boot();
+}
+document.getElementById("gateForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  var pw = document.getElementById("pw").value;
+  var err = document.getElementById("gateErr");
+  err.textContent = "";
+  sha256Hex(pw + PW_SALT).then(function (h) {
+    if (h === PW_HASH) unlock();
+    else { err.textContent = "Wrong password."; document.getElementById("pw").select(); }
+  });
+});
+
+/* ==================================================================== *
+ *  State
+ * ==================================================================== */
+var K = OptimallyClip;
+var DEMO = "demo/";
+
+var PRESETS = {
+  /* THE SAME FOUR THE CAPTURE SCRIPT SHIPS, and for the same reason: every
+     number is one the engine really produced. `flagged` and `clean` are the
+     app's own onboarding reveals, so somebody who installs after seeing a
+     clip meets the identical pairing on their third onboarding screen. */
+  "Trail bar (18)": {
+    format: "tier", score: 18, name: "TRAIL BAR", fit: "cover", method: "barcode",
+    image: DEMO + "OnboardingBadProduct.jpg",
+    reasons: [{ tone: "bad", text: "Made with industrial seed oils" },
+              { tone: "bad", text: "Ultra-processed (NOVA 4)" },
+              { tone: "warn", text: "Aspartame, flagged additive" }]
+  },
+  "Norr (94)": {
+    format: "ring", score: 94, name: "NORR", fit: "cover", method: "barcode",
+    image: DEMO + "OnboardingGoodProduct.jpg",
+    reasons: [{ tone: "good", text: "Minimally processed, no seed oils" },
+              { tone: "good", text: "No additives" },
+              { tone: "good", text: "Whole ingredients only" }]
+  },
+  "Counter (97)": {
+    format: "metrics", score: 97, name: "Kitchen counter", fit: "cover", method: "photo",
+    image: DEMO + "OnboardingWholeFoods.jpg",
+    reasons: [{ tone: "good", text: "No seed oils" },
+              { tone: "good", text: "Whole foods, nothing ultra-processed" },
+              { tone: "good", text: "42 g of protein" }]
+  },
+  "Head to head": {
+    format: "versus", score: 18, name: "TRAIL BAR", fit: "cover",
+    image: DEMO + "OnboardingBadProduct.jpg",
+    b: { name: "NORR", score: 94, fit: "cover", image: DEMO + "OnboardingGoodProduct.jpg" }
+  },
+  "Blank": { format: "tier", score: 50, name: "", image: "", reasons: [] }
+};
+
+var S = {
+  format: "tier", aspect: "1:1", score: 18, name: "TRAIL BAR", brand: "",
+  image: "", fit: "cover", tiers: "looksmax", method: "barcode",
+  wordmark: true, trust: false, intensity: 1, duration: 3.0, hold: 0,
+  reasons: [{ tone: "bad", text: "Made with industrial seed oils" },
+            { tone: "bad", text: "Ultra-processed (NOVA 4)" },
+            { tone: "warn", text: "Aspartame, flagged additive" }],
+  // NO SUGAR AXIS — see DEFAULT_METRICS in clip-engine.js. Sugar is an energy
+  // source in this app's argument and whether it counts against a food depends
+  // on the food; a bar between "Seed oils" and "Additives" says otherwise.
+  metrics: [{ label: "Seed oils", value: 0 }, { label: "Additives", value: 0 },
+            { label: "Processing", value: 0 }, { label: "Whole food", value: 0 },
+            { label: "Protein", value: 0 }],
+  b: { name: "NORR", score: 94, image: "", fit: "cover" }
+};
+
+var $ = function (id) { return document.getElementById(id); };
+var clip = null, playing = false, t = 0, raf = null, lastFrame = 0;
+
+/* ==================================================================== *
+ *  Controls
+ * ==================================================================== */
+function segment(host, values, get, set, labelFn) {
+  host.innerHTML = "";
+  values.forEach(function (v) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = labelFn ? labelFn(v) : v;
+    b.setAttribute("aria-pressed", String(get() === v));
+    b.addEventListener("click", function () {
+      set(v);
+      Array.prototype.forEach.call(host.children, function (c) {
+        c.setAttribute("aria-pressed", String(c === b));
+      });
+      rebuild();
+    });
+    host.appendChild(b);
+  });
+}
+
+function bind(id, key, cast) {
+  var el = $(id);
+  if (!el) return;
+  el.addEventListener("input", function () {
+    S[key] = cast ? cast(el.value) : el.value;
+    rebuild();
+  });
+}
+
+function boot() {
+  segment($("formats"), K.FORMATS, function () { return S.format; },
+          function (v) { S.format = v; });
+  segment($("aspects"), K.ASPECTS, function () { return S.aspect; },
+          function (v) { S.aspect = v; });
+  segment($("fits"), ["cover", "contain"], function () { return S.fit; },
+          function (v) { S.fit = v; },
+          function (v) { return v === "cover" ? "Fill the card" : "Fit inside"; });
+  segment($("tiers"), Object.keys(K.TIERS), function () { return S.tiers; },
+          function (v) { S.tiers = v; },
+          function (v) { return K.TIERS[v].join(" / "); });
+
+  var pres = $("presets");
+  pres.innerHTML = "";
+  Object.keys(PRESETS).forEach(function (name) {
+    var b = document.createElement("button");
+    b.type = "button"; b.textContent = name;
+    b.addEventListener("click", function () { applyPreset(PRESETS[name]); });
+    pres.appendChild(b);
+  });
+
+  segment($("toggles"), ["wordmark", "trust"],
+          function () { return null; }, function () {}, function (v) { return v; });
+  // Toggles are checkboxes wearing a segment's clothes, so they are wired by hand.
+  Array.prototype.forEach.call($("toggles").children, function (b, i) {
+    var key = ["wordmark", "trust"][i];
+    b.textContent = key === "wordmark" ? "Search bar" : "Trust line";
+    b.setAttribute("aria-pressed", String(S[key]));
+    b.onclick = function () {
+      S[key] = !S[key];
+      b.setAttribute("aria-pressed", String(S[key]));
+      rebuild();
+    };
+  });
+
+  bind("name", "name");
+  bind("brand", "brand");
+  bind("method", "method");
+  bind("hold", "hold", parseFloat);
+  bind("intensity", "intensity", parseFloat);
+  $("duration").addEventListener("input", function () {
+    S.duration = parseFloat(this.value);
+    $("durOut").textContent = S.duration.toFixed(1) + "s";
+    rebuild();
+  });
+
+  var sr = $("scoreRange"), sn = $("scoreNum");
+  function setScore(v) {
+    v = Math.max(0, Math.min(100, Math.round(+v || 0)));
+    S.score = v; sr.value = v; sn.value = v;
+    var chip = $("bandChip");
+    chip.textContent = K.BAND_LABEL[K.bandIndex(v)].toUpperCase();
+    chip.style.background = K.bandColor(v);
+    rebuild();
+  }
+  sr.addEventListener("input", function () { setScore(sr.value); });
+  sn.addEventListener("input", function () { setScore(sn.value); });
+
+  $("bname").addEventListener("input", function () { S.b.name = this.value; rebuild(); });
+  $("bscore").addEventListener("input", function () { S.b.score = +this.value; rebuild(); });
+
+  imageDrop($("drop"), $("file"), $("thumbWrap"), $("thumb"), $("clearImg"),
+            function (src) { S.image = src; });
+  imageDrop($("dropB"), $("fileB"), $("thumbWrapB"), $("thumbB"), $("clearImgB"),
+            function (src) { S.b.image = src; });
+
+  buildReasonRows();
+  buildMetricRows();
+
+  // A link the founder pasted wins over the defaults, so a clip can be handed
+  // between machines (everything but the photograph, which is far too big for
+  // a query string). With no link, the studio opens on a real scan rather than
+  // on an empty form: a blank tool is a tool nobody learns.
+  /* ONLY A LINK THIS PAGE WROTE COUNTS AS A LINK.
+     It used to take any query string at all, so `?v=2` — or a `?utm_source=`
+     somebody pasted in — parsed as a spec and silently blanked the panel:
+     no name, score 0, default format. */
+  var Q0 = new URLSearchParams(location.search);
+  var KNOWN = ["format", "aspect", "score", "name", "brand", "fit", "tiers",
+               "method", "intensity", "duration", "hold", "wordmark", "trust",
+               "reasons", "metrics", "bname", "bscore"];
+  if (!KNOWN.some(function (k) { return Q0.has(k); })) {
+    applyPreset(PRESETS["Trail bar (18)"]);
+  } else {
+    var q = K.specFromQuery(location.search);
+    ["format", "aspect", "score", "name", "brand", "fit", "tiers", "method",
+     "intensity", "duration", "hold", "wordmark", "trust"]
+      .forEach(function (k) { S[k] = q[k]; });
+    if (q.reasons.length) S.reasons = q.reasons;
+    if (new URLSearchParams(location.search).has("metrics")) S.metrics = q.metrics;
+    if (q.b) S.b = { name: q.b.name, score: q.b.score, image: "", fit: q.b.fit };
+    syncControls();
+  }
+
+  setScore(S.score);
+  wireTransport();
+  wireExports();
+  rebuild();
+  reportCapabilities();
+}
+
+function syncControls() {
+  $("name").value = S.name; $("brand").value = S.brand;
+  $("method").value = S.method; $("hold").value = S.hold; $("intensity").value = S.intensity;
+  $("duration").value = S.duration; $("durOut").textContent = (+S.duration).toFixed(1) + "s";
+  $("bname").value = S.b.name; $("bscore").value = S.b.score;
+  [["formats", K.FORMATS, "format"], ["aspects", K.ASPECTS, "aspect"],
+   ["fits", ["cover", "contain"], "fit"], ["tiers", Object.keys(K.TIERS), "tiers"]]
+    .forEach(function (spec) {
+      Array.prototype.forEach.call($(spec[0]).children, function (b, i) {
+        b.setAttribute("aria-pressed", String(spec[1][i] === S[spec[2]]));
+      });
+    });
+  buildReasonRows(); buildMetricRows();
+}
+
+function applyPreset(p) {
+  S.format = p.format || S.format;
+  S.score = p.score; S.name = p.name || ""; S.brand = p.brand || "";
+  S.image = p.image || ""; S.fit = p.fit || "cover"; S.method = p.method || "barcode";
+  S.reasons = (p.reasons || []).map(function (r) { return { tone: r.tone, text: r.text }; });
+  S.b = p.b ? { name: p.b.name, score: p.b.score, image: p.b.image || "", fit: p.b.fit || "cover" }
+            : { name: "", score: 0, image: "", fit: "cover" };
+  showThumb($("thumbWrap"), $("thumb"), S.image);
+  showThumb($("thumbWrapB"), $("thumbB"), S.b.image);
+  var chip = $("bandChip");
+  $("scoreRange").value = $("scoreNum").value = S.score;
+  chip.textContent = K.BAND_LABEL[K.bandIndex(S.score)].toUpperCase();
+  chip.style.background = K.bandColor(S.score);
+  syncControls();
+  rebuild();
+}
+
+function showThumb(wrap, img, src) {
+  if (src) { img.src = src; wrap.hidden = false; } else { img.removeAttribute("src"); wrap.hidden = true; }
+}
+
+function imageDrop(drop, input, wrap, img, clear, set) {
+  function take(file) {
+    if (!file || !/^image\//.test(file.type)) return;
+    var fr = new FileReader();
+    // A data URL, not an object URL: the canvas must stay untainted or the
+    // exporters cannot read a single pixel back out of it.
+    fr.onload = function () { set(fr.result); showThumb(wrap, img, fr.result); rebuild(); };
+    fr.readAsDataURL(file);
+  }
+  drop.addEventListener("click", function () { input.click(); });
+  input.addEventListener("change", function () { take(input.files[0]); });
+  ["dragenter", "dragover"].forEach(function (e) {
+    drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.add("over"); });
+  });
+  ["dragleave", "drop"].forEach(function (e) {
+    drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.remove("over"); });
+  });
+  drop.addEventListener("drop", function (ev) {
+    take(ev.dataTransfer.files && ev.dataTransfer.files[0]);
+  });
+  clear.addEventListener("click", function () { set(""); showThumb(wrap, img, ""); rebuild(); });
+}
+
+var TONES = ["bad", "warn", "good"];
+function buildReasonRows() {
+  var host = $("reasons"); host.innerHTML = "";
+  for (var i = 0; i < 4; i++) (function (i) {
+    var r = S.reasons[i] || { tone: "warn", text: "" };
+    var row = document.createElement("div"); row.className = "rowline";
+    var sel = document.createElement("select");
+    TONES.forEach(function (tn) {
+      var o = document.createElement("option"); o.value = tn;
+      o.textContent = tn === "bad" ? "Bad" : tn === "warn" ? "Warn" : "Good";
+      if (tn === r.tone) o.selected = true;
+      sel.appendChild(o);
+    });
+    var txt = document.createElement("input");
+    txt.type = "text"; txt.value = r.text; txt.placeholder = "the app's own sentence";
+    function push() {
+      S.reasons[i] = { tone: sel.value, text: txt.value };
+      S.reasons = S.reasons.filter(function (x) { return x && x.text.trim(); });
+      rebuild();
+    }
+    sel.addEventListener("change", push);
+    txt.addEventListener("input", push);
+    row.appendChild(sel); row.appendChild(txt); host.appendChild(row);
+  })(i);
+}
+
+function buildMetricRows() {
+  var host = $("metrics"); host.innerHTML = "";
+  for (var i = 0; i < 5; i++) (function (i) {
+    var m = S.metrics[i] || { label: "", value: 0 };
+    var row = document.createElement("div"); row.className = "rowline metric";
+    var lab = document.createElement("input");
+    lab.type = "text"; lab.value = m.label; lab.placeholder = "axis";
+    var val = document.createElement("input");
+    val.type = "number"; val.min = 0; val.max = 100; val.value = m.value;
+    function push() {
+      S.metrics[i] = { label: lab.value, value: Math.max(0, Math.min(100, +val.value || 0)) };
+      rebuild();
+    }
+    lab.addEventListener("input", push);
+    val.addEventListener("input", push);
+    row.appendChild(lab); row.appendChild(val); host.appendChild(row);
+  })(i);
+}
+
+/* ==================================================================== *
+ *  Preview
+ *
+ *  Rebuilt whenever the spec changes, at HALF SIZE. The engine is a pure
+ *  function of time, so a half-size preview and a full-size export are the
+ *  same film — which is the whole reason the studio can be trusted to show
+ *  what the exporter will write.
+ * ==================================================================== */
+function spec() {
+  var s = {
+    format: S.format, aspect: S.aspect, score: S.score, name: S.name, brand: S.brand,
+    image: S.image, fit: S.fit, tiers: S.tiers, method: S.method,
+    wordmark: S.wordmark, trust: S.trust, intensity: S.intensity,
+    duration: S.duration, hold: S.hold,
+    reasons: S.reasons.filter(function (r) { return r.text.trim(); }),
+    metrics: S.metrics.filter(function (m) { return m.label.trim(); })
+  };
+  if (S.format === "versus") s.b = S.b;
+  return s;
+}
+
+var rebuildTimer = null;
+function rebuild() {
+  // Debounced: a slider drag would otherwise decode the photograph 40 times a
+  // second, and the preview would stutter exactly while it is being judged.
+  clearTimeout(rebuildTimer);
+  rebuildTimer = setTimeout(rebuildNow, 55);
+}
+
+function rebuildNow() {
+  var canvas = $("canvas");
+  clip = K.create(canvas, spec(), { scale: 0.5 });
+  // The backing store is half size; CSS decides how big it looks.
+  var maxH = Math.max(320, window.innerHeight - 250);
+  var h = Math.min(maxH, 760);
+  canvas.style.height = h + "px";
+  canvas.style.width = (h * canvas.width / canvas.height) + "px";
+  $("scrub").max = Math.round(clip.duration * 1000);
+  clip.ready.then(function () {
+    t = Math.min(t, clip.duration);
+    draw();
+  });
+}
+
+function draw() {
+  if (!clip) return;
+  clip.render(t);
+  $("scrub").value = Math.round(t * 1000);
+  $("tlabel").textContent = t.toFixed(2) + " / " + clip.duration.toFixed(2);
+}
+
+function wireTransport() {
+  $("scrub").addEventListener("input", function () {
+    stop();
+    t = +this.value / 1000;
+    draw();
+  });
+  $("play").addEventListener("click", function () { playing ? stop() : play(); });
+  window.addEventListener("keydown", function (e) {
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+    if (e.code === "Space") { e.preventDefault(); playing ? stop() : play(); }
+  });
+  window.addEventListener("resize", function () {
+    if (!clip) return;
+    var canvas = $("canvas");
+    var h = Math.min(Math.max(320, window.innerHeight - 250), 760);
+    canvas.style.height = h + "px";
+    canvas.style.width = (h * canvas.width / canvas.height) + "px";
+  });
+}
+
+function play() {
+  playing = true;
+  $("play").textContent = "❚❚";
+  lastFrame = performance.now();
+  if (t >= clip.duration - 0.01) t = 0;
+  (function loop(now) {
+    if (!playing) return;
+    t += (now - lastFrame) / 1000;
+    lastFrame = now;
+    if (t >= clip.duration) { t = clip.duration; draw(); stop(); return; }
+    draw();
+    raf = requestAnimationFrame(loop);
+  })(performance.now());
+}
+function stop() {
+  playing = false;
+  $("play").textContent = "▶";
+  if (raf) cancelAnimationFrame(raf);
+}
+
+/* ==================================================================== *
+ *  Export
+ * ==================================================================== */
+var FPS = 30;
+function log(msg, warn) {
+  $("log").innerHTML = warn ? '<span class="warn">' + msg + "</span>" : msg;
+}
+function progress(p) {
+  var bar = $("bar");
+  if (p === null) { bar.style.display = "none"; return; }
+  bar.style.display = "block";
+  bar.firstElementChild.style.width = Math.round(p * 100) + "%";
+}
+function busy(on) {
+  Array.prototype.forEach.call(document.querySelectorAll("#exports button"), function (b) {
+    b.disabled = on;
+  });
+}
+/* THE SAVE, AND A WAY BACK IF IT DOES NOT HAPPEN.
+ *
+ * A programmatic `a.click()` five seconds after the button was pressed is no
+ * longer inside a user gesture, and browsers are entitled to ignore it —
+ * Chrome blocks the second and later files under "automatic downloads" (a
+ * small icon in the address bar and nothing else), and Safari is stricter
+ * still. That failure is invisible: the log says the file was written and no
+ * file appears, which is exactly "the website doesn't let me export".
+ *
+ * So the blob is kept and every exporter prints a real link to it. Clicking
+ * that link IS a gesture, so it always works. */
+var lastURL = null;
+function download(blob, filename) {
+  if (lastURL) URL.revokeObjectURL(lastURL);
+  lastURL = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = lastURL; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  return lastURL;
+}
+
+/** The manual link, for when the automatic save was ignored. */
+function saveLink(url, filename, size) {
+  var mb = (size / 1048576).toFixed(1);
+  return '<br><a href="' + url + '" download="' + filename + '">' + filename +
+         "</a> · " + mb + " MB — if it did not land in Downloads, click it.";
+}
+
+/* WHY A TAINTED CANVAS IS CHECKED BEFORE EVERY EXPORT.
+ *
+ * Reading pixels back out of a canvas that has drawn an image the browser
+ * considers cross-origin throws a SecurityError, and it takes down every
+ * exporter here at once: `new VideoFrame(canvas)`, `canvas.toBlob` and
+ * `canvas.captureStream` all need the canvas to be clean. The usual way to
+ * hit it is opening this page straight off the disk — over file:// the demo
+ * photographs taint the canvas, so the presets fail while a photo you upload
+ * yourself (a data URL) works. That asymmetry is baffling without a message,
+ * so this says it plainly instead of throwing. */
+function exportBlocked(canvas) {
+  try {
+    canvas.getContext("2d").getImageData(0, 0, 1, 1);
+    return null;
+  } catch (e) {
+    return location.protocol === "file:"
+      ? "This page is open <b>from a file</b>, so the browser will not let it read "
+        + "its own canvas back and no export can work. Serve the folder over http "
+        + '(<code>python3 -m http.server</code>) — or upload a photo of your own, '
+        + "which is not subject to it."
+      : "The canvas is tainted by an image the browser treats as cross-origin ("
+        + e.name + "), so it cannot be exported. Upload the photo from your "
+        + "computer rather than linking it.";
+  }
+}
+function slug() {
+  var n = (S.name || S.format).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return "optimally-" + (n || "clip") + "-" + S.format + "-" + S.score;
+}
+
+/** A full-size, offscreen instance. The preview is half size on purpose and
+    must never be what gets encoded. */
+function exportClip() {
+  var c = document.createElement("canvas");
+  return K.create(c, spec(), { scale: 1 });
+}
+
+/* ---- MP4, frame by frame, through WebCodecs -------------------------
+ *
+ * NOT MediaRecorder. MediaRecorder captures a canvas in REAL TIME: it drops
+ * frames when a render takes longer than 33ms and duplicates them when it is
+ * quick, so the exported file's timing depends on how busy the laptop was.
+ * The whole engine is built so that frame N is a pure function of N; encoding
+ * it frame by frame is the only export that preserves that.
+ * ------------------------------------------------------------------- */
+var MUXER_URL = "https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.1/build/mp4-muxer.min.js";
+function loadMuxer() {
+  if (window.Mp4Muxer) return Promise.resolve(true);
+  return new Promise(function (resolve) {
+    var s = document.createElement("script");
+    s.src = MUXER_URL;
+    s.onload = function () { resolve(!!window.Mp4Muxer); };
+    s.onerror = function () { resolve(false); };
+    document.head.appendChild(s);
+  });
+}
+
+function pickCodec(w, h) {
+  // High 5.2 first, then progressively less demanding profiles. A machine
+  // whose hardware encoder refuses 1080x1920 High will usually take Main.
+  var candidates = ["avc1.640034", "avc1.640033", "avc1.4d0034", "avc1.42003e"];
+  return (function next(i) {
+    if (i >= candidates.length) return Promise.resolve(null);
+    return VideoEncoder.isConfigSupported({
+      codec: candidates[i], width: w, height: h, bitrate: 14000000, framerate: FPS
+    }).then(function (r) {
+      return r.supported ? candidates[i] : next(i + 1);
+    }).catch(function () { return next(i + 1); });
+  })(0);
+}
+
+function exportMp4() {
+  if (typeof VideoEncoder === "undefined") {
+    log("This browser has no WebCodecs. Use <b>Export WebM</b>, or PNG frames and the Mac encoder.", true);
+    return;
+  }
+  busy(true); stop(); log("Loading the encoder…"); progress(0);
+  var ex = exportClip();
+  var blocked = exportBlocked(ex.canvas);
+  if (blocked) { log(blocked, true); busy(false); progress(null); return; }
+  var W = ex.geometry.pxW, H = ex.geometry.pxH;
+  var total = Math.round(ex.duration * FPS);
+
+  loadMuxer().then(function (ok) {
+    if (!ok) throw new Error("muxer");
+    return Promise.all([ex.ready, pickCodec(W, H)]);
+  }).then(function (r) {
+    var codec = r[1];
+    if (!codec) throw new Error("codec");
+    var muxer = new Mp4Muxer.Muxer({
+      target: new Mp4Muxer.ArrayBufferTarget(),
+      video: { codec: "avc", width: W, height: H },
+      fastStart: "in-memory"
+    });
+    var failed = null;
+    var enc = new VideoEncoder({
+      output: function (chunk, meta) { muxer.addVideoChunk(chunk, meta); },
+      error: function (e) { failed = e; }
+    });
+    enc.configure({ codec: codec, width: W, height: H, bitrate: 14000000, framerate: FPS });
+
+    /* BACK-PRESSURE, ON THE ENCODER'S OWN EVENT.
+     *
+     * The first version polled `encodeQueueSize` on a setTimeout(0). That is
+     * a spin loop wearing a queue check's clothes: when the queue stops
+     * draining it never notices, and a second export in the same page hung at
+     * frame 112 forever with a progress bar that looked alive. It hung because
+     * the FIRST export's encoder was never closed — a hardware H.264 session
+     * is a real resource and the browser hands out very few of them — so
+     * `enc.close()` below is the actual fix, and this is the belt to its
+     * braces: wait on `dequeue`, and give up with a message rather than
+     * spinning if nothing moves for eight seconds. */
+    var STALL_MS = 8000;
+    function room() {
+      if (enc.encodeQueueSize < 8) return Promise.resolve();
+      return new Promise(function (res, rej) {
+        var settled = false, t0 = Date.now();
+        function check() {
+          if (settled) return;
+          if (enc.encodeQueueSize < 8) { settled = true; cleanup(); res(); }
+          else if (Date.now() - t0 > STALL_MS) { settled = true; cleanup(); rej(new Error("stall")); }
+        }
+        var iv = setInterval(check, 120);
+        function cleanup() { clearInterval(iv); enc.removeEventListener("dequeue", check); }
+        enc.addEventListener("dequeue", check);
+      });
+    }
+
+    var i = 0;
+    function step() {
+      if (failed) return Promise.reject(failed);
+      if (i >= total) {
+        return enc.flush().then(function () {
+          enc.close();
+          muxer.finalize();
+          var blob = new Blob([muxer.target.buffer], { type: "video/mp4" });
+          var name = slug() + ".mp4";
+          var url = download(blob, name);
+          log("Wrote " + total + " frames at " + FPS + " fps, "
+              + ex.duration.toFixed(2) + "s." + saveLink(url, name, blob.size));
+          busy(false); progress(null);
+        });
+      }
+      return room().then(function () {
+        ex.render(i / FPS);
+        var frame = new VideoFrame(ex.canvas, {
+          timestamp: Math.round(i * 1e6 / FPS), duration: Math.round(1e6 / FPS)
+        });
+        // A keyframe every second keeps the file scrubbable in an editor.
+        enc.encode(frame, { keyFrame: i % FPS === 0 });
+        frame.close();
+        i++;
+        if (i % 6 === 0 || i === total) {
+          progress(i / total);
+          log("Encoding frame " + i + " of " + total + "…");
+        }
+        return step();
+      });
+    }
+    return step().catch(function (e) {
+      try { enc.close(); } catch (x) {}
+      throw e;
+    });
+  }).catch(function (e) {
+    var why = e && e.message === "muxer"
+      ? "Could not load the MP4 muxer (offline?)."
+      : e && e.message === "codec"
+      ? "No H.264 encoder here accepts " + W + "x" + H + "."
+      : e && e.message === "stall"
+      ? "The H.264 encoder stopped responding. Reload the page and try again."
+      : "MP4 export failed: " + (e && e.message);
+    log(why + " Falling back to <b>WebM</b> or PNG frames.", true);
+    busy(false); progress(null);
+  });
+}
+
+/* ---- WebM, in real time -------------------------------------------- *
+ * The fallback, and it is a real fallback rather than an equal: it records
+ * the canvas as it plays, so a slow frame becomes a dropped one. Good enough
+ * for a preview to send someone, not for the cut. */
+function exportWebm() {
+  busy(true); stop(); log("Recording…"); progress(0);
+  var ex = exportClip();
+  ex.ready.then(function () {
+    var blocked = exportBlocked(ex.canvas);
+    if (blocked) { log(blocked, true); busy(false); progress(null); return; }
+    var canvas = ex.canvas;
+    var stream = canvas.captureStream(FPS);
+    var types = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"];
+    var type = types.filter(function (x) {
+      return window.MediaRecorder && MediaRecorder.isTypeSupported(x);
+    })[0];
+    if (!type) { log("No MediaRecorder support here.", true); busy(false); progress(null); return; }
+    var rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 14000000 });
+    var parts = [];
+    rec.ondataavailable = function (e) { if (e.data.size) parts.push(e.data); };
+    rec.onstop = function () {
+      stream.getTracks().forEach(function (tr) { tr.stop(); });
+      var ext = type.indexOf("mp4") >= 0 ? "mp4" : "webm";
+      var blob = new Blob(parts, { type: type });
+      var name = slug() + "." + ext;
+      var url = download(blob, name);
+      log("Wrote a " + ext.toUpperCase() + ". Real-time capture, so check the "
+          + "timing before you cut with it." + saveLink(url, name, blob.size));
+      busy(false); progress(null);
+    };
+    rec.start();
+    var t0 = performance.now();
+    (function loop(now) {
+      var tt = (now - t0) / 1000;
+      progress(Math.min(1, tt / ex.duration));
+      if (tt >= ex.duration) { ex.render(ex.duration); setTimeout(function () { rec.stop(); }, 120); return; }
+      ex.render(tt);
+      requestAnimationFrame(loop);
+    })(t0);
+  });
+}
+
+/* ---- PNG frames, zipped -------------------------------------------- *
+ * The deliverable an editor actually wants: exact colour, no codec, imports
+ * as an image sequence. STORE, no deflate — a PNG is already compressed and
+ * a pure-JS deflate would take longer than the render. */
+function crc32(buf) {
+  var c, table = crc32.table;
+  if (!table) {
+    table = crc32.table = new Uint32Array(256);
+    for (var n = 0; n < 256; n++) {
+      c = n;
+      for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      table[n] = c >>> 0;
+    }
+  }
+  c = 0xFFFFFFFF;
+  for (var i = 0; i < buf.length; i++) c = table[(c ^ buf[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+
+function zipStore(files) {
+  var chunks = [], central = [], offset = 0;
+  var enc = new TextEncoder();
+  function u32(v) { return [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255]; }
+  function u16(v) { return [v & 255, (v >>> 8) & 255]; }
+  files.forEach(function (f) {
+    var name = enc.encode(f.name), crc = crc32(f.data);
+    var local = [].concat([0x50, 0x4B, 0x03, 0x04], u16(20), u16(0), u16(0), u16(0), u16(0),
+      u32(crc), u32(f.data.length), u32(f.data.length), u16(name.length), u16(0));
+    chunks.push(new Uint8Array(local), name, f.data);
+    central.push({ name: name, crc: crc, size: f.data.length, offset: offset });
+    offset += local.length + name.length + f.data.length;
+  });
+  var cdStart = offset, cdSize = 0;
+  central.forEach(function (e) {
+    var head = [].concat([0x50, 0x4B, 0x01, 0x02], u16(20), u16(20), u16(0), u16(0), u16(0), u16(0),
+      u32(e.crc), u32(e.size), u32(e.size), u16(e.name.length),
+      u16(0), u16(0), u16(0), u16(0), u32(0), u32(e.offset));
+    chunks.push(new Uint8Array(head), e.name);
+    cdSize += head.length + e.name.length;
+  });
+  chunks.push(new Uint8Array([].concat([0x50, 0x4B, 0x05, 0x06], u16(0), u16(0),
+    u16(central.length), u16(central.length), u32(cdSize), u32(cdStart), u16(0))));
+  return new Blob(chunks, { type: "application/zip" });
+}
+
+function exportFrames() {
+  busy(true); stop(); log("Rendering frames…"); progress(0);
+  var ex = exportClip();
+  var total = Math.round(ex.duration * FPS);
+  var files = [], i = 0;
+  ex.ready.then(function () {
+    var blocked = exportBlocked(ex.canvas);
+    if (blocked) throw new Error(blocked);
+  }).then(function step() {
+    if (i >= total) {
+      log("Zipping " + total + " frames…");
+      return new Promise(function (res) { setTimeout(res, 20); }).then(function () {
+        var blob = zipStore(files);
+        var name = slug() + "-frames.zip";
+        var url = download(blob, name);
+        log("Wrote " + total + " PNGs. Import as an image sequence at " + FPS
+            + " fps." + saveLink(url, name, blob.size));
+        busy(false); progress(null);
+      });
+    }
+    ex.render(i / FPS);
+    return new Promise(function (res) {
+      ex.canvas.toBlob(function (b) { b.arrayBuffer().then(res); }, "image/png");
+    }).then(function (buf) {
+      files.push({ name: "frame_" + String(i).padStart(4, "0") + ".png", data: new Uint8Array(buf) });
+      i++;
+      progress(i / total);
+      if (i % 5 === 0) log("Rendering frame " + i + " of " + total + "…");
+      return new Promise(function (res) { setTimeout(res, 0); }).then(step);
+    });
+  }).catch(function (e) {
+    // It used to have no catch: a tainted canvas took `toBlob` down and left
+    // the buttons disabled with the log still saying "Rendering frame 3".
+    log((e && e.message) || "PNG export failed.", true);
+    busy(false); progress(null);
+  });
+}
+
+function exportPoster() {
+  busy(true); log("Rendering the poster…");
+  var ex = exportClip();
+  var at = t;
+  ex.ready.then(function () {
+    var blocked = exportBlocked(ex.canvas);
+    if (blocked) { log(blocked, true); busy(false); return; }
+    ex.render(at);
+    ex.canvas.toBlob(function (b) {
+      var name = slug() + "-poster.png";
+      var url = download(b, name);
+      log("Poster at " + at.toFixed(2) + "s." + saveLink(url, name, b.size));
+      busy(false);
+    }, "image/png");
+  }).catch(function (e) {
+    log((e && e.message) || "Poster failed.", true);
+    busy(false);
+  });
+}
+
+function copyLink() {
+  var q = new URLSearchParams();
+  ["format", "aspect", "score", "name", "brand", "fit", "tiers", "method"].forEach(function (k) {
+    if (S[k] !== "" && S[k] !== undefined) q.set(k, S[k]);
+  });
+  if (!S.wordmark) q.set("wordmark", "0");
+  if (S.trust) q.set("trust", "1");
+  if (+S.duration !== 3.0) q.set("duration", S.duration);
+  if (+S.hold) q.set("hold", S.hold);
+  if (+S.intensity !== 1) q.set("intensity", S.intensity);
+  var rs = S.reasons.filter(function (r) { return r.text.trim(); });
+  if (rs.length) q.set("reasons", rs.map(function (r) { return r.tone + ":" + r.text; }).join("|"));
+  var ms = S.metrics.filter(function (m) { return m.label.trim() && m.value; });
+  if (ms.length) q.set("metrics", ms.map(function (m) { return m.label + ":" + m.value; }).join("|"));
+  if (S.format === "versus") { q.set("bname", S.b.name); q.set("bscore", S.b.score); }
+  var url = location.origin + location.pathname + "?" + q.toString();
+  var done = function () {
+    log("Link copied. <b>The photograph is not in it</b> — a data URL is megabytes and a query string is not.");
+  };
+  if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, function () { prompt("Copy:", url); });
+  else prompt("Copy:", url);
+}
+
+/* THE AUTO-UNLOCK LIVES AT THE BOTTOM, and that is not tidiness.
+   It used to sit beside the form handler, which meant a returning session ran
+   boot() while `var K = OptimallyClip` was still hoisted-but-unassigned: the
+   whole panel threw on the first line and rendered as a page of empty
+   headings. Going through the form hid it, because the hash comparison is
+   async and the rest of the script had finished by the time it resolved. */
+/* WHAT THIS BROWSER CAN ACTUALLY DO, SAID ON ARRIVAL.
+ *
+ * "It doesn't let me export to MP4" is three different faults wearing one
+ * sentence — no WebCodecs, no H.264 encoder that will take the size, or a
+ * canvas the browser will not read back — and none of them announced itself
+ * until a five-second export produced nothing. Now the answer is on screen
+ * before anything is clicked, and it names which one. */
+function reportCapabilities() {
+  if (location.protocol === "file:") {
+    log("Opened <b>from a file</b>, so no export can work — the browser will "
+        + "not let this page read its own canvas back. Serve the folder: "
+        + "<code>python3 -m http.server</code> in it, then open "
+        + "<code>http://localhost:8000/studio.html</code>.", true);
+    return;
+  }
+  if (typeof VideoEncoder === "undefined") {
+    log("This browser has no WebCodecs, so <b>MP4 export is unavailable</b>. "
+        + "Chrome or Edge can do it. Here, use <b>Export WebM</b> or PNG "
+        + "frames plus the Mac encoder.", true);
+    return;
+  }
+  var dims = K.create(document.createElement("canvas"), spec(), { scale: 1 }).geometry;
+  VideoEncoder.isConfigSupported({
+    codec: "avc1.640034", width: dims.pxW, height: dims.pxH,
+    bitrate: 14000000, framerate: FPS
+  }).then(function (r) {
+    if (!r.supported) throw new Error("unsupported");
+    log("Ready. MP4 export available at " + dims.pxW + "x" + dims.pxH + ".");
+  }).catch(function () {
+    log("This browser's H.264 encoder will not take " + dims.pxW + "x" + dims.pxH
+        + ". <b>Export will fall back automatically</b>; if it fails, use WebM "
+        + "or PNG frames.", true);
+  });
+}
+
+function wireExports() {
+  $("expMp4").addEventListener("click", exportMp4);
+  $("expWebm").addEventListener("click", exportWebm);
+  $("expFrames").addEventListener("click", exportFrames);
+  $("expPoster").addEventListener("click", exportPoster);
+  $("copyLink").addEventListener("click", copyLink);
+}
+
+try { if (sessionStorage.getItem("optimally.studio") === "1") unlock(); } catch (e) {}
+</script>
+</body>
+</html>
