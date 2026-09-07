@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+import { SITE_URL as origin, BASE_PATH as base } from '@/lib/site'
 
 /**
  * Absolute URLs, because a sitemap with relative ones is ignored — so this has
@@ -8,9 +9,8 @@ import type { MetadataRoute } from 'next'
  *   NEXT_PUBLIC_BASE_PATH  ''  on a custom domain, '/verawesbite' on the
  *                          github.io project page
  *
- * The fallbacks below describe the project-page deployment, so a build with
- * neither variable set still produces a sitemap that is correct rather than
- * one that is confidently wrong.
+ * Both are resolved in lib/site.ts, which tolerates a blank or scheme-less
+ * value rather than throwing — see the note there.
  *
  * `/studio/` is deliberately absent: it is an internal tool, and robots.txt
  * disallows it.
@@ -20,8 +20,6 @@ import type { MetadataRoute } from 'next'
    a static export has no server to regenerate a sitemap on. */
 export const dynamic = 'force-static'
 
-const origin = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nathaniel1232.github.io'
-const base = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 const PAGES = ['/', '/support/', '/contact/', '/privacy/', '/terms/']
 

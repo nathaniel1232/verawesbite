@@ -2,16 +2,10 @@ import type { Metadata, Viewport } from 'next'
 import { asset } from '@/lib/asset'
 import './globals.css'
 
-/**
- * Absolute base for Open Graph image URLs — a social crawler cannot resolve a
- * relative path. Set NEXT_PUBLIC_SITE_URL in CI to the real origin; the
- * fallback keeps local builds warning-free.
- */
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nathaniel1232.github.io'
+import { SITE_URL } from '@/lib/site'
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Optimally — Know what's really in your food",
     template: '%s — Optimally',

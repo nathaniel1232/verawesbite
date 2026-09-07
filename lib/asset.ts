@@ -11,8 +11,8 @@
  * building with NEXT_PUBLIC_BASE_PATH set and grepping the output — links were
  * prefixed, images were not.
  */
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+import { BASE_PATH } from './site'
 
 export function asset(path: string): string {
-  return `${BASE}${path}`
+  return `${BASE_PATH}${path}`
 }
