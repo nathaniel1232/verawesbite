@@ -544,21 +544,39 @@
    * ================================================================== */
   function timeline(spec) {
     var T = {
-      dim:       [0.00, 0.24],
-      brackets:  [0.02, 0.40],
-      dots:      [0.10, 0.50],
-      // ONE PASS, AND A SLOW ONE. The first cut ran a sweep down in 0.48s and
-      // a fast confirm back up, plus five checks ticking inside the same
-      // window — eight separate things happening in under a second, which is
-      // why the note back was "the analysing part is what makes it look too
-      // quick". Fewer events, each with room, reads as deliberate; the same
-      // events crammed read as a glitch.
-      sweepDown: [0.06, 0.86],
+      /* THE SCAN OPENS ON FRAME 0 ALREADY RUNNING.
+       *
+       * `brackets` and `dim` used to begin at 0.02 and ramp for a quarter of a
+       * second, so the film opened on a plain photograph and then faded a HUD
+       * in over it. Two tenths of a second of nothing is a long time at the
+       * top of a three second clip, and it is the part a viewer decides on.
+       * Both now start at zero: the first frame is a scan in progress. */
+      dim:       [0.00, 0.16],
+      brackets:  [0.00, 0.24],
+      dots:      [0.04, 0.30],
+      /* ONE PASS, AND IT NOW TAKES 0.62 RATHER THAN 0.80.
+       *
+       * The history is worth keeping because it has swung both ways. The
+       * first cut ran the sweep in 0.48s with a fast confirm back up and five
+       * checks ticking inside the same window — eight events in under a
+       * second, and the note back was that the analysing part looked too
+       * quick. So it was slowed to 0.80 with one pass, and the note back was
+       * "slow and just weird to the eye".
+       *
+       * BOTH NOTES WERE ABOUT THE SAME FAULT and neither was really about
+       * duration: the lattice used to stay lit everywhere the sweep had been,
+       * so by the end of the pass the product was under a full web of wires
+       * (see `drawScan`). Busy reads as frantic when it is fast and as
+       * dragging when it is slow. With the mesh now travelling WITH the sweep
+       * instead of accumulating behind it, the pass can be shorter without
+       * going back to frantic, and the 0.20 saved goes to the verdict, which
+       * is the part anybody actually stops for. */
+      sweepDown: [0.03, 0.65],
       sweepUp:   [10, 10],       // off. Kept so nothing downstream needs a guard.
-      readout:   [0.10, 0.90],
-      lock:      [0.86, 1.02],
-      flash:     [0.96, 1.08],   // the reveal beat: one short colour pop
-      cut:        1.00
+      readout:   [0.04, 0.68],
+      lock:      [0.65, 0.80],
+      flash:     [0.76, 0.88],   // the reveal beat: one short colour pop
+      cut:        0.80
     };
     if (spec.format === "tier") {
       /* THE PHOTOGRAPH'S TRAVEL GETS 0.54 OF THE 3.0, and every other beat is
@@ -566,43 +584,50 @@
        * that in the first 0.1 — the move was over before the eye found it.
        * A move this large is the biggest single gesture in the film and it is
        * now the longest one. */
-      T.settle   = [0.98, 1.52];
-      T.slam     = [1.18, 1.52];   // the word lands as the picture settles
-      T.score    = [1.46, 2.04];
-      T.rows     =  1.90; T.rowStep = 0.10;
-      T.foot     = [2.24, 2.40];
+      T.settle   = [0.78, 1.34];
+      T.slam     = [0.98, 1.34];   // the word lands as the picture settles
+      T.score    = [1.26, 1.86];
+      /* THE ROWS COME IN WHILE THE NUMBER IS STILL COUNTING.
+       *
+       * They used to start well after the card had appeared, which left a
+       * full-height white panel standing empty under the score for about half
+       * a second — a hole in the middle of the frame at the exact moment the
+       * verdict is supposed to be arriving. Overlapping them means the card
+       * fills as the number climbs, and both finish together. */
+      T.rows     =  1.48; T.rowStep = 0.10;
+      T.foot     = [2.06, 2.22];
       T.end      =  3.00;
     } else if (spec.format === "metrics") {
-      T.light    = [0.96, 1.06];  // the stage comes UP to bone at the cut
-      T.settle   = [0.98, 1.52];
-      T.head     = [1.30, 1.52];
-      T.rows     =  1.54; T.rowStep = 0.10;
-      T.score    = [1.96, 2.40];
-      T.foot     = [2.44, 2.58];
+      T.light    = [0.76, 0.86];  // the stage comes UP to bone at the cut
+      T.settle   = [0.78, 1.34];
+      T.head     = [1.10, 1.34];
+      T.rows     =  1.36; T.rowStep = 0.10;
+      T.score    = [1.78, 2.24];
+      T.foot     = [2.30, 2.46];
       T.end      =  3.00;
     } else if (spec.format === "versus") {
-      T.light    = [0.96, 1.06];
-      T.settle   = [0.98, 1.52];
-      T.score    = [1.36, 2.02];
-      T.crown    = [2.04, 2.22];
-      T.foot     = [2.26, 2.42];
+      T.light    = [0.76, 0.86];
+      T.settle   = [0.78, 1.34];
+      T.score    = [1.16, 1.84];
+      T.crown    = [1.88, 2.08];
+      T.foot     = [2.12, 2.30];
       T.end      =  3.00;
     } else if (spec.format === "card") {
-      T.light    = [0.96, 1.06];
-      T.settle   = [0.98, 1.46];
-      T.score    = [1.28, 1.94];
-      T.band     = [1.88, 2.02];
-      T.foot     = [2.08, 2.22];
+      T.light    = [0.76, 0.86];
+      T.settle   = [0.78, 1.28];
+      T.score    = [1.08, 1.76];
+      T.band     = [1.70, 1.86];
+      T.foot     = [1.92, 2.08];
       T.end      =  3.00;
     } else { // ring
-      T.light    = [0.96, 1.06];
-      T.settle   = [0.98, 1.52];
-      T.sheet    = [1.02, 1.54];
-      T.score    = [1.24, 1.92];
-      T.band     = [1.86, 2.00];
-      T.lead     = [1.92, 2.08];
-      T.rows     =  2.10; T.rowStep = 0.09;
-      T.foot     = [2.46, 2.60];
+      T.light    = [0.76, 0.86];
+      T.settle   = [0.78, 1.34];
+      T.sheet    = [0.82, 1.36];
+      T.score    = [1.04, 1.74];
+      T.band     = [1.68, 1.84];
+      T.lead     = [1.74, 1.92];
+      T.rows     =  1.94; T.rowStep = 0.09;
+      T.foot     = [2.32, 2.48];
       T.end      =  3.00;
     }
     /* LENGTH IS A DIAL, NOT A CONSTANT.
@@ -1022,10 +1047,21 @@
       var P = new Array(lat.pts.length);
       for (var i = 0; i < lat.pts.length; i++) {
         var p = lat.pts[i];
-        // Points settle to 0.55 rather than staying at full: a cloud that
-        // stays at peak brightness is a texture, not a reading.
-        var passed = clamp01((litY - p.y) / (hud.h * 0.10));
-        var heat = passed * (1 - 0.45 * clamp01((litY - p.y) / (hud.h * 0.34)));
+        /* A BAND OF ACTIVITY THAT TRAVELS, NOT A WEB THAT ACCUMULATES.
+         *
+         * Points used to settle to 0.55 of full and stay there, so every point
+         * the sweep had crossed kept glowing: by the end of the pass the
+         * entire packshot was under a lit constellation with a glow on every
+         * wire. That is the thing that read as "weird to the eye" — the
+         * product, which is the only reason the clip exists, spent the whole
+         * scan buried under a network diagram.
+         *
+         * They now light as the line reaches them and fall away to 0.10 just
+         * behind it, over a fifth of the card rather than a third. What you
+         * see is a bright band moving down the pack, which is both quieter
+         * and a better picture of what a scanner does. */
+        var passed = clamp01((litY - p.y) / (hud.h * 0.08));
+        var heat = passed * (1 - 0.90 * clamp01((litY - p.y) / (hud.h * 0.20)));
         var shimmer = 0.86 + 0.14 * Math.sin(t * 5.2 + p.ph);
         P[i] = {
           x: cxm + (p.x - cxm) * contract,
@@ -1096,7 +1132,14 @@
     /* ---- 2. brackets ------------------------------------------------- *
      * They converge from outside the card, then kick outward at the lock and
      * take the band colour. Everything else in the scan is white. */
-    var bIn = outQuint(span(t, T.brackets[0], T.brackets[1]));
+    /* THE BRACKETS ARE ALREADY THERE ON FRAME 0.
+     *
+     * Easing them from zero means the film opens on a plain photograph and
+     * only becomes a scan a few frames later. That first frame is the one the
+     * eye lands on and the one a thumbnail is cut from, and it should say
+     * what this is. They start at 40% and grow in from there, so there is
+     * still an arrival — it just happens to something already on screen. */
+    var bIn = 0.40 + 0.60 * outQuint(span(t, T.brackets[0], T.brackets[1]));
     if (bIn > 0) {
       var grow = (1 - bIn) * box.w * 0.10 + outBack(lockP) * box.w * 0.022;
       var col = lockP > 0.02 ? mix("#FFFFFF", g.band, outCubic(lockP)) : "#FFFFFF";
@@ -2244,7 +2287,7 @@
       stageDark: 1,
       img: null, imgB: null, quietHUD: false
     };
-    g.lattice0 = buildLattice(scanRect, spec.seed, tall ? 150 : 120);
+    g.lattice0 = buildLattice(scanRect, spec.seed, tall ? 66 : 54);
     g.lattice = g.lattice0;
 
     var ready = Promise.all([
@@ -2255,7 +2298,7 @@
       spec.b ? loadImage(spec.b.image).then(function (im) { g.imgB = im; }) : Promise.resolve()
     ]).then(function () {
       reshape(g.img);
-      g.lattice0 = buildLattice(scanRect, spec.seed, tall ? 150 : 120);
+      g.lattice0 = buildLattice(scanRect, spec.seed, tall ? 66 : 54);
       g.lattice = g.lattice0;
       if (spec.format === "versus") {
         // Two panels, two clouds, two seeds. One lattice reused would put the
@@ -2270,9 +2313,9 @@
         var dd = Math.min(side * 0.70, Math.max(W * 0.16, (slack - cardH) / 1.48));
         var blockH = cardH + W * 0.028 + nameH + dd * 1.48 + pillH;
         var topY = g.contentTop + Math.max(0, (avail - blockH) / 2);
-        g.lattice0 = buildLattice({ x: W * 0.075, y: topY, w: side, h: cardH }, spec.seed, 70);
+        g.lattice0 = buildLattice({ x: W * 0.075, y: topY, w: side, h: cardH }, spec.seed, 34);
         g.latticeB = buildLattice({ x: W * 0.075 + side + gap, y: topY, w: side, h: cardH },
-                                  spec.seed ^ 0x9E3779B9, 70);
+                                  spec.seed ^ 0x9E3779B9, 34);
         g.lattice = g.lattice0;
       }
       return true;
