@@ -29,10 +29,19 @@ jobs:
           cache: npm
       - run: npm ci
       # Project pages live at /<repo>/, so the export needs that prefix baked in.
-      # Delete this env line if you move the site to a custom domain.
+      #
+      # MOVING TO optimallyapp.com IS A TWO-LINE CHANGE HERE, AND IT MUST HAPPEN
+      # AFTER THE DNS RESOLVES, NOT BEFORE. See DEPLOY.md — flipping this early
+      # points the whole site at a domain that does not exist yet, and the iOS
+      # app's Privacy / Terms / Support links go with it. App Review opens
+      # those links.
+      #
+      #   NEXT_PUBLIC_BASE_PATH: ''                        <- custom domain
+      #   NEXT_PUBLIC_SITE_URL:  https://optimallyapp.com
       - run: npm run build
         env:
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+          NEXT_PUBLIC_SITE_URL: https://nathaniel1232.github.io
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -1,0 +1,8 @@
+# The studio is an internal tool behind a password. The password is a
+# client-side check and cannot keep a secret (see public/studio/index.html), so
+# keeping the page out of the index is most of what actually protects it.
+User-agent: *
+Disallow: /studio/
+Allow: /
+
+Sitemap: https://optimallyapp.com/sitemap.xml
