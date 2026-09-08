@@ -7,7 +7,7 @@
 <title>Optimally Clip Studio</title>
 
 <link rel="stylesheet" href="satoshi.css">
-<script src="clip-engine.js?v=2026-09-07.7abf86b"></script>
+<script src="clip-engine.js?v=2026-09-08.4f585a9"></script>
 
 <style>
   /* CONTRAST, BECAUSE THE FIRST VERSION FAILED IT BADLY.
@@ -153,6 +153,21 @@
      indistinguishable from a bug that was never fixed, and this is the one
      line that tells the two apart. */
   #build{margin-top:18px;font-size:11.5px;color:var(--ink3);letter-spacing:.04em}
+
+  .barrow{display:flex;gap:8px}
+  .barrow input{flex:1;min-width:0}
+  .barrow button{white-space:nowrap;padding:9px 14px;border-radius:9px;font-weight:700;
+    font-size:12.5px;cursor:pointer;background:var(--panel2);border:1px solid var(--line);
+    color:var(--ink)}
+  .barrow button:hover{border-color:var(--accent)}
+  .barrow button:disabled{opacity:.5;cursor:default}
+  #offOut{margin:8px 0 10px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;
+    background:var(--panel2);font-size:12.5px;line-height:1.55;color:var(--ink2)}
+  #offOut b{color:var(--ink)}
+  #offOut .facts{color:var(--ink3);font-size:12px;margin-top:3px}
+  #offOut .warn{color:var(--poor);font-weight:600}
+  #offOut .ask{margin-top:7px;padding-top:7px;border-top:1px solid var(--line);color:var(--ink3);
+    font-size:12px}
 </style>
 </head>
 <body>
@@ -185,6 +200,13 @@
     <div class="seg" id="aspects" style="margin-top:6px"></div>
 
     <h2>Product</h2>
+    <div class="field"><label>Barcode</label>
+      <div class="barrow">
+        <input id="barcode" type="text" inputmode="numeric" placeholder="5000112637922">
+        <button id="lookup" class="ghost">Look up</button>
+      </div>
+    </div>
+    <div id="offOut" hidden></div>
     <div class="drop" id="drop">Drop a photo here, or click to choose<input id="file" type="file"
       accept="image/*" hidden></div>
     <div class="thumb" id="thumbWrap" hidden><img id="thumb" alt=""><button id="clearImg">remove</button></div>
@@ -369,7 +391,7 @@ var PRESETS = {
 var S = {
   format: "tier", aspect: "1:1", score: 18, name: "TRAIL BAR", brand: "",
   image: "", fit: "cover", tiers: "looksmax", method: "barcode",
-  wordmark: true, trust: false, intensity: 1, duration: 3.0, hold: 0,
+  wordmark: true, trust: false, intensity: 1, duration: 3.0, hold: 0, barcode: "",
   reasons: [{ tone: "bad", text: "Made with industrial seed oils" },
             { tone: "bad", text: "Ultra-processed (NOVA 4)" },
             { tone: "warn", text: "Aspartame, flagged additive" }],
@@ -465,13 +487,21 @@ function boot() {
   function setScore(v) {
     v = Math.max(0, Math.min(100, Math.round(+v || 0)));
     S.score = v; sr.value = v; sn.value = v;
-    var chip = $("bandChip");
-    chip.textContent = K.BAND_LABEL[K.bandIndex(v)].toUpperCase();
-    chip.style.background = K.bandColor(v);
+    setBandChip(v);
+    // Tied to the barcode, so the next clip for this product starts with the
+    // number you already looked up rather than with the last preset's.
+    if (S.barcode) rememberScore(S.barcode, v);
     rebuild();
   }
   sr.addEventListener("input", function () { setScore(sr.value); });
   sn.addEventListener("input", function () { setScore(sn.value); });
+
+  $("barcode").addEventListener("input", function () { S.barcode = this.value.replace(/\s+/g, ""); });
+  $("barcode").addEventListener("keydown", function (e) {
+    // Enter in a lone text field would submit nothing and look broken.
+    if (e.key === "Enter") { e.preventDefault(); lookupBarcode(); }
+  });
+  $("lookup").addEventListener("click", lookupBarcode);
 
   $("bname").addEventListener("input", function () { S.b.name = this.value; rebuild(); });
   $("bscore").addEventListener("input", function () { S.b.score = +this.value; rebuild(); });
@@ -494,7 +524,7 @@ function boot() {
      no name, score 0, default format. */
   var Q0 = new URLSearchParams(location.search);
   var KNOWN = ["format", "aspect", "score", "name", "brand", "fit", "tiers",
-               "method", "intensity", "duration", "hold", "wordmark", "trust",
+               "method", "intensity", "duration", "hold", "wordmark", "trust", "barcode",
                "reasons", "metrics", "bname", "bscore"];
   if (!KNOWN.some(function (k) { return Q0.has(k); })) {
     applyPreset(PRESETS["Trail bar (18)"]);
@@ -503,6 +533,10 @@ function boot() {
     ["format", "aspect", "score", "name", "brand", "fit", "tiers", "method",
      "intensity", "duration", "hold", "wordmark", "trust"]
       .forEach(function (k) { S[k] = q[k]; });
+    /* Not through `specFromQuery`. A barcode is not something the clip
+       renders — the engine has no such field and should not grow one — it is
+       a note to this page about where the picture came from. */
+    S.barcode = (Q0.get("barcode") || "").replace(/[^0-9]/g, "");
     if (q.reasons.length) S.reasons = q.reasons;
     if (new URLSearchParams(location.search).has("metrics")) S.metrics = q.metrics;
     if (q.b) S.b = { name: q.b.name, score: q.b.score, image: "", fit: q.b.fit };
@@ -519,6 +553,7 @@ function boot() {
 function syncControls() {
   $("name").value = S.name; $("brand").value = S.brand;
   $("method").value = S.method; $("hold").value = S.hold; $("intensity").value = S.intensity;
+  $("barcode").value = S.barcode || "";
   $("duration").value = S.duration; $("durOut").textContent = (+S.duration).toFixed(1) + "s";
   $("bname").value = S.b.name; $("bscore").value = S.b.score;
   [["formats", K.FORMATS, "format"], ["aspects", K.ASPECTS, "aspect"],
@@ -535,17 +570,218 @@ function applyPreset(p) {
   S.format = p.format || S.format;
   S.score = p.score; S.name = p.name || ""; S.brand = p.brand || "";
   S.image = p.image || ""; S.fit = p.fit || "cover"; S.method = p.method || "barcode";
+  S.barcode = ""; $("barcode").value = ""; $("offOut").hidden = true;
   S.reasons = (p.reasons || []).map(function (r) { return { tone: r.tone, text: r.text }; });
   S.b = p.b ? { name: p.b.name, score: p.b.score, image: p.b.image || "", fit: p.b.fit || "cover" }
             : { name: "", score: 0, image: "", fit: "cover" };
   showThumb($("thumbWrap"), $("thumb"), S.image);
   showThumb($("thumbWrapB"), $("thumbB"), S.b.image);
-  var chip = $("bandChip");
   $("scoreRange").value = $("scoreNum").value = S.score;
-  chip.textContent = K.BAND_LABEL[K.bandIndex(S.score)].toUpperCase();
-  chip.style.background = K.bandColor(S.score);
+  setBandChip(S.score);
   syncControls();
   rebuild();
+}
+
+/* ================================================================== *
+ *  Barcode lookup
+ *
+ *  WHAT IT FILLS, AND WHY IT STOPS THERE.
+ *
+ *  It fills the product's IDENTITY — its name, its brand and its packshot —
+ *  because those are facts held by Open Food Facts and looking them up by hand
+ *  is the tedious part of making a clip.
+ *
+ *  IT DOES NOT SET THE SCORE, and that is deliberate rather than unfinished.
+ *  The number is the output of a 4,000-line engine in the app, mirrored once
+ *  already by `tools/score_audit.py`, which HAS disagreed with the app in
+ *  practice (43 against 48 on one bar). A third implementation, in JavaScript,
+ *  on a page whose whole job is to make marketing, would eventually publish a
+ *  score the app does not give — and "deterministic, and it says why" is the
+ *  entire pitch. `CatalogDump.swift` says the same thing about the website:
+ *  marketing may only print figures the shipping engine really produces.
+ *
+ *  IT DOES NOT WRITE THE REASONS either, for the reason already printed under
+ *  the Reasons heading: the clip quotes the app, it does not paraphrase it.
+ *
+ *  What it CAN do is show the facts it got back, so it is obvious at a glance
+ *  whether the barcode found the product you meant.
+ * ================================================================== */
+var OFF_ENDPOINT = "https://vera-swaps.nathanielfiskaa.workers.dev/v1/off/product";
+
+/** Scores you have already typed for a barcode, so the second clip for a
+    product costs nothing. Per browser; it is a convenience, not a record. */
+function rememberScore(code, score) {
+  try {
+    var m = JSON.parse(localStorage.getItem("optimally.scores") || "{}");
+    m[code] = score;
+    localStorage.setItem("optimally.scores", JSON.stringify(m));
+  } catch (e) {}
+}
+function recallScore(code) {
+  try { return JSON.parse(localStorage.getItem("optimally.scores") || "{}")[code]; }
+  catch (e) { return undefined; }
+}
+
+function offSay(html, bad) {
+  var el = $("offOut");
+  el.hidden = false;
+  el.innerHTML = bad ? '<span class="warn">' + html + "</span>" : html;
+}
+
+/* The packshot is converted to a data URL rather than kept as a link.
+   An uploaded photo already takes that path, and it is the one that cannot
+   surprise an exporter: no second fetch while the encoder waits on `ready`,
+   no chance of a redirect landing on a host that sends no CORS header and
+   tainting the canvas. Open Food Facts does send `Allow-Origin: *` today —
+   this does not depend on it staying true. */
+function fetchAsDataURL(url) {
+  return fetch(url)
+    .then(function (r) { if (!r.ok) throw new Error("image " + r.status); return r.blob() })
+    .then(function (b) {
+      return new Promise(function (res, rej) {
+        var fr = new FileReader();
+        fr.onload = function () { res(fr.result) };
+        fr.onerror = function () { rej(new Error("image read")) };
+        fr.readAsDataURL(b);
+      });
+    });
+}
+
+function lookupBarcode() {
+  var code = ($("barcode").value || "").replace(/\s+/g, "");
+  S.barcode = code;
+  if (!/^\d{6,14}$/.test(code)) {
+    offSay("A barcode is 6 to 14 digits. That is " + (code.length || 0) + ".", true);
+    return;
+  }
+  $("lookup").disabled = true;
+  offSay("Looking up " + code + "\u2026");
+
+  fetch(OFF_ENDPOINT + "?code=" + code)
+    .then(function (r) { return r.json() })
+    .then(function (d) {
+      // The proxy answers 200 even for a miss, so `status` is the real answer.
+      if (!d || d.status !== 1 || !d.product) throw new Error("not_found");
+      var pr = d.product;
+      var brand = (pr.brands || "").split(",")[0].trim();
+      var name = bestName(pr.product_name, pr.product_name_en, pr.generic_name, brand);
+      if (!name && !brand) throw new Error("empty");
+
+      S.name = name || brand;
+      S.brand = brand && brand.toLowerCase() !== (name || "").toLowerCase() ? brand : "";
+      $("name").value = S.name;
+      $("brand").value = S.brand;
+
+      /* THE PREVIOUS PRODUCT'S VERDICT DOES NOT SURVIVE A LOOKUP.
+       *
+       * Looking up a Coca-Cola left the Trail Bar's three reason lines sitting
+       * under it, and its score with them — a clip that reads as a real verdict
+       * on a real product and is neither. Both are cleared, so an unfinished
+       * clip looks unfinished. A blank reason list says nothing; a stale one
+       * says something false about a named brand.
+       *
+       * A score you have already used for THIS barcode is restored instead,
+       * because that one is about this product. */
+      S.reasons = [];
+      buildReasonRows();
+      var known = recallScore(code);
+      S.score = known === undefined ? 0 : known;
+      $("scoreRange").value = $("scoreNum").value = S.score;
+      setBandChip(S.score);
+
+      var facts = [];
+      if (pr.nova_group) facts.push("NOVA " + pr.nova_group);
+      if (pr.additives_tags && pr.additives_tags.length)
+        facts.push(pr.additives_tags.length + " additive" + (pr.additives_tags.length === 1 ? "" : "s"));
+      if (pr.ingredients_n) facts.push(pr.ingredients_n + " ingredients");
+      if (pr.quantity) facts.push(pr.quantity);
+
+      var head = "<b>" + esc(S.name) + "</b>" + (S.brand ? " \u00b7 " + esc(S.brand) : "");
+      var body = facts.length ? '<div class="facts">' + esc(facts.join(" \u00b7 ")) + "</div>" : "";
+      var ask = known !== undefined
+        ? '<div class="ask">Score ' + known + " restored from the last time you used this barcode. "
+          + "The reasons were cleared \u2014 put this product\u2019s own back in.</div>"
+        : '<div class="ask">Score and reasons cleared. Put in what the app\u2019s verdict '
+          + "screen says for this product; this page will not guess a number the engine "
+          + "did not produce.</div>";
+
+      var img = pr.image_front_url;
+      if (!img) {
+        offSay(head + body + '<div class="facts">No packshot on Open Food Facts \u2014 '
+               + "drop one in below.</div>" + ask);
+        rebuild();
+        return;
+      }
+      return fetchAsDataURL(img).then(function (durl) {
+        S.image = durl;
+        showThumb($("thumbWrap"), $("thumb"), durl);
+        offSay(head + body + ask);
+        rebuild();
+      }, function () {
+        offSay(head + body + '<div class="facts">The packshot would not load \u2014 '
+               + "drop one in below.</div>" + ask);
+        rebuild();
+      });
+    })
+    .catch(function (e) {
+      offSay(e.message === "not_found" || e.message === "empty"
+        ? "Open Food Facts has nothing for " + esc(code) + ". It is a community database, so "
+          + "plenty of real products are simply not in it. Fill the fields in by hand."
+        : "The lookup failed (" + esc(e.message) + "). Check the connection and try again.", true);
+    })
+    .then(function () { $("lookup").disabled = false });
+}
+
+/* WHICH OF OPEN FOOD FACTS' NAME FIELDS TO USE.
+ *
+ * First-non-empty is wrong, and it showed: this page asked for
+ * `product_name_en || product_name` and a Coca-Cola came back called
+ * "330ml Can". Junk in the first field beats a good value in the second.
+ *
+ * The rule is `OpenFoodFactsClient.bestName` in the app, ported because it is
+ * a CHOICE BETWEEN FIELDS THE DATABASE ALREADY HOLDS rather than a name being
+ * invented — prefer the candidate that shares a word with the brand, since a
+ * product name and its brand agree far more often than a contributor's typo
+ * agrees with either. The app's live examples: barcode 3274080005003 has
+ * product_name "isabelle" and product_name_en "Cristaline"; 5010029000023 has
+ * "Original" and "Weetabix".
+ *
+ * The app's `cleanName`/`tidyName` cosmetics — HTML entities, slug detection,
+ * sentence case — are deliberately NOT ported. They are a lot of string
+ * handling to keep in step for something that lands in an editable text box
+ * two inches below, and unlike a score, a wrong capital costs nothing. */
+function bestName(productName, productNameEn, genericName, brand) {
+  var candidates = [productName, productNameEn, genericName]
+    .map(function (x) { return (x || "").trim() })
+    .filter(Boolean);
+  if (!candidates.length) return "";
+
+  function fold(x) {
+    return x.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  }
+  // Split on spaces only, as the Swift does, so the two agree on what a word is.
+  var brandTokens = fold(brand).split(" ").filter(function (w) { return w.length >= 3 });
+  if (brandTokens.length) {
+    for (var i = 0; i < candidates.length; i++) {
+      var tokens = fold(candidates[i]).split(" ");
+      for (var j = 0; j < tokens.length; j++) {
+        if (brandTokens.indexOf(tokens[j]) !== -1) return candidates[i];
+      }
+    }
+  }
+  return candidates[0];
+}
+
+function esc(x) {
+  return String(x).replace(/[&<>"]/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+  });
+}
+
+function setBandChip(v) {
+  var chip = $("bandChip");
+  chip.textContent = K.BAND_LABEL[K.bandIndex(v)].toUpperCase();
+  chip.style.background = K.bandColor(v);
 }
 
 function showThumb(wrap, img, src) {
@@ -913,12 +1149,142 @@ function pickCodec(list, W, H) {
   })(0)
 }
 
+/* ---- MP4 WITHOUT WEBCODECS -----------------------------------------
+ *
+ * THERE IS ALWAYS AN MP4, WHATEVER THE BROWSER HAS.
+ *
+ * WebCodecs is the fast path and it is hardware H.264, so it stays the
+ * default. But it is not everywhere: iOS Safari ships no `VideoEncoder` at
+ * all, and a desktop browser can expose one that then refuses these
+ * dimensions. Both used to end the same way — a red line saying MP4 was
+ * unavailable and a suggestion to use PNG frames and a Mac. "I still am not
+ * able to export mp4" is a fair thing to say to that.
+ *
+ * `h264-mp4-encoder` is minih264 compiled to WebAssembly, 1.7 MB with the
+ * wasm inlined, bundled here rather than fetched. It needs nothing from the
+ * browser but the ability to run wasm and read pixels back out of a canvas,
+ * so it works where WebCodecs does not. It is slower and softer than the
+ * hardware encoder, which is exactly the right trade for a fallback.
+ *
+ * It also catches the case nobody can diagnose remotely: if the WebCodecs
+ * path fails for ANY reason mid-encode, this runs automatically and says so,
+ * rather than leaving a red line and no file. */
+var WASM_H264 = { url: 'vendor/h264-mp4-encoder.web.js', global: 'HME' }
+
+function exportMp4Wasm(why) {
+  busy(true); stop(); progress(0)
+  log((why ? why + ' ' : '') + 'Encoding with the built-in encoder\u2026')
+
+  var ex = exportClip()
+  var blocked = exportBlocked(ex.canvas)
+  if (blocked) { log(blocked, true); busy(false); progress(null); return }
+
+  var W = ex.geometry.pxW, H = ex.geometry.pxH
+  var total = Math.round(ex.duration * FPS)
+
+  loadScript(WASM_H264.url, WASM_H264.global)
+    .then(function (ok) {
+      if (!ok) throw new Error('wasm')
+      return Promise.all([readyOrTimeout(ex), HME.createH264MP4Encoder()])
+    })
+    .then(function (r) {
+      var enc = r[1]
+      // minih264 needs even dimensions. Every aspect this studio offers is
+      // already even; this is here so a future one cannot break it silently.
+      enc.width = W - (W % 2); enc.height = H - (H % 2)
+      enc.frameRate = FPS
+
+      /* CONSTANT QUALITY, NOT A BITRATE. `kbps` is left at its default of 0,
+         which is what turns rate control OFF and lets the quantiser below
+         decide. Setting a bitrate here did nothing useful: the encoder kept
+         its default quantizationParameter of 33 and produced 2.3 Mbps of
+         visibly blocky text against the 14,000 kbps it had been asked for.
+         18 is near-transparent on flat graphics, which is all this film is. */
+      enc.quantizationParameter = 18
+      enc.speed = 0                    // 0 is the slowest and the best
+
+      /* EVERY FRAME IS A KEYFRAME, AND THAT IS A CORRECTNESS FIX.
+       *
+       * This encoder writes no `stss` box. `stss` is the sync-sample table,
+       * and a file without one is declaring that EVERY sample is a keyframe.
+       * With a keyframe a second that is a lie: samples 0, 30 and 60 were IDR
+       * and the other 87 were P-frames, so anything that seeks — QuickLook,
+       * AVFoundation, an editor's scrubber, a transcoder — handed itself a
+       * P-frame with no reference to decode against. macOS did not just show
+       * a bad picture, it HUNG on the file, twice, in two different tools.
+       *
+       * The choice was to graft a correct `stss` into the box tree by hand or
+       * to make the file's own claim true. Rewriting a moov in JavaScript, on
+       * the fallback path whose entire job is to be the thing that always
+       * works, is the wrong place to be clever. All-intra costs bytes — a few
+       * MB on a three second clip — and buys a file that is correct by
+       * construction and frame-accurate to scrub, which is what an editor
+       * wants anyway. The bitrate goes up to match the fast path.
+       *
+       * If this ever needs to be smaller, the fix is `stss`, not a larger
+       * groupOfPictures. */
+      enc.groupOfPictures = 1
+      enc.initialize()
+
+      var cx = ex.canvas.getContext('2d')
+      var i = 0
+      function step() {
+        if (i >= total) {
+          enc.finalize()
+          var u8 = enc.FS.readFile(enc.outputFilename)
+          // Copy out before delete(): the array is a view on wasm memory and
+          // is garbage the moment the encoder is freed.
+          var bytes = new Uint8Array(u8)
+          enc.delete()
+          var blob = new Blob([bytes], { type: 'video/mp4' })
+          var name = slug() + '.mp4'
+          var url = download(blob, name)
+          log('Wrote ' + total + ' frames at ' + FPS + ' fps, ' + ex.duration.toFixed(2) +
+              's, with the built-in encoder.' + saveLink(url, name, blob.size))
+          busy(false); progress(null)
+          return
+        }
+        ex.render(i / FPS)
+        enc.addFrameRgba(cx.getImageData(0, 0, enc.width, enc.height).data)
+        i++
+        if (i % 5 === 0 || i === total) {
+          progress(i / total)
+          log('Encoding frame ' + i + ' of ' + total + '\u2026')
+        }
+        // Every frame, not every tenth: this encoder is slow enough that a
+        // long run of them would freeze the tab and stall its own progress.
+        setTimeout(step, 0)
+      }
+      step()
+    })
+    .catch(function (e) {
+      log(e && e.message === 'wasm'
+        ? 'The built-in encoder did not load. Reload the page.'
+        : e && e.message === 'ready'
+        ? 'The fonts or the photograph never finished loading. If this tab was '
+          + 'in the background, bring it to the front and try again.'
+        : 'MP4 export failed: ' + (e && e.message) + '. Use PNG frames.', true)
+      busy(false); progress(null)
+    })
+}
+
+/* `ex.ready`, but it can never hang. Fonts and photographs are both things a
+   browser will happily leave pending forever, and a spinner that never
+   resolves is the worst thing this page can do. */
+function readyOrTimeout(ex) {
+  return Promise.race([
+    ex.ready,
+    new Promise(function (_, rej) { setTimeout(function () { rej(new Error('ready')) }, 20000) }),
+  ])
+}
+
 function exportVideo(kind) {
   var spec = MUXERS[kind]
   if (typeof VideoEncoder === 'undefined') {
+    if (kind === 'mp4') { exportMp4Wasm('No WebCodecs here.'); return }
     log(
-      'This browser has no WebCodecs, so it cannot encode video here. ' +
-        'Chrome or Edge can. Use <b>PNG frames</b> and the Mac encoder instead.',
+      'This browser has no WebCodecs, so it cannot make a WebM. ' +
+        'Use <b>Export MP4</b>, which does not need it.',
       true,
     )
     return
@@ -935,21 +1301,7 @@ function exportVideo(kind) {
   loadMuxer(spec)
     .then(function (ok) {
       if (!ok) throw new Error('muxer')
-      /* NOTHING IN HERE IS ALLOWED TO HANG SILENTLY.
-       *
-       * `ex.ready` waits on fonts and photographs, and browsers are perfectly
-       * willing to leave one of those promises pending forever — a hidden
-       * tab's image decode is the case that actually happened. Sitting on
-       * "Loading the encoder…" with no error is the single worst thing this
-       * page can do, because it looks exactly like the export being broken.
-       * Time it out and say so instead. */
-      var ready = Promise.race([
-        ex.ready,
-        new Promise(function (_, rej) {
-          setTimeout(function () { rej(new Error('ready')) }, 20000)
-        }),
-      ])
-      return Promise.all([ready, pickCodec(spec.codecs, W, H)])
+      return Promise.all([readyOrTimeout(ex), pickCodec(spec.codecs, W, H)])
     })
     .then(function (r) {
       var codec = r[1]
@@ -1036,14 +1388,21 @@ function exportVideo(kind) {
           ? 'Could not load the ' + spec.ext.toUpperCase() + ' muxer \u2014 ' +
             spec.url + ' is missing from this deploy.'
           : m === 'codec'
-          ? 'No ' + spec.ext.toUpperCase() + ' encoder here accepts ' + W + 'x' + H + '.'
+          ? 'This browser\u2019s H.264 encoder will not take ' + W + 'x' + H + '.'
           : m === 'stall'
-          ? 'The encoder stopped responding. Reload the page and try again.'
+          ? 'The hardware encoder stopped responding.'
           : m === 'ready'
           ? 'The fonts or the photograph never finished loading. If this tab '
             + 'was in the background, bring it to the front and try again.'
           : (spec.ext.toUpperCase() + ' export failed: ' + m)
-      log(why + ' Try the other format, or PNG frames.', true)
+
+      /* AN MP4 IS NOT ALLOWED TO JUST FAIL.
+         Whatever went wrong with the hardware path, the bundled encoder needs
+         nothing from the browser but wasm and a readable canvas, so it is
+         tried rather than reported. A `ready` failure is the exception: it is
+         the clip that is not ready, and the second encoder would hit it too. */
+      if (kind === 'mp4' && m !== 'ready') { exportMp4Wasm(why); return }
+      log(why + (kind === 'webm' ? ' Try <b>Export MP4</b>, or PNG frames.' : ''), true)
       busy(false); progress(null)
     })
 }
@@ -1164,6 +1523,7 @@ function copyLink() {
   if (+S.duration !== 3.0) q.set("duration", S.duration);
   if (+S.hold) q.set("hold", S.hold);
   if (+S.intensity !== 1) q.set("intensity", S.intensity);
+  if (S.barcode) q.set("barcode", S.barcode);
   var rs = S.reasons.filter(function (r) { return r.text.trim(); });
   if (rs.length) q.set("reasons", rs.map(function (r) { return r.tone + ":" + r.text; }).join("|"));
   var ms = S.metrics.filter(function (m) { return m.label.trim() && m.value; });
@@ -1199,7 +1559,7 @@ function copyLink() {
  * the stamp, compare it to the last deploy, and the question is closed before
  * anybody reads any code. `sync.py` writes it; unstamped means running from
  * source. */
-var BUILD = "2026-09-07.7abf86b";
+var BUILD = "2026-09-08.4f585a9";
 function showBuild() {
   var b = /^__/.test(BUILD) ? "dev (unstamped, running from source)" : BUILD;
   $("build").textContent = "build " + b;
