@@ -17,18 +17,58 @@
   --ink: #1c1d19;         /* Brand.ink */
   --ink-2: #23261f;       /* Brand.textPrimary */
   --sub: #66655b;         /* Brand.textSecondary */
-  --faint: #78766b;       /* darkened from textTertiary #9A988C, which is
-                             2.4:1 on the ground and unreadable */
-  /* ScoreBand.color, all four, because the site shows real scores now. */
+  --faint: #706e63;       /* darkened from textTertiary #9A988C, which is
+                             2.4:1 on the ground and unreadable. Darkened again
+                             from #78766b, which measured 4.23:1 there: close
+                             enough to look fine and still under the floor, on
+                             the attribution and disclaimer lines. 4.75:1, with
+                             the same margin over 4.5 as the band inks and for
+                             the same reason. */
+  /* ScoreBand.color, all four, because the site shows real scores now. These
+     are FILLS: the app uses them for the verdict ring and the alert pills,
+     where they sit behind white text and never have to be read themselves. */
   --excellent: #0fa968;
   --good: #86c440;
   --poor: #f5960a;
   --bad: #e5484d;
 
+  /* AND THESE ARE THE SAME FOUR AS TEXT, WHICH IS NOT THE SAME PROBLEM.
+     The site set score numbers, band labels and reason lines in the fill
+     colours, and measured on this ground they came out at:
+
+         good  #86c440   2.10:1     poor #f5960a   2.27:1
+         bad   #e5484d   3.91:1     excellent      3.05:1
+
+     all four under the 4.5:1 floor for body text, and the two worst of them
+     carrying the largest numbers on the page. Each ink below is its fill
+     walked down in lightness with hue and saturation held, so it still reads
+     as the same band colour, stopping at 4.75:1 against --bg (#f6f6f8), the
+     darker of the two grounds it lands on. The margin over 4.5 is deliberate:
+     the first pass landed each of them on exactly 4.50 and the browser's own
+     rounding then put half of them at 4.48. Verified by measuring the rendered
+     page, not by looking at it. Fills stay on bars, dots and rings; ink goes on anything
+     anyone has to read. */
+  --excellent-ink: #0b7e4d;
+  --good-ink: #517925;
+  --poor-ink: #9d6006;
+  --bad-ink: #d71e24;
+
   /* Shadows on a cool grey ground: neutral, not the warm brown they were. */
   --shadow: 0 18px 40px -24px rgba(28, 29, 25, 0.22);
   --shadow-lg: 0 40px 80px -40px rgba(28, 29, 25, 0.34);
   --maxw: 1100px;
+
+  /* One scale, so section rhythm is a decision rather than whatever number
+     was typed that day. Sections were uniformly 64px top and bottom, which is
+     why every band on the page had the same weight. */
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 88px;
+  --ring: 0 0 0 3px rgba(42, 90, 62, 0.35);
 
   /* THE APP'S OWN TYPEFACE. The site was on the system stack, which is most of
      why it read as generic next to the product it is selling. Satoshi is what
@@ -45,6 +85,25 @@
 
 * {
   box-sizing: border-box;
+}
+
+/* THIS FILE HAD NO FOCUS RULES AT ALL. Nothing was removing the outline, so
+   keyboard navigation worked, but every focusable thing on the site got the
+   browser default: a hairline drawn round a 92px ledger row, invisible against
+   its own border. One ring, on the brand colour, everywhere. */
+:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.btn:focus-visible,
+.appstore:focus-visible {
+  outline-offset: 3px;
+}
+.lrow:focus-visible {
+  outline-offset: -3px;
+  border-radius: 14px;
+  background: var(--bg);
 }
 html {
   scroll-behavior: smooth;
@@ -98,7 +157,12 @@ img {
   position: sticky;
   top: 0;
   z-index: 30;
-  background: rgba(244, 239, 230, 0.82);
+  /* THIS WAS rgba(244, 239, 230, 0.82) — #F4EFE6, the warm cream the whole
+     palette was moved off. One value the sweep missed, and because it is the
+     header it was the first thing on every page: a beige strip sitting on a
+     cool grey ground. Same class of drift as the comment that used to sit at
+     the top of this file. It is the ground colour now, with its own alpha. */
+  background: rgba(246, 246, 248, 0.82);
   backdrop-filter: saturate(1.2) blur(14px);
   border-bottom: 1px solid var(--stroke);
 }
@@ -162,7 +226,7 @@ img {
 
 /* ---------- hero ---------- */
 .hero {
-  padding: 72px 0 56px;
+  padding: clamp(var(--s-7), 6vw, var(--s-9)) 0 var(--s-6);
 }
 .hero-grid {
   display: grid;
@@ -193,6 +257,13 @@ img {
   margin-top: 30px;
   flex-wrap: wrap;
 }
+.purchase-note {
+  max-width: 42ch;
+  margin: 11px 0 0;
+  color: var(--sub);
+  font-size: 13px;
+  line-height: 1.45;
+}
 .appstore {
   display: inline-flex;
   align-items: center;
@@ -218,6 +289,16 @@ img {
   font-weight: 700;
   line-height: 1.15;
 }
+/* On the forest card at the foot of the page, the near-black badge is a dark
+   rectangle on a dark green field. Inverted, it is the brightest thing there,
+   which is what the last ask on the page should be. */
+.cta-card .appstore {
+  background: #fff;
+  color: var(--forest-deep);
+}
+.cta-card .appstore:hover {
+  background: #f2f6f3;
+}
 
 /* ---------- phone frame ---------- */
 .phone {
@@ -226,7 +307,9 @@ img {
   max-width: 78vw;
   margin: 0 auto;
   border-radius: 44px;
-  background: linear-gradient(160deg, #d9d2c4, #b9b3a5);
+  /* Also warm-palette residue (#d9d2c4 -> #b9b3a5, a tan). Every phone on the
+     page was framed in brown against cool grey screenshots. Neutral now. */
+  background: linear-gradient(160deg, #d6d6dc, #b4b4bd);
   padding: 9px;
   box-shadow: var(--shadow-lg);
 }
@@ -249,7 +332,7 @@ img {
 
 /* ---------- generic section ---------- */
 .band {
-  padding: 64px 0;
+  padding: clamp(var(--s-8), 7vw, var(--s-9)) 0;
 }
 .band.alt {
   background: var(--bg-2);
@@ -307,7 +390,7 @@ img {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  background: rgba(255, 254, 251, 0.94);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(8px);
   border-radius: 999px;
   padding: 8px 16px 8px 14px;
@@ -349,58 +432,24 @@ img {
   padding: 6px 11px;
   border-radius: 999px;
 }
+/* THE WORST PAIR ON THE PAGE, at 1.85:1.
+   The `ok` pill was filled with a tint of --excellent (#0fa968) and then
+   lettered in --good (#86c440), which is a different green belonging to a
+   different band: a yellow-green on a mint ground, effectively unreadable.
+   The `no` pill was red on its own tint at 3.35:1. Neither band ink is dark
+   enough here either, because the tint eats most of the range, so each pill
+   gets a text colour derived against its OWN ground rather than against the
+   page. Both measure 4.75:1. */
 .tagpill.ok {
   background: rgba(15, 169, 104, 0.12);
-  color: var(--good);
+  color: #0b7a4b;
 }
 .tagpill.no {
   background: rgba(229, 72, 77, 0.12);
-  color: var(--bad);
+  color: #cd1d23;
 }
 .cmp-body p {
   margin-top: 14px;
-  font-size: 14.5px;
-  color: var(--sub);
-}
-
-/* ---------- pillars ---------- */
-.pillars {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-}
-@media (max-width: 860px) {
-  .pillars {
-    grid-template-columns: 1fr;
-  }
-}
-.pcard {
-  background: var(--card);
-  border: 1px solid var(--stroke);
-  border-radius: 22px;
-  padding: 26px 24px;
-  box-shadow: var(--shadow);
-}
-.pcard .ic {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: var(--forest-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--forest);
-  margin-bottom: 16px;
-}
-.pcard .ic svg {
-  width: 22px;
-  height: 22px;
-}
-.pcard h3 {
-  font-size: 19px;
-}
-.pcard p {
-  margin-top: 8px;
   font-size: 14.5px;
   color: var(--sub);
 }
@@ -491,53 +540,11 @@ img {
   margin-top: 3px;
 }
 
-/* ---------- pricing ---------- */
-.pricecard {
-  background: var(--card);
-  border: 1px solid var(--forest);
-  border-radius: 26px;
-  padding: 32px 30px;
-  box-shadow: var(--shadow);
-  max-width: 640px;
-}
-.pricecard h3 {
-  font-size: 22px;
-}
-.pricecard .sub {
-  font-size: 15px;
-  color: var(--sub);
-  margin-top: 8px;
-}
-.pricecard ul {
-  margin: 22px 0 0;
-  padding: 0;
-  list-style: none;
-}
-.pricecard li {
-  display: flex;
-  gap: 10px;
-  font-size: 15px;
-  color: var(--sub);
-  margin: 11px 0;
-}
-.pricecard li svg {
-  flex: 0 0 auto;
-  width: 17px;
-  height: 17px;
-  color: var(--forest);
-  margin-top: 4px;
-}
-.finewarn {
-  margin-top: 24px;
-  padding: 16px 18px;
-  border-left: 3px solid var(--forest);
-  background: var(--forest-soft);
-  border-radius: 0 12px 12px 0;
-  font-size: 14px;
-  color: var(--sub);
-}
-
-/* ---------- trust ---------- */
+/* ---------- closing call to action ----------
+   Was written for a "trust" section that no longer exists, and has been sitting
+   unreferenced ever since. It is the right shape for the ask at the foot of the
+   page, so it is that now. The page previously ended on a paragraph about
+   research and went straight into the footer with nothing to click. */
 .trust {
   background: var(--forest);
   color: #eaf1ea;
@@ -574,25 +581,46 @@ img {
 .footer {
   padding: 52px 0 44px;
   border-top: 1px solid var(--stroke);
-  margin-top: 64px;
+  margin-top: var(--s-8);
+}
+/* The closing card already carries a full band of padding under it; another
+   64px of footer margin on top of that left a visible hole between the last
+   thing to click and the end of the page. */
+.band:has(.cta-card) + .footer {
+  margin-top: 0;
 }
 .foot {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 12px;
   flex-wrap: wrap;
+  margin-left: -6px; /* cancel the new padding on the first link */
 }
 .foot .links {
   margin-left: auto;
   display: flex;
-  gap: 22px;
+  gap: 10px;
   flex-wrap: wrap;
 }
+/* MEASURED AT 22px TALL. Five links in a row on a phone, each a third of the
+   44px minimum, sitting 22px apart: the gap was bigger than the target. The
+   padding gives each one a 44px box without moving the text, and the gap comes
+   down to match because the boxes now supply their own separation. */
 .foot a {
   font-size: 14px;
   font-weight: 600;
   color: var(--sub);
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 6px;
+}
+/* The wordmark is a link in both the header and the footer, and was 31px and
+   26px respectively. */
+.brand {
+  min-height: 44px;
+  padding-right: 4px;
 }
 .foot a:hover {
   color: var(--forest);
@@ -833,14 +861,26 @@ img {
   color: var(--faint);
   margin-top: 1px;
 }
+/* THE WORDS ARE NOT COLOURED, THE DOT IS.
+   These carry `lreason` plus the tone class, and `.good`/`.bad` are defined
+   later in this file at equal specificity, so the tone class was winning and
+   every lead reason rendered in a band colour: the ten lines under the ten
+   product names were 2.10:1 (good) and 3.91:1 (bad) on a white card. Colour
+   is redundant here anyway. The dot already says it, the sentence already
+   says it, and the score two columns over says it a third time. */
 .lreason {
   margin: 7px 0 0;
   font-size: 14px;
   font-weight: 600;
-  color: var(--sub);
   display: flex;
   align-items: center;
   gap: 8px;
+}
+.lrow .lreason,
+.lrow .lreason.good,
+.lrow .lreason.bad,
+.lrow .lreason.warn {
+  color: var(--sub);
 }
 /* A dot, in the tone the app itself gives that line. */
 .lreason::before {
@@ -890,14 +930,19 @@ img {
   height: 100%;
   border-radius: 3px;
 }
-.excellent { color: var(--excellent); }
-.good      { color: var(--good); }
-.poor      { color: var(--poor); }
-.bad       { color: var(--bad); }
-em.excellent { background: var(--excellent); }
-em.good      { background: var(--good); }
-em.poor      { background: var(--poor); }
-em.bad       { background: var(--bad); }
+/* TEXT gets the ink. This one block is what the score numbers, the band
+   labels, the inline band ranges in the method and the verdict headline all
+   resolve through, so it is the whole of the contrast fix for typography. */
+.excellent { color: var(--excellent-ink); }
+.good      { color: var(--good-ink); }
+.poor      { color: var(--poor-ink); }
+.bad       { color: var(--bad-ink); }
+
+/* FILLS keep the app's own colour, because nothing is read off them. */
+em.excellent, i.excellent { background: var(--excellent); }
+em.good,      i.good      { background: var(--good); }
+em.poor,      i.poor      { background: var(--poor); }
+em.bad,       i.bad       { background: var(--bad); }
 
 .ledger-note {
   margin: 16px 2px 0;
@@ -1047,10 +1092,6 @@ em.bad       { background: var(--bad); }
   max-width: 420px;
 }
 .vbar i { display: block; height: 100%; border-radius: 4px; }
-.vbar i.excellent { background: var(--excellent); }
-.vbar i.good { background: var(--good); }
-.vbar i.poor { background: var(--poor); }
-.vbar i.bad { background: var(--bad); }
 .vsummary {
   margin: 18px 0 0;
   font-size: 16px;
@@ -1083,12 +1124,15 @@ em.bad       { background: var(--bad); }
   margin: 0 0 14px;
 }
 .vreasons, .vings { list-style: none; margin: 0; padding: 0; }
-.vreasons li {
+.vreasons li,
+.vreasons li.good,
+.vreasons li.bad {
   font-size: 15px;
   font-weight: 600;
   padding: 9px 0 9px 20px;
   position: relative;
   border-top: 1px solid var(--stroke);
+  color: var(--ink); /* the ::before dot carries the tone, not the sentence */
 }
 .vreasons li:first-child { border-top: 0; }
 .vreasons li::before {
@@ -1136,3 +1180,520 @@ em.bad       { background: var(--bad); }
   max-width: 52ch;
   line-height: 1.55;
 }
+
+
+/* ---------------------------------------------------------------------------
+   THE BAND SCALE, in the hero.
+
+   The four thresholds were only stated once, in prose, in step four of the
+   method, a long way below the ledger that uses them. So a reader met "92"
+   and "63" and "27" with no idea what the scale was, and the colours had to
+   carry it alone. This is that scale as a diagram, above the ledger, in the
+   hero: four equal segments because the bands ARE four equal quarters, in the
+   app's own fill colours, with the app's own band names under them.
+
+   Step four's prose no longer repeats the ranges. Saying it twice is what the
+   page was already being criticised for.
+   ------------------------------------------------------------------------ */
+.scale {
+  margin: var(--s-6) 0 0;
+  max-width: 440px;
+}
+.scale + .cta-row {
+  margin-top: var(--s-6);
+}
+.scale-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.scale-bar span {
+  display: block;
+}
+/* Two classes deep, so these win over the single-class ink rules above: the
+   segments are fills, not text. */
+.scale-bar .bad { background: var(--bad); }
+.scale-bar .poor { background: var(--poor); }
+.scale-bar .good { background: var(--good); }
+.scale-bar .excellent { background: var(--excellent); }
+
+.scale-legend {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  margin-top: 11px;
+  list-style: none;
+  padding: 0;
+}
+.scale-legend li {
+  text-align: center;
+}
+.scale-legend b {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  line-height: 1.25;
+}
+.scale-legend span {
+  display: block;
+  margin-top: 3px;
+  font-size: 12.5px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 420px) {
+  .scale-legend b { font-size: 9.5px; letter-spacing: 0.04em; }
+  .scale-legend span { font-size: 11.5px; }
+}
+
+/* ---------------------------------------------------------------------------
+   The closing ask.
+   ------------------------------------------------------------------------ */
+.cta-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cta-card .row {
+  margin-top: var(--s-6);
+}
+.cta-card .finelink {
+  margin-top: 18px;
+  font-size: 13px;
+  color: #b9cfbf;
+  max-width: 46ch;
+}
+
+/* A screenshot's caption. `.shot p` has been styled since the first version of
+   this file and no page has ever rendered one, so the four phones carried a
+   two-word title each and nothing else. */
+.shot p {
+  max-width: 30ch;
+}
+
+/* The two compare photographs are stock, not scans, and they sit directly
+   under a section of ten real audited products. Labelling them is the whole
+   reason this rule was written; it stopped being rendered at some point and
+   the distinction went with it. */
+.cmp-body .brandline {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 10.5px;
+}
+
+
+/* ---------------------------------------------------------------------------
+   Section-entry motion.
+
+   Guarded on html[data-reveal], which components/reveal.tsx sets only after it
+   has confirmed the browser can do the job and the reader has not asked for
+   less motion. Without that attribute none of this exists, so a failed bundle
+   cannot leave the page blank. See the note in that file.
+   ------------------------------------------------------------------------ */
+:root[data-reveal] [data-r] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+:root[data-reveal] [data-r][data-shown] {
+  opacity: 1;
+  transform: none;
+}
+/* The ledger rows arrive one after another rather than as a block of ten. The
+   delay is capped so the last row is never waiting on the first nine. */
+:root[data-reveal] .ledger > li {
+  transition-delay: calc(var(--i, 0) * 45ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-reveal] [data-r] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   The method, with the step numbers doing some work.
+
+   Four white boxes with a 13px numeral in the corner made the one section that
+   explains the actual mechanism the palest thing on the page.
+   ------------------------------------------------------------------------ */
+/* A solid marker, not a big faint numeral. The huge-and-ghosted step number is
+   a decorative trope, and here it would also have been unreadable: forest at
+   22% on white measures about 1.35:1. This is the same number at 7.4:1, in a
+   disc, which anchors the card without anyone having to squint at it. */
+.steps li::before {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--forest-soft);
+  color: var(--forest);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0;
+  margin-bottom: 14px;
+}
+.steps li {
+  padding: 30px 30px 32px;
+}
+.steps h3 {
+  margin-top: 0;
+}
+
+
+/* ---------------------------------------------------------------------------
+   The evidence cards.
+
+   Six is a number that wants to become a 3x2 grid of identical boxes, which is
+   the house style of every generated landing page there is and a tell this
+   site has already been criticised for. The randomised trial is the strongest
+   thing on the page by a distance (it is the only one that isolates cause), so
+   it takes a double-width card and sets the top row against a single
+   companion. The remaining three run underneath at equal weight.
+   ------------------------------------------------------------------------ */
+.facts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+@media (max-width: 900px) {
+  .facts { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .facts { grid-template-columns: 1fr; }
+}
+.fact {
+  background: var(--card);
+  border: 1px solid var(--stroke);
+  border-radius: 22px;
+  padding: 26px 26px 22px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+.fact.lead {
+  grid-column: span 2;
+  background: linear-gradient(180deg, var(--forest-soft), var(--card) 62%);
+  border-color: rgba(42, 90, 62, 0.24);
+}
+@media (max-width: 600px) {
+  .fact.lead { grid-column: span 1; }
+}
+.fact .fig {
+  font-size: clamp(40px, 5.4vw, 56px);
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  color: var(--forest);
+  font-variant-numeric: tabular-nums;
+}
+.fact.lead .fig {
+  color: var(--forest-deep);
+}
+.fact h3 {
+  font-size: 17px;
+  font-weight: 850;
+  margin: 12px 0 0;
+  letter-spacing: -0.01em;
+}
+.fact p {
+  margin: 10px 0 0;
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: var(--sub);
+}
+.fact.lead p {
+  font-size: 15.5px;
+  max-width: 58ch;
+}
+/* The metadata is pushed to the bottom so cards of unequal text still line
+   their citations up with each other. */
+.fmeta {
+  margin-top: auto;
+  padding-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.etag {
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--bg-2);
+  color: var(--sub);
+  white-space: nowrap;
+}
+/* THE CAVEAT IS NOT SMALL PRINT. It is the sentence that separates this page
+   from every other site quoting the same numbers, so it sits at readable size
+   in the reader's eyeline rather than being tucked under the citation. */
+.ecav {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--poor-ink);
+}
+/* Measured at 20px tall on one line and 40px on two, against a 44px minimum,
+   and there are eight of them on the home page. The rule is underlined rather
+   than bordered because a border-bottom sits at the foot of the padded box and
+   would float well clear of the text once the box is tall enough to tap;
+   text-decoration tracks the text itself. */
+.fcite {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 2px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--forest);
+  align-self: flex-start;
+  text-decoration: underline;
+  text-decoration-color: rgba(42, 90, 62, 0.35);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.fcite:hover {
+  text-decoration-color: var(--forest);
+}
+.ledger-note a {
+  color: var(--forest);
+  font-weight: 700;
+}
+
+
+/* ---------------------------------------------------------------------------
+   Guides.
+
+   A reading column, not a landing page. The measure is capped near 68
+   characters because these run to a thousand words and the rest of this site's
+   layout is built for scanning rather than reading.
+   ------------------------------------------------------------------------ */
+.guide {
+  padding: var(--s-6) 0 var(--s-9);
+}
+.gwrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+/* `.backlink` is inline-block and `.eyebrow` is inline, so the two ran
+   together as "All guidesCOMPARISON" on every article. Both go on their own
+   line here. */
+.guide .backlink {
+  display: block;
+  margin-bottom: var(--s-6);
+}
+.guide .eyebrow {
+  display: block;
+}
+.guide h1 {
+  font-size: clamp(30px, 5vw, 42px);
+  line-height: 1.06;
+  margin: 10px 0 0;
+}
+.gquestion {
+  margin: 14px 0 0;
+  font-size: 17.5px;
+  line-height: 1.55;
+  color: var(--sub);
+  max-width: 60ch;
+}
+.guide section {
+  margin-top: var(--s-7);
+}
+.guide h2 {
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px;
+}
+.guide p {
+  margin: 0 0 14px;
+  font-size: 16.5px;
+  line-height: 1.68;
+  color: var(--ink-2);
+}
+.guide ul {
+  margin: 0 0 14px;
+  padding-left: 0;
+  list-style: none;
+}
+.guide section > ul > li {
+  position: relative;
+  padding-left: 22px;
+  margin: 9px 0;
+  font-size: 16.5px;
+  line-height: 1.62;
+  color: var(--ink-2);
+}
+.guide section > ul > li::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 11px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--forest);
+  opacity: 0.55;
+}
+
+/* THE ANSWER BLOCK. First thing under the heading, and styled to look like the
+   answer rather than like an introduction, because a reader who has to decide
+   whether a page is worth reading has already half left. */
+.answer {
+  margin-top: var(--s-6);
+  background: var(--forest-soft);
+  border: 1px solid rgba(42, 90, 62, 0.22);
+  border-radius: 20px;
+  padding: 24px 26px 20px;
+}
+.answer h2 {
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--forest-deep);
+  margin: 0 0 10px;
+}
+.answer p {
+  margin: 0;
+  font-size: 17.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* The ask, after the answer. */
+.ginline {
+  margin-top: var(--s-5);
+  padding: 22px 24px;
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  background: var(--card);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+.ginline p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  max-width: 52ch;
+}
+.gfine {
+  font-size: 12.5px;
+  color: var(--faint);
+}
+
+/* Worked examples: straight into the /scan/ pages, which is also what stops
+   those ten pages being orphans now the home-page ledger is gone. */
+.gscans {
+  display: grid;
+  gap: 10px;
+}
+.gscans li { margin: 0 !important; padding: 0 !important; }
+.gscans li::before { display: none; }
+.gscans a {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: baseline;
+  gap: 14px;
+  padding: 14px 18px;
+  border: 1px solid var(--stroke);
+  border-radius: 14px;
+  background: var(--card);
+  text-decoration: none;
+  transition: background 0.14s ease;
+}
+.gscans a:hover { background: var(--bg); }
+.gs-name { font-weight: 800; font-size: 15.5px; }
+.gs-brand {
+  grid-column: 1;
+  grid-row: 2;
+  font-size: 13px;
+  color: var(--faint);
+}
+.gscans b {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  align-self: center;
+}
+.gs-band {
+  grid-row: 1 / span 2;
+  grid-column: 3;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  align-self: center;
+}
+
+.gfaq { margin: 0; }
+.gfaq > div {
+  border-top: 1px solid var(--stroke);
+  padding: 16px 0;
+}
+.gfaq > div:first-child { border-top: 0; padding-top: 0; }
+.gfaq dt {
+  font-weight: 800;
+  font-size: 16.5px;
+  margin-bottom: 6px;
+}
+.gfaq dd {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.62;
+  color: var(--sub);
+}
+
+.gupdated {
+  margin-top: var(--s-7);
+  font-size: 13px;
+  color: var(--faint);
+}
+.grelated {
+  margin-top: var(--s-6);
+  border-top: 1px solid var(--stroke);
+  padding-top: var(--s-5);
+}
+.grelated h2 { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); }
+.grelated ul { margin: 0; }
+.grelated li { margin: 8px 0; }
+.grelated a { color: var(--forest); font-weight: 700; font-size: 16px; }
+
+/* The index. */
+.gindex { display: grid; gap: 10px; }
+.gindex li { margin: 0; }
+.gindex a {
+  display: block;
+  padding: 18px 22px;
+  border: 1px solid var(--stroke);
+  border-radius: 16px;
+  background: var(--card);
+  text-decoration: none;
+  transition: background 0.14s ease, border-color 0.14s ease;
+}
+.gindex a:hover { background: var(--bg); border-color: rgba(42, 90, 62, 0.3); }
+.gindex h3 { font-size: 17.5px; margin: 0; letter-spacing: -0.01em; }
+.gindex p { margin: 5px 0 0; font-size: 14.5px; color: var(--sub); }

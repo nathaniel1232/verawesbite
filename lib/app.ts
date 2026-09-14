@@ -70,3 +70,30 @@ export const APP_STORE_NAME = 'Optimally: Food Scanner'
 
 /** Bundle id, for anyone cross-checking against the app project. */
 export const BUNDLE_ID = 'com.nathanielfiskaa.vera'
+
+/* ---------------------------------------------------------------------------
+   WHAT IT COSTS, IN ONE STRING, AND WHY THAT MATTERS MORE THAN USUAL.
+
+   The app project added a free tier on 12 September 2026: three scans, score
+   only, every other control opening an upsell (FreeTier.swift). It is NOT in
+   the shipped build. The live listing is version 1.4, released 4 September,
+   which is the subscription-only build, verified against the iTunes lookup API
+   rather than assumed from the working tree. The app project's own notes
+   record that builds are archived from a dirty working tree, so the presence
+   of a feature in source says nothing about what users have.
+
+   This matters here because the single largest complaint in 976 one- and
+   two-star reviews across fifteen competing scanners was the paywall, at 37%.
+   It is the most tempting claim on this entire website and today it would be
+   a false one. Optimally would earn the same review.
+
+   So every page states the live position, from this constant. When the free
+   tier actually ships, change these two lines and the whole site follows.
+   --------------------------------------------------------------------------- */
+
+/** One short line for a CTA. */
+export const OFFER_SHORT = 'Paid subscription. Requires iOS.'
+
+/** The full statement, for anywhere with room for it. */
+export const OFFER_LONG =
+  'Optimally is a paid subscription. Eligible Apple IDs see any free trial and the renewal price before purchase.'

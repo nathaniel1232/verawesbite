@@ -4,6 +4,7 @@ import './globals.css'
 
 import { SITE_URL } from '@/lib/site'
 import { StoreLinkLocaliser } from '@/components/store-link'
+import { Reveal } from '@/components/reveal'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -57,10 +58,31 @@ export default function RootLayout({
             )}") format("woff2-variations");font-weight:300 900;font-style:normal;font-display:swap}`,
           }}
         />
+        {/* THIS HAS TO RUN BEFORE THE FIRST PAINT, WHICH IS WHY IT IS HERE AND
+            NOT IN THE EFFECT THAT DOES THE REST OF THE WORK.
+
+            The reveal's starting state is guarded on html[data-reveal]. Set
+            that from a useEffect and the browser has already painted the
+            sections at full opacity by the time it lands, so every section
+            visibly pops out and then fades back in. Setting it from a blocking
+            inline script in the head means the attribute is present before
+            anything is drawn.
+
+            It stays a script rather than a hardcoded attribute for the reason
+            in components/reveal.tsx: if scripting is off the attribute is
+            never set, and nothing on the page is hidden by a mechanism that is
+            not running. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&'IntersectionObserver' in window){document.documentElement.setAttribute('data-reveal','')}}catch(e){}",
+          }}
+        />
       </head>
       <body>
         {children}
         <StoreLinkLocaliser />
+        <Reveal />
       </body>
     </html>
   )

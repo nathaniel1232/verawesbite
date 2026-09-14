@@ -73,12 +73,11 @@ export const PRODUCTS: Product[] = [
     category: 'Sparkling water',
     score: 92,
     band: 'excellent',
-    summary: 'An excellent choice. It features quality ingredients like natural mineral water, but ultra-processing limits its score.',
+    summary: 'An excellent choice. The water-only ingredient list outweighs a conflicting processing tag in the community record.',
     img: '3068320123264.jpg',
     off: 'https://world.openfoodfacts.org/product/3068320123264',
     reasons: [
-      { tone: 'bad', text: 'Ultra-processed (NOVA 4)' },
-      { tone: 'bad', text: 'Preservatives: E290' },
+      { tone: 'bad', text: 'Database processing tag conflicts with the water-only label' },
       { tone: 'good', text: 'Short label: 1 ingredient' },
       { tone: 'good', text: 'Low sugar and salt' },
     ],
@@ -278,8 +277,28 @@ export function productByCode(code: string) {
  * hidden by this: the product's own page lists every reason the engine gave,
  * sugar included. Choosing which of several true things to lead with is an
  * editorial call; deleting one would not be.
+ *
+ * AND IT LEADS WITH A LINE THAT AGREES WITH THE SCORE NEXT TO IT.
+ *
+ * This used to take the first `bad` reason for every product regardless of how
+ * the product scored, which read as a contradiction on everything at the top
+ * of the table. La Salvetat scored 92, VERY OPTIMAL, in green, beside a red
+ * dot reading "Database processing tag conflicts with the water-only label".
+ * Coles Rolled Oats scored 63 beside a red "Oat flakes is the main
+ * ingredient" — a sentence the engine emits with a `bad` tone but which, read
+ * cold on a marketing page, looks like an accusation against porridge.
+ *
+ * So: a product in the top two bands leads with what it did right, one in the
+ * bottom two leads with what held it down. Both are the engine's own lines,
+ * neither is edited, and the product's own page still prints all of them in
+ * the order the audit gave them.
  */
 export function leadReason(p: Product) {
   const notSugar = p.reasons.filter((r) => !/sugar/i.test(r.text))
-  return notSugar.find((r) => r.tone === 'bad') ?? notSugar[0] ?? p.reasons[0]
+  const wanted: Tone = p.band === 'excellent' || p.band === 'good' ? 'good' : 'bad'
+  return (
+    notSugar.find((r) => r.tone === wanted) ??
+    notSugar[0] ??
+    p.reasons[0]
+  )
 }
