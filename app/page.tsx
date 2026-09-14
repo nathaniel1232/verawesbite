@@ -5,35 +5,55 @@ import { asset } from '@/lib/asset'
 import { FACTS, EVIDENCE_LABEL, EVIDENCE_CAVEAT } from '@/lib/facts'
 
 
-/* A caption each. These were titles alone, two words under a phone, and
-   `.shot p` has been styled in globals.css since the beginning without a
-   single page rendering one. Each line adds something the title does not
-   already say, per the house rule about subtitles that restate their heading;
-   two of them are the app's own sentences, read off the screenshot above. */
+/* RECAPTURED 14 SEPTEMBER 2026, AND THREE OF THE FOUR SHOWED A UI THAT NO
+   LONGER EXISTS.
+
+   The previous set was taken on 7 September against a five-tab layout reading
+   Scan / Today / List / Research / Settings. The app now reads Home / Explore
+   / List / Evidence / Settings, so every tab bar on this page was wrong.
+
+   The fourth screenshot was worse than stale. It showed a "Today" progress
+   screen, and progress is no longer a tab at all: ContentView's own comment
+   says the cards moved to the bottom of the Scan tab, and they did not.
+   `ProgressSections` is defined in ProgressTabView.swift and referenced from
+   nowhere in the app. The screen in that image cannot be reached. It has been
+   replaced by the swap shelf, which is a real screen, is in the App Store
+   description, and finishes the argument the other three start: here is the
+   problem, here is the evidence, here is what to buy instead.
+
+   Captured on an iPhone 17 Pro Max simulator, which is 440x956pt at 3x and so
+   exactly 1320x2868, then scaled to 1050 wide. Nothing is upscaled. Launched
+   with `-seedDemo -skipOnboarding -pro -country US`, so every product on
+   screen is one of the bundled fictional fixtures (GymFuel, CleanMacro,
+   Nordby, Bare Bar, Morning Co.) and no real brand appears, which is the rule
+   for this app's marketing art.
+
+   A caption each. Each line adds something the title does not already say, per
+   the house rule about subtitles that restate their heading. */
 const SHOTS = [
   {
     src: '/shots/scan.jpg',
-    alt: 'Optimally home screen: scan button, product search, barcode entry, and recent scans each showing their score',
+    alt: 'Optimally home screen: a scan button, two suggested alternatives scoring 88 and 92, a product search, a barcode field and the most recent scan',
     title: 'Scan or search',
     desc: 'Point the camera at a barcode, or type a name in.',
   },
   {
     src: '/shots/verdict.jpg',
-    alt: 'Optimally verdict screen scoring Sour Cream Potato Chips 19 out of 100, very bad, flagged ultra-processed and contains seed oils',
+    alt: 'Optimally scoring a Choc-Chip Protein Bar 14 out of 100, very bad, flagged ultra-processed and contains seed oils',
     title: 'Read the verdict',
     desc: 'The number, the band, and every line that moved it.',
   },
   {
     src: '/shots/research.jpg',
-    alt: 'Optimally research screen listing seed oils, ultra-processing, added sugar and refined grain',
+    alt: 'Optimally research screen headed "Why Optimally rates what it rates", listing seed oils, ultra-processing, the food matrix and sugar, each showing how many papers back it',
     title: 'Check our work',
     desc: 'Every flag traces to a published paper.',
   },
   {
-    src: '/shots/progress.jpg',
-    alt: 'Optimally Today screen: a weighted score of 36 for four things logged, calories and macros, and what share of the day was industrially formulated',
-    title: 'See the pattern',
-    desc: 'What you ate today, weighted by how much of each.',
+    src: '/shots/swaps.jpg',
+    alt: 'Optimally showing better products on the same shelf at 92, 88 and 88, above a breakdown rating sunflower oil and aspartame Very Bad',
+    title: 'Find something better',
+    desc: 'Higher scores on the same shelf, and every ingredient rated.',
   },
 ]
 
@@ -91,7 +111,7 @@ export default function Home() {
 
             <Phone
               src="/shots/verdict.jpg"
-              alt="Optimally scoring a bag of potato chips 19 out of 100, flagged ultra-processed and contains seed oils"
+              alt="Optimally scoring a Choc-Chip Protein Bar 14 out of 100, flagged ultra-processed and contains seed oils"
               tilt
               priority
             />
