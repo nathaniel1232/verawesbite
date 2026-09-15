@@ -88,10 +88,10 @@ export const GUIDES: Guide[] = [
     title: 'How to spot seed oils on a label',
     heading: 'How to spot seed oils on a label',
     description:
-      'Every name industrial seed oils appear under on an ingredient list, why "vegetable oil" is the one that matters, and what the evidence actually supports.',
+      'Every name industrial seed oils appear under on an ingredient list, what the group name "vegetable oil" does and does not hide, and what the evidence actually supports.',
     question: 'What are seed oils called on ingredient lists?',
     answer:
-      'Look for sunflower, safflower, soybean, corn, canola, rapeseed, cottonseed, grapeseed and rice bran oil. Then look for the catch-all terms, which are the ones that actually hide things: vegetable oil, vegetable fat, and blends listed as "vegetable oils (in varying proportions)". Those are legally allowed to be any of the above, so a label carrying only that is telling you it could be anything. Position matters too. An oil in the first three ingredients is a major part of the product, not a trace.',
+      'Look for sunflower, safflower, soybean, corn, canola, rapeseed, cottonseed, grapeseed and rice bran oil. Then read the brackets after "vegetable oil" or "vegetable fat": in the US and the EU the individual oils have to be named there. What those rules still allow is flexibility. A US label can list oils a product might contain using "and/or", and EU and UK labels can add "in varying proportions", so the mix in your pack can change between batches. An oil in the first three ingredients is a major part of the product.',
     sections: [
       {
         h: 'The full list of names',
@@ -105,21 +105,22 @@ export const GUIDES: Guide[] = [
           '- Cottonseed oil',
           '- Grapeseed oil',
           '- Rice bran oil',
-          "- The catch-alls: vegetable oil, vegetable fat, plant oil, and any list that says “in varying proportions”",
-          'Hydrogenated and interesterified versions of all of the above count too, and usually say so.',
+          '- The group names: vegetable oil, vegetable oils, vegetable fat. The specific oils should follow in brackets.',
+          'Hydrogenated versions of all of the above count too.',
         ],
       },
       {
-        h: 'Why the catch-all is the important one',
+        h: 'What “vegetable oil” does and does not hide',
         p: [
-          'Food labelling rules in most markets let a manufacturer declare a generic "vegetable oil" and swap the actual oil depending on commodity prices, as long as the category is accurate. The practical effect is that the ingredient list stops being a description of the product and becomes a description of a range of possible products.',
-          'It is also the reason a label can look cleaner than the food is. One line reading "vegetable oil" replaces what might be three named oils, and a short ingredient list reads as a simple product.',
+          'Both US and EU rules let refined oils be declared together under a group name, but the individual oils still have to be named straight after it. So "vegetable oils (rapeseed, sunflower, palm)" is a normal compliant label, and "vegetable oil" with nothing after it is not. In the EU a group of oils takes its place in the ingredient list by their combined weight.',
+          'What the rules do allow is flexibility. In the US, a manufacturer that cannot keep a blend constant may list oils the product might contain, marked "and/or" or "contains one or more of the following", for oils that are not the main ingredient. EU and UK labels can add "in varying proportions". Either way the label tells you which oils are possible, not which one is in the pack in your hand, or how much of each.',
+          'If you do see "vegetable oil" with nothing after it, either the label is incomplete or the database you are reading dropped the brackets when the product was entered. Either way, turn the pack over and read it.',
         ],
       },
       {
         h: 'Where they turn up when you are not expecting them',
         p: [
-          'Nobody is surprised to find seed oil in crisps. The places people miss are bread and wraps, tinned fish, hummus and dips, pesto and jarred sauces, most mayonnaise and salad dressing, protein and cereal bars, roasted nuts, and nearly all takeaway fried food.',
+          'Nobody is surprised to find seed oil in crisps. The places people miss are bread and wraps, tinned fish, hummus and dips, pesto and jarred sauces, most mayonnaise and salad dressing, protein and cereal bars, roasted nuts, and a lot of takeaway fried food.',
           'The pattern is that the oil is there as a cheap fat with a neutral taste and a long shelf life, so it shows up wherever a product needs one of those three things.',
         ],
       },
@@ -132,11 +133,11 @@ export const GUIDES: Guide[] = [
         ],
       },
     ],
-    cta: 'Optimally flags every name on that list, including the catch-alls, and tells you which position in the ingredient list it appeared at.',
+    cta: 'Optimally flags each of those oils by name, including when they sit inside a group name, and rates every other ingredient on the label as well.',
     faq: [
       {
         q: 'Is olive oil a seed oil?',
-        a: 'No. Olive and avocado oil are pressed from fruit rather than seed, and are not refined the same way. Optimally does not penalise them.',
+        a: 'No. Olive and avocado oil are pressed from the fruit rather than the seed, and extra virgin olive oil is not refined at all. Optimally does not flag olive oil as a seed oil.',
       },
       {
         q: 'Does "high oleic" make a difference?',
@@ -144,7 +145,7 @@ export const GUIDES: Guide[] = [
       },
       {
         q: 'Is "vegetable oil" always a seed oil?',
-        a: 'Not necessarily, but it can be, and the label does not tell you. Palm and coconut oil are also vegetable oils and are usually named because naming them is a selling point.',
+        a: 'Not necessarily. Palm and coconut oil count as vegetable oils too. The specific oils should be named in brackets after the group name, so read those. What the label may not tell you is which of the listed oils is in your pack, or how much of each.',
       },
     ],
     scans: ['8076809513692', '7622210449283'],
@@ -166,7 +167,7 @@ export const GUIDES: Guide[] = [
       {
         h: 'The test in one sentence',
         p: [
-          'NOVA, the classification used in nearly all the published research, sorts food by what was done to it rather than by its nutrition. Group 1 is unprocessed or minimally processed. Group 2 is culinary ingredients such as oil, butter, sugar and salt. Group 3 is those two combined, which is most traditional cooking. Group 4 is everything containing at least one substance that exists only as an industrial input.',
+          'NOVA, the classification behind every ultra-processed food study cited on this site, sorts food by what was done to it rather than by its nutrition. Group 1 is unprocessed or minimally processed. Group 2 is culinary ingredients such as oil, butter, sugar and salt. Group 3 is the two combined into products such as cheese, tinned vegetables and fresh bread. Group 4 is everything containing at least one substance that exists only as an industrial input.',
           'That last clause is the whole test. Not "is it processed", which describes bread and cheese and yoghurt, but "does it contain something no kitchen has".',
         ],
       },
@@ -223,22 +224,22 @@ export const GUIDES: Guide[] = [
     title: 'What to do when a food scanner cannot find your barcode',
     heading: 'When the scanner cannot find your barcode',
     description:
-      'Why food scanner apps miss products, how regional barcodes cause it, and the three things that actually work when a scan comes back empty.',
+      'Why food scanner apps miss products, how regional barcodes play into it, and the three things that actually work when a scan comes back empty.',
     question: 'Why is my product not in the food scanner app?',
     answer:
-      'Almost always it means nobody has added that product to the database yet, not that the app is broken. Most scanners read Open Food Facts, which is crowd-sourced, so coverage follows whoever has been contributing in your country. Three things work. Check you are not hitting a regional barcode difference, because the same product carries different codes per market. Photograph the ingredient panel instead, if the app can read one. Add the product yourself, which takes about a minute and means it resolves next time for everybody.',
+      'Usually it means nobody has added that product to the database yet, not that the app is broken. Many scanners, Optimally included, read Open Food Facts, which is crowd-sourced, so coverage follows whoever has been contributing in your country. Three things work. Check you are not hitting a regional barcode difference, because the same product can carry different codes in different markets. Photograph the ingredient panel instead, if the app can read one. Add the product yourself, so it resolves next time for everybody.',
     sections: [
       {
         h: 'Why it happens',
         p: [
-          'This is the third most common complaint about food scanner apps, and it is largely structural rather than a fault in any one of them. The databases behind most scanners are contributed to by volunteers. Coverage is excellent in France, good in the UK, the US and Germany, and thin in smaller markets.',
-          'The gaps are predictable. Supermarket own-brand lines, anything launched in the last few months, regional and local products, and bulk or deli items with a store-printed code are the four categories that come back empty most often.',
+          'It is one of the most common complaints in the one- and two-star reviews of food scanner apps, and it is largely structural rather than a fault in any one of them. Open Food Facts, the database behind many scanners, is built by volunteers, and its coverage is strongest in France, where it started, and much thinner in smaller markets.',
+          'The gaps tend to be in the same places: supermarket own-brand lines, anything launched in the last few months, regional and local products, and deli items with a store-printed code.',
         ],
       },
       {
         h: 'The regional barcode trap',
         p: [
-          'A product sold in several countries frequently carries a different EAN in each, because the barcode is assigned by the company registering it in that market. So the same jar in a British and a German supermarket can be two separate records, one of them well filled in and the other empty.',
+          'A product sold in several countries can carry a different barcode in each, when it has been registered separately for each market. So the same jar in a British and a German supermarket can be two separate records, one of them well filled in and the other empty.',
           'If an app lets you pick a country, that setting changes which record it prefers, and switching it is worth trying before concluding the product is missing.',
         ],
       },
@@ -252,8 +253,8 @@ export const GUIDES: Guide[] = [
       {
         h: 'Add it, so it exists next time',
         p: [
-          'Open Food Facts is a non-profit, open-data project, and adding a product means photographing the front, the ingredients and the nutrition panel in their app or on their site. It takes roughly a minute.',
-          'That entry is then available to every app reading the database, including whichever one you are using. It is the only one of these three steps that fixes the problem for anyone other than you.',
+          'Open Food Facts is a non-profit, open-data project, and adding a product means photographing the front, the ingredients and the nutrition panel in their app or on their site.',
+          'That entry is then available to every app that reads Open Food Facts. It is the only one of these three steps that fixes the problem for anyone other than you.',
         ],
       },
     ],
@@ -261,7 +262,7 @@ export const GUIDES: Guide[] = [
     faq: [
       {
         q: 'Do food scanner apps work offline?',
-        a: 'Barcode lookups need a connection, because the product record lives on a server. Reading a photographed ingredient panel can be done on the device, which is how Optimally still returns a result with no network.',
+        a: 'A barcode lookup normally needs a connection, because the product record lives on a server, though some apps keep popular products cached for offline use. Reading a photographed ingredient panel can be done on the device, which is how Optimally still returns a result with no network.',
       },
       {
         q: 'Why do two apps give different results for the same barcode?',
@@ -282,7 +283,7 @@ export const GUIDES: Guide[] = [
       'Five apps people move to from Yuka, what each one actually rates, and which complaint about Yuka each of them does and does not fix.',
     question: 'What is a good alternative to Yuka?',
     answer:
-      'It depends which part you want to replace. If the problem is the premium gate on search and offline use, Bobby Approved and Open Food Facts are free and ungated. If the problem is the rating method, Yuka weighs nutrition heavily and Optimally reads the ingredient list first and publishes a study behind every rule. If you want food logging as well, Fooducate does both. Yuka is the largest of these by a wide margin, at a stated 85 million users and 6 million products, so any alternative you pick will find fewer of your products.',
+      'It depends which part you want to replace. If the problem is the premium gate on search and offline use, Bobby Approved and Open Food Facts are free and ungated. If the problem is the rating method, Yuka puts 60% of its score on nutrition and Optimally reads the ingredient list first, with the study behind each of its main rules linked. If you want food logging as well, Fooducate does both. Yuka states 85 million users and 4 million food products, so test any alternative against what you actually buy before you commit to it.',
     sections: [
       {
         h: 'Start with which complaint you are actually trying to fix',
@@ -303,7 +304,7 @@ export const GUIDES: Guide[] = [
       {
         h: 'Open Food Facts',
         p: [
-          'The non-profit open database that sits under a large part of this whole category, with its own free app. No paid tier, no advertising, no account required, and you can export everything.',
+          'The non-profit open database that a number of scanners, Optimally included, are built on, with its own free app. No paid tier, no advertising, no account needed to look things up, and you can download the whole dataset.',
           'It gives you Nutri-Score and the NOVA processing group rather than an opinionated verdict, so it suits someone who wants the underlying data and is happy to interpret it themselves.',
         ],
       },
@@ -316,8 +317,8 @@ export const GUIDES: Guide[] = [
       {
         h: 'Optimally',
         p: [
-          'Ours, so read this with that in mind. It reads the ingredient list first rather than the nutrition panel, applies a fixed rule table, and links a published study behind each rule. The same ingredient gets the same rating every time, which is the specific thing an AI-generated verdict cannot promise.',
-          'It is also the newest and smallest app here by a long way, it has no ratings to speak of yet, and unlike the others on this list it needs a subscription. If the reason you are leaving Yuka is its paywall, this is not the app that fixes that.',
+          'Ours, so read this with that in mind. It reads the ingredient list first rather than the nutrition panel, applies a fixed rule table, and links the published study behind each of its main rules. The same ingredient gets the same rating every time, which is the specific thing an AI-generated verdict cannot promise.',
+          'It is also the newest app here, it has no ratings to speak of yet, and unlike the others on this list it needs a subscription. If the reason you are leaving Yuka is its paywall, this is not the app that fixes that.',
         ],
       },
     ],
@@ -328,8 +329,8 @@ export const GUIDES: Guide[] = [
         a: 'The app is free to download and scanning is free. Searching products by name and using it offline are part of its paid tier.',
       },
       {
-        q: 'Which alternative has the most products?',
-        a: 'Yuka states 6 million, of which 4 million are food. Nothing else in this list is close, and any alternative will miss more of your shopping.',
+        q: 'Which of these has the most products?',
+        a: 'Yuka states 4 million food products and 2 million cosmetics. Fooducate describes its database as hundreds of thousands of products, and Bobby Approved gives no figure in its listing. Test any of them against what you actually buy.',
       },
     ],
     related: ['optimally-vs-yuka', 'best-food-scanner-apps'],
@@ -345,43 +346,48 @@ export const GUIDES: Guide[] = [
       'A straight comparison of two food scanners that disagree about what a score should measure, including where Yuka is plainly ahead.',
     question: 'How is Optimally different from Yuka?',
     answer:
-      'Yuka scores a product mostly on its nutrition panel, plus additives and whether it is organic. Optimally scores it on the ingredient list, caps anything ultra-processed, and links a published study behind every rule. That is the real difference: what the number is measuring. Yuka is far bigger, with a stated 85 million users and 6 million products against an app that launched in September 2026, and its free tier is more usable than ours. Pick Optimally if you want a rule you can audit. Pick Yuka if you want coverage and a free tier.',
+      'Yuka scores a product 60% on nutrition, using Nutri-Score, 30% on additives and 10% on whether it is organic. Optimally scores it on the ingredient list, caps anything ultra-processed, and links the study behind each of its main rules. The real difference is what the number measures: degree of processing is not one of Yuka’s criteria. Yuka is far bigger, with a stated 85 million users and 4 million food products, and it is free to scan with, which Optimally is not. Pick Optimally if processing matters most to you, and Yuka for coverage and price.',
     sections: [
       {
         h: 'What each score is actually measuring',
         p: [
-          'Yuka’s listing describes three criteria: nutritional quality, presence of additives, and the organic aspect of the product. Nutrition carries the most weight. That produces a score which tracks fat, sugar, salt, fibre and protein closely.',
+          'Yuka’s own help pages give the weighting: 60% nutritional quality, calculated with Nutri-Score, 30% additives, and 10% a bonus for an official organic label. There is also a hard limit: if Yuka considers an additive high-risk, the product cannot score above 49. So the score follows energy, sugar, salt, saturated fat, fibre, protein and fruit and vegetable content closely, and a risky additive can override all of it.',
           'Optimally starts from the ingredient list. Each ingredient is matched against a fixed table and given a rating, then rules are applied for industrial seed oils, degree of processing and flagged additives, and the nutrition panel is used last rather than first.',
-          'The practical consequence is that the two disagree most on engineered products with good macros. A protein bar built to hit a nutrition target scores well on a nutrition-led method and is capped by a processing-led one.',
+          'The practical consequence is that the two disagree most on engineered products with good macros and no additive Yuka rates high-risk. A protein bar built to hit a nutrition target can score well on a nutrition-led method and still be capped by a processing-led one.',
         ],
       },
       {
         h: 'Consistency',
         p: [
-          'Optimally writes an ingredient rating once and then freezes it, so the same ingredient scores the same for you, for everybody else, and next year. Every rating can be opened to see the rule and the paper behind it.',
-          'This is worth dwelling on only because "the rating changed" and "it is just AI making it up" are recurring complaints across this category, including about apps that generate a verdict per scan. A fixed table cannot drift. It can be wrong, and if it is wrong it is wrong visibly and in the same direction for everyone, which is a better failure.',
+          'Optimally’s rules are fixed, so the same ingredient scores the same for you and for everybody else, every time it is scanned. Every rating can be opened to see why, and its main rules link the published study behind them.',
+          'To be fair to Yuka, its score is a published formula too, so this is not a difference between these two apps. It is a difference from scanners that ask a model for a verdict on every scan, where the same product can come back scored differently. A fixed table can still be wrong, but it is wrong visibly and in the same direction for everyone.',
         ],
       },
       {
         h: 'Where Yuka is ahead, plainly',
         p: [
-          '- Coverage. 6 million products against a much smaller reach. You will hit fewer empty scans.',
-          '- Price. Yuka scans free. Optimally needs a subscription, and this is the single most common complaint about apps in this category, so it is a real cost and not a footnote.',
-          '- Track record. 99,000 US ratings at 4.8, against effectively none. Optimally has been on the App Store since 4 September 2026.',
-          '- Cosmetics. Yuka rates personal care products too. Optimally does not and has no plans to.',
+          '- Scale. A stated 85 million users and 4 million food products.',
+          '- Price. Yuka scans free. Optimally needs a subscription, and a paywall is the most common complaint in the one- and two-star reviews of apps like these, so it is a real cost and not a footnote.',
+          '- Track record. 99,000 US ratings at 4.8, against effectively none. Optimally has been on the App Store since 18 August 2026.',
+          '- Cosmetics. Yuka rates personal care products too. Optimally does not.',
         ],
       },
       {
-        h: 'Where Optimally is ahead',
+        h: 'Where Optimally is different',
         p: [
-          '- The rule is published, and each one links the study it came from.',
-          '- Ultra-processing is a cap rather than a deduction, so a flattering nutrition panel cannot lift a group 4 product into a good band.',
-          '- Seed oils are flagged under every name including the catch-alls, with the honest note that the evidence behind that flag is weaker than the evidence behind the processing one.',
-          '- No brand can pay for placement or for a better score.',
+          '- Degree of processing is part of the score. It is not among Yuka’s three published criteria, and in Optimally an ultra-processed product is capped at 49 however good its nutrition panel looks.',
+          '- Oil type counts. Industrial seed oils are flagged by name, with the honest note that the evidence behind that flag is weaker than the evidence behind the processing one.',
+          '- Its main rules link the published study they came from, inside the app.',
+        ],
+      },
+      {
+        h: 'Where they are the same',
+        p: [
+          'Both score with a fixed formula rather than asking a model on every scan, both publish how the score is built, and both say no brand can pay for placement or for a better score. Yuka makes that last promise in its own App Store listing.',
         ],
       },
     ],
-    cta: 'If a number you can audit matters more to you than the size of the database, that is the trade Optimally is making.',
+    cta: 'If degree of processing matters more to you than the size of the database, that is the trade Optimally is making.',
     scans: ['3017620422003', '5031021679253'],
     related: ['yuka-alternatives', 'best-food-scanner-apps'],
     updated: UPDATED,
@@ -397,27 +403,27 @@ export const GUIDES: Guide[] = [
       'Five food scanner apps ranked on coverage, method and cost, with our own app placed where the evidence puts it rather than at the top.',
     question: 'Which food scanner app is best?',
     answer:
-      'For most people it is Yuka, on coverage alone: a stated 6 million products and 85 million users means it answers more scans than anything else. Bobby Approved is the fastest if you want a straight pass or fail. Fooducate is the pick if you also want a food diary. Open Food Facts is the best free and open option. Optimally, which we make, is the only one that publishes its rule table with a study behind each rule, and it is also the newest, the smallest and the only one here that needs a subscription.',
+      'For most people it is Yuka, on coverage: a stated 4 million food products and 85 million users. Bobby Approved is the simplest if you want a straight pass or fail. Fooducate is the pick if you also want a food diary. Open Food Facts is the free, open-data option. Optimally, which we make, is the one built around degree of processing, with the study behind each of its main rules linked, and it is also the newest and the only one here that needs a subscription.',
     sections: [
       {
         h: 'A note on this page before the list',
         p: [
-          'This is a ranking on a website belonging to one of the apps in it, so the ordering is worth explaining. We have put Optimally fifth. It launched on 4 September 2026, it has close to no ratings, and four of the apps below are free to scan with where it is not. Ranking ourselves first would be the normal thing to do here and it would not survive thirty seconds of checking.',
-          'Every figure below comes from the App Store listing of the app in question, on 14 September 2026, in the US storefront.',
+          'This is a ranking on a website belonging to one of the apps in it, so the ordering is worth explaining. We have put Optimally fifth. It launched on 18 August 2026, it has close to no ratings, and four of the apps below are free to scan with where it is not. Ranking ourselves first would be the normal thing to do here and it would not survive thirty seconds of checking.',
+          'Rating counts come from each app’s US App Store listing on 14 September 2026. Yuka’s scoring weights come from Yuka’s own help pages.',
         ],
       },
       {
         h: '1. Yuka',
         p: [
           '99,347 ratings at 4.8. Free to scan, with a paid tier covering search and offline use.',
-          'Scores food on nutritional quality, additives and organic status, and covers cosmetics as well. The database is the reason it wins: a stated 4 million food and 2 million cosmetic products. If your priority is that the app actually finds what you scanned, this is the answer.',
-          'The main objection to it is the method. A nutrition-weighted score is generous to engineered products that hit good macros, and it is not published in enough detail to audit.',
+          'Scores food 60% on nutritional quality using Nutri-Score, 30% on additives and 10% on organic status, and covers cosmetics as well. Scale is the reason it ranks first: a stated 4 million food and 2 million cosmetic products. If your priority is that the app finds what you scanned, start here.',
+          'The main objection to it is the method. Degree of processing is not one of its criteria, so an engineered product that hits good macros can score well, unless it contains an additive Yuka rates high-risk, which caps it at 49.',
         ],
       },
       {
         h: '2. Bobby Approved',
         p: [
-          '160,584 ratings at 4.9, the highest count on this list. Free.',
+          '160,584 ratings at 4.9. Free.',
           'Checks products against a list of more than a hundred ingredients its creator considers harmful, and highlights the failures in red. Fast and unambiguous in a shop.',
           'It is one person’s list, presented as a verdict. That is a strength if you share the premise and a weakness if you want to see the reasoning, and a binary result cannot tell you how close a product came.',
         ],
@@ -425,27 +431,27 @@ export const GUIDES: Guide[] = [
       {
         h: '3. Fooducate',
         p: [
-          '77,542 ratings at 4.6. Free, with a premium tier. Running since 2010, which is longer than everything else here combined.',
-          'Really a food diary with grading attached. If you want to track intake as well as check products, it is the only one on this list that does both properly. If you only want to check a label, it is more app than you need.',
+          '77,542 ratings at 4.6. Free, with a premium tier. Running since 2010.',
+          'Really a food diary with grading attached. If you want to track intake as well as check products, it is the one on this list built to do both. If you only want to check a label, it is more app than you need.',
         ],
       },
       {
         h: '4. Open Food Facts',
         p: [
-          'The non-profit open database a great deal of this category is built on, with its own free app. No paid tier, no advertising, no account, and the whole dataset is downloadable.',
-          'It gives you Nutri-Score and the NOVA group rather than a verdict, so you do the interpreting. That is the right trade for some people and no help at all to someone standing in an aisle wanting an answer.',
+          'The non-profit open database that a number of scanners, Optimally included, are built on, with its own free app. No paid tier, no advertising, no account needed to look things up, and the whole dataset is downloadable.',
+          'It gives you Nutri-Score and the NOVA group rather than a single verdict, so more of the interpreting is left to you.',
         ],
       },
       {
         h: '5. Optimally',
         p: [
-          'Ours. Effectively no ratings, live since 4 September 2026, and it requires a subscription where four of the five above do not.',
-          'What it does that none of the others do: every ingredient rating is fixed rather than generated per scan, every rule links the published study behind it, and the band thresholds are printed on the website. Ultra-processing is applied as a hard cap, so a product cannot score well on macros alone.',
-          'That is a narrow advantage and it matters to a narrow group: people who have stopped trusting a number they cannot check. If you are not in that group, one of the four above is a better app for you today.',
+          'Ours. Effectively no ratings, live since 18 August 2026, and it requires a subscription where four of the five above do not.',
+          'What it does differently: degree of processing decides the score rather than informing it, so an ultra-processed product is capped at 49 however good its macros, and its main rules link the published study behind them inside the app.',
+          'That is a narrow advantage and it matters to a narrow group: people who think degree of processing is what a score should be measuring. If you are not in that group, one of the four above is a better app for you today.',
         ],
       },
     ],
-    cta: 'If you want to see what a published rule table looks like in use, that is the thing Optimally is for.',
+    cta: 'If you want a score built around degree of processing, with the study behind each main rule a tap away, that is what Optimally is for.',
     faq: [
       {
         q: 'Which food scanner app is free?',
@@ -453,7 +459,7 @@ export const GUIDES: Guide[] = [
       },
       {
         q: 'Which has the largest database?',
-        a: 'Yuka, at a stated 6 million products including cosmetics.',
+        a: 'Yuka states 4 million food products and 2 million cosmetics. Fooducate describes its database as hundreds of thousands of products, and Bobby Approved gives no figure in its listing.',
       },
       {
         q: 'Do they agree with each other?',
@@ -471,15 +477,15 @@ export const GUIDES: Guide[] = [
     title: 'A seed oil scanner app',
     heading: 'Scanning for seed oils',
     description:
-      'What a seed oil scanner should actually check, why the catch-all label names are the hard part, and an honest read of the evidence.',
+      'What a seed oil scanner should actually check, why group names like "vegetable oils" are the hard part, and an honest read of the evidence.',
     question: 'Is there an app that checks for seed oils?',
     answer:
-      'Several, and the thing that separates them is whether they catch the generic names. Checking for "sunflower oil" is easy. Catching "vegetable oil", "vegetable fat" and blends declared "in varying proportions" is the part that matters, because that is where most of it sits. A scanner worth using should also tell you where in the ingredient list the oil appeared, since an oil listed second is a major component and one listed last is a trace. Optimally flags all of them, and weights the penalty below ultra-processing on purpose.',
+      'Several, and what separates them is whether they read the whole oil declaration. Matching "sunflower oil" is easy. The harder part is a group name like "vegetable oils" followed by a bracketed list, or a US label marked "and/or", where every oil named has to be checked. A scanner worth using should also show where in the ingredient list the oil sits, since an oil listed second is a major component and one listed last is a trace. Optimally reads the group names, and weights the penalty below ultra-processing on purpose.',
     sections: [
       {
         h: 'What a scanner has to catch',
         p: [
-          'Nine named oils, their high oleic and hydrogenated variants, and at least three catch-all phrases that are allowed to mean any of them. A checker that only matches the named ones will pass a product whose label says "vegetable oil" and miss the most common case.',
+          'Nine named oils, their high oleic and hydrogenated variants, and the group names they are declared under. The group names are where a simple checker fails: "vegetable oils (rapeseed, sunflower)" has to be read into its parts, and a US list marked "and/or" names oils the product may or may not contain.',
           'The second thing is position. Ingredient lists are ordered by weight, so the same oil means something different at position two than at position eleven.',
         ],
       },
@@ -487,19 +493,19 @@ export const GUIDES: Guide[] = [
         h: 'The honest version of the evidence',
         p: [
           'Most of what is written about seed oils online overstates the case, and an app that does the same is asking to be believed rather than checked.',
-          'The strongest evidence is the 2016 BMJ re-analysis of the Minnesota Coronary Experiment: replacing saturated fat with linoleic acid lowered cholesterol and did not lower death from heart disease or from any cause. Separately, linoleic acid in the American diet has more than tripled over the last century, which is a measurement of exposure rather than of harm.',
+          'The strongest evidence is the 2016 BMJ re-analysis of the Minnesota Coronary Experiment: replacing saturated fat with linoleic acid lowered cholesterol and did not lower death from heart disease or from any cause. Separately, linoleic acid went from between 2.2% and 2.8% of the calories available in the American food supply in 1909, depending on how that year’s diet is modelled, to 7.2% in 1999, mostly from soybean oil. That measures what the food supply contained, not what anyone ate, and not harm.',
           'Put together, that supports treating the change as unproven and worth avoiding, not as established toxicity. Optimally penalises seed oils less than it penalises ultra-processing, and says so, because that is what the difference in evidence justifies.',
         ],
       },
       {
         h: 'Why the products usually fail anyway',
         p: [
-          'In practice a product high in industrial seed oil is very often ultra-processed as well, and the processing rule is the heavier one. The oil is frequently a marker for the kind of product rather than the sole problem with it.',
+          'In practice a product high in industrial seed oil is often ultra-processed as well, and the processing rule is the heavier one. The oil is frequently a marker for the kind of product rather than the sole problem with it.',
           'That is worth knowing because it means avoiding seed oils and avoiding ultra-processed food push you towards mostly the same shelf, and the second is the one with a randomised trial behind it.',
         ],
       },
     ],
-    cta: 'Optimally flags every seed oil name including the catch-alls, shows its position in the list, and links the study behind the rule.',
+    cta: 'Optimally flags each seed oil by name, including inside group names, and links the study behind the rule.',
     scans: ['8076809513692', '3017620422003'],
     related: ['how-to-spot-seed-oils-on-a-label', 'best-food-scanner-apps'],
     updated: UPDATED,
@@ -514,26 +520,26 @@ export const GUIDES: Guide[] = [
       'What to look for on packaging aimed at children, the one figure worth knowing, and how to check a label in the few seconds a supermarket trip allows.',
     question: 'How do I check what is in the food I buy for my kids?',
     answer:
-      'Turn the pack over and read the first three ingredients, because those are most of what is in it by weight. On products marketed to children the front of the pack is where the health claims are and the back is where the answer is. Two thirds of the calories eaten by American under-19s now come from ultra-processed food, measured across twenty years of national survey data, so the useful question at the shelf is usually the processing one rather than the sugar one.',
+      'Turn the pack over and read the first three ingredients, because those are usually most of what is in it by weight. On products marketed to children the front of the pack is where the health claims are and the back is where the answer is. Two thirds of the calories eaten by American children and teenagers now come from ultra-processed food, measured across twenty years of national survey data, so the useful question at the shelf is usually the processing one rather than the sugar one.',
     sections: [
       {
         h: 'The figure worth carrying around',
         p: [
-          'A JAMA analysis of US national survey data from 1999 to 2018 found that the share of calories from ultra-processed food among 2 to 19 year olds rose to about 67%. The equivalent adult figure is 57%.',
+          'A JAMA analysis of US national survey data from 1999 to 2018 found that the share of calories from ultra-processed food among 2 to 19 year olds rose from 61.4% to 67.0%.',
           'That is a measurement of intake rather than of harm, and it is worth stating plainly as such. What it tells you is where the volume is. A change applied to two thirds of what a child eats has more room to matter than one applied to the margins.',
         ],
       },
       {
         h: 'What front-of-pack claims are allowed to mean',
         p: [
-          'The claims that appear most on children’s food are the ones with the least legal content behind them. "Natural" has never been formally defined by the US Food and Drug Administration. "Made with real fruit" sets no minimum. "No artificial colours" says nothing about the sweeteners, the emulsifiers or the processing.',
+          'The claims that appear most on children’s food are the ones with the least legal content behind them. "Natural" has never been formally defined by the US Food and Drug Administration. "No artificial colours" says nothing about the sweeteners, the emulsifiers or the processing.',
           'The regulated claims are the nutrition ones, and even those are chosen by the manufacturer from whichever number flatters the product. A cereal can be high in fibre and still be group 4.',
         ],
       },
       {
         h: 'A workable habit in a supermarket',
         p: [
-          '- Read the first three ingredients only. They are the bulk of the product.',
+          '- Read the first three ingredients. They are usually the bulk of the product.',
           '- Look for one marker of ultra-processing rather than trying to assess everything: a flavouring, an emulsifier, a colour, a non-sugar sweetener, a protein isolate.',
           '- Treat the front of the pack as advertising, because that is what it is.',
           '- Compare within a shelf rather than in the abstract. The useful question is which of these four cereals, not whether cereal is good.',
@@ -542,7 +548,7 @@ export const GUIDES: Guide[] = [
       {
         h: 'On fear, and where this site stops',
         p: [
-          'The evidence on ultra-processed food is strong enough that it does not need inflating, and most of it is observational, which means association rather than proof. One randomised trial in twenty adults is the piece that isolates cause, and it measured calorie intake and weight over two weeks, not childhood outcomes over decades.',
+          'The evidence on ultra-processed food is strong enough that it does not need inflating, and most of it is observational, which means association rather than proof. One randomised trial in twenty adults is the piece that isolates cause, and it measured calorie intake and weight over two weeks on each diet, not childhood outcomes over decades.',
           'Nothing here is medical advice, and a score on a phone is not a judgement about a meal, a household or a parent. Allergen information in particular should always be read from the physical packaging, because only the label in your hand is authoritative.',
         ],
       },

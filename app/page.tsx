@@ -81,7 +81,7 @@ export default function Home() {
               <p className="lede muted">
                 Scan a barcode and get a score out of 100, built from the
                 ingredient list. The same ingredient gets the same rating
-                every time, and every rule links the study behind it.
+                every time, and every flag links the study behind it.
               </p>
               {/* The scale itself, before any number on the page uses it. */}
               <figure className="scale">
@@ -135,7 +135,7 @@ export default function Home() {
             <span className="eyebrow">Why this matters</span>
             <h2>The evidence on ultra-processed food.</h2>
             <p>
-              Six findings, each one a paper you can open. Where a study is
+              Eight findings, each one a source you can open. Where a study is
               observational the card says so, because the difference between
               association and cause is the whole argument.
             </p>
@@ -161,8 +161,8 @@ export default function Home() {
           </ol>
 
           <p className="ledger-note">
-            Ultra-processed here means NOVA group 4, the classification those
-            papers use. Optimally applies it as a hard cap rather than a
+            Ultra-processed here means NOVA group 4, the classification the ultra-processed
+            food studies above use. Optimally applies it as a hard cap rather than a
             deduction: a NOVA-4 product cannot rate as Good however flattering
             its nutrition panel is.{' '}
             <Link href="/guides/">Read the guides</Link> for what that means
@@ -190,9 +190,9 @@ export default function Home() {
               <h3>Rate every ingredient</h3>
               <p>
                 Each one is matched against a bundled taxonomy and given a
-                rating. A rating is written <strong>once</strong> and then
-                frozen, so the same ingredient scores the same for you, for
-                everyone else, and next year.
+                rating. The rules are fixed, so the same ingredient
+                scores the same for you and for everyone else, every time it is
+                scanned.
               </p>
             </li>
             <li>
@@ -207,8 +207,8 @@ export default function Home() {
               <p>
                 Out of 100, into one of the four fixed bands at the top of this
                 page. The thresholds never move: no curve, no comparison to
-                other users, and no adjusting for what is normal in the
-                category.
+                other users, and no grading a product against the rest
+                of its aisle.
               </p>
             </li>
           </ol>
@@ -301,7 +301,7 @@ export default function Home() {
           <div className="split">
             <div>
               <span className="eyebrow">Receipts</span>
-              <h2>Every rule has a study behind it.</h2>
+              <h2>Every flag has a study behind it.</h2>
               <p>
                 Each article states the claim, links the evidence, and prints
                 the exact rule it drives, read out of the scoring engine
@@ -311,8 +311,8 @@ export default function Home() {
                 <li>
                   <Check />
                   <span>
-                    Peer-reviewed studies, plus EFSA and IARC assessments where
-                    they exist.
+                    Peer-reviewed studies and regulator assessments, with anything
+                    weaker, such as an author’s own essay, labelled as exactly that.
                   </span>
                 </li>
                 <li>
@@ -353,7 +353,7 @@ export default function Home() {
             <h2>Scan the next thing you pick up.</h2>
             <p>
               The score, the ingredient ratings and the studies behind each
-              rule, on whatever is in your hand in the shop.
+              flag, on whatever is in your hand in the shop.
             </p>
             <div className="row">
               <AppStoreButton />

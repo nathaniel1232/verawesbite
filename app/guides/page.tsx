@@ -2,13 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SiteHeader, SiteFooter } from '@/components/site'
 import { GUIDES, KIND_LABEL, type GuideKind } from '@/lib/guides'
-import { SITE_URL } from '@/lib/site'
+import { CANONICAL_ORIGIN } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Guides',
   description:
-    'Plain answers on seed oils, ultra-processing, food labels and the scanner apps that read them. Every claim cited, every comparison checkable.',
-  alternates: { canonical: `${SITE_URL}/guides/` },
+    'Plain answers on seed oils, ultra-processing, food labels and the scanner apps that read them. Sources named, comparisons dated.',
+  alternates: { canonical: `${CANONICAL_ORIGIN}/guides/` },
 }
 
 /* The order the index runs in, which is deliberately not the order they were
@@ -27,8 +27,8 @@ export default function GuidesIndex() {
           <span className="eyebrow">Guides</span>
           <h1>Reading a label, and the apps that read it for you.</h1>
           <p className="gquestion">
-            Written against the questions people actually ask, with the study
-            behind each claim linked rather than described.
+            Written against the questions people actually ask, with the evidence named
+            and the weak parts of it said out loud.
           </p>
 
           {ORDER.map((kind) => {

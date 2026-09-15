@@ -5,4 +5,4 @@ User-agent: *
 Disallow: /studio/
 Allow: /
 
-Sitemap: https://optimallyapp.com/sitemap.xml
+Sitemap: https://www.optimallyapp.com/sitemap.xml

@@ -24,7 +24,26 @@
    initialization` at module-evaluation time. A fallback that only fails when
    it is needed is worse than no fallback. Caught by building against every
    value a dashboard field might hold, not by reading it. */
-const FALLBACK = 'https://optimallyapp.com'
+/* WWW, NOT THE APEX, AND IT WAS MEASURED RATHER THAN CHOSEN.
+   `curl -sI https://optimallyapp.com/` answers `HTTP/2 308` with
+   `location: https://www.optimallyapp.com/`, and deep paths keep their path.
+   Vercel's domain settings already decided the canonical host; this constant
+   was the one place still disagreeing with them, so the sitemap submitted a
+   URL per page that permanently redirected somewhere else. */
+const FALLBACK = 'https://www.optimallyapp.com'
+
+/**
+ * Where every page's `<link rel="canonical">` points, ON EVERY DEPLOYMENT.
+ *
+ * Deliberately not SITE_URL. The GitHub Pages build sets SITE_URL to
+ * github.io and a basePath of /verawesbite, and it exists only so the shipped
+ * app's Privacy, Terms and Support links keep resolving. It is a full mirror
+ * of the site, so without this every guide would exist twice to a search
+ * engine and compete with itself. The first version of the guides built their
+ * canonical from SITE_URL and forgot the basePath too, which on the mirror
+ * produced a canonical pointing at a URL that 404s.
+ */
+export const CANONICAL_ORIGIN = FALLBACK
 
 /** The deployment's origin, always a valid absolute URL. */
 export const SITE_URL = resolveSiteUrl()

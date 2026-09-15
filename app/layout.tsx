@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     template: '%s · Optimally',
   },
   description:
-    'Scan a barcode and get a score out of 100, built from the ingredient list. The same ingredient gets the same rating every time, and every rule links the study behind it.',
+    'Scan a barcode and get a score out of 100, built from the ingredient list. The same ingredient gets the same rating every time, and every flag links the study behind it.',
   icons: {
     icon: asset('/veramark.png'),
     apple: asset('/appicon.png'),

@@ -204,6 +204,7 @@ img {
 .btn {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   gap: 8px;
   font-weight: 700;
   font-size: 14px;
@@ -1024,13 +1025,18 @@ em.bad,       i.bad       { background: var(--bad); }
    One product's verdict.
    ------------------------------------------------------------------------ */
 .verdict { padding: 34px 24px 90px; }
+/* MEASURED AT 21px on a 375px viewport, and it is the only way back out of a
+   guide or a scan page. The box is 44 now; the negative top margin keeps the
+   text where it was, so nothing below it moves. */
 .backlink {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   font-size: 13.5px;
   font-weight: 700;
   color: var(--sub);
   text-decoration: none;
-  margin-bottom: 26px;
+  margin: -11px 0 15px;
 }
 .backlink::before { content: '‹ '; }
 .backlink:hover { color: var(--ink); }
@@ -1679,8 +1685,10 @@ em.bad,       i.bad       { background: var(--bad); }
 }
 .grelated h2 { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); }
 .grelated ul { margin: 0; }
-.grelated li { margin: 8px 0; }
-.grelated a { color: var(--forest); font-weight: 700; font-size: 16px; }
+.grelated li { margin: 0; }
+/* Measured at 20px each and stacked 16px apart: the gap between two related
+   links was nearly as tall as the links. 44px boxes supply their own spacing. */
+.grelated a { color: var(--forest); font-weight: 700; font-size: 16px; display: inline-flex; align-items: center; min-height: 44px; }
 
 /* The index. */
 .gindex { display: grid; gap: 10px; }

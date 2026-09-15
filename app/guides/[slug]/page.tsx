@@ -4,7 +4,7 @@ import { SiteHeader, SiteFooter, AppStoreButton } from '@/components/site'
 import { GUIDES, KIND_LABEL, guideBySlug, type GuideSection } from '@/lib/guides'
 import { PRODUCTS, BAND_LABEL, productByCode } from '@/lib/products'
 import { OFFER_SHORT } from '@/lib/app'
-import { SITE_URL } from '@/lib/site'
+import { CANONICAL_ORIGIN } from '@/lib/site'
 
 export function generateStaticParams() {
   return GUIDES.map((g) => ({ slug: g.slug }))
@@ -21,7 +21,7 @@ export async function generateMetadata({
   return {
     title: g.title,
     description: g.description,
-    alternates: { canonical: `${SITE_URL}/guides/${g.slug}/` },
+    alternates: { canonical: `${CANONICAL_ORIGIN}/guides/${g.slug}/` },
     openGraph: { title: g.title, description: g.description, type: 'article' },
   }
 }
@@ -85,7 +85,7 @@ export default async function GuidePage({
       headline: g.heading,
       description: g.description,
       dateModified: '2026-09-14',
-      mainEntityOfPage: `${SITE_URL}/guides/${g.slug}/`,
+      mainEntityOfPage: `${CANONICAL_ORIGIN}/guides/${g.slug}/`,
       publisher: { '@type': 'Organization', name: 'Optimally' },
     },
   ]
