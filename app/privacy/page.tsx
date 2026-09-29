@@ -38,8 +38,11 @@ export default function Privacy() {
       <h2>Data stored on your device</h2>
       <p>
         Your profile answers, scan history, saved items and shopping list are
-        stored <strong>locally on your device</strong> and are not uploaded to
-        any Optimally server. You can erase all of it at any time in{' '}
+        stored <strong>locally on your device</strong>. The complete records are
+        not uploaded to an Optimally server. Shopping recommendations send the
+        selected country and a few product categories inferred from recent
+        lower-scoring scans, as described below. You can erase the local records
+        at any time in{' '}
         <strong>Settings &rarr; Reset everything</strong>, or by deleting the
         app.
       </p>
@@ -91,6 +94,24 @@ export default function Privacy() {
             </tr>
             <tr>
               <td>
+                <strong>Shopping recommendations</strong>
+                <br />
+                (our Cloudflare Worker and OpenAI)
+              </td>
+              <td>
+                Your selected shopping country, preferred product categories
+                inferred from up to ten recent lower-scoring scans, and a short
+                list of public catalog products with their barcodes, names,
+                brands, categories, scores and ingredient counts
+              </td>
+              <td>
+                To order real, country-listed products for your shopping list.
+                OpenAI returns barcodes from that supplied list; it does not
+                create product facts or determine their scores.
+              </td>
+            </tr>
+            <tr>
+              <td>
                 <strong>openFDA</strong> (U.S. Food &amp; Drug Administration)
               </td>
               <td>A brand name or product name</td>
@@ -132,7 +153,10 @@ export default function Privacy() {
       </div>
       <p>
         None of these requests include your name, email address, contacts,
-        precise location, or your scan history.
+        precise location, or your complete scan history. The recommendation
+        request includes the limited category preferences described above. Our
+        Cloudflare service uses your IP address to limit recommendation requests;
+        its per-IP counter expires after two hours.
       </p>
 
       <h2>Camera and photos</h2>
