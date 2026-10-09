@@ -2257,50 +2257,58 @@
     if (mark) ctx.drawImage(mark, W * 0.08, H * 0.075 - W * 0.022, W * 0.043, W * 0.043);
     font(ctx, W * 0.030, 800, -0.5); ctx.fillStyle = C.accent;
     drawText(ctx, "Optimally", W * 0.137, H * 0.075, -0.5);
-    ctx.textBaseline = "alphabetic";
-    ctx.globalAlpha = 1 - outro;
-    centered(copy.opening[0], H * (portrait ? 0.170 : 0.185), W * 0.103, C.ink);
-    centered(copy.opening[1], H * (portrait ? 0.235 : 0.285), W * 0.103, C.accent);
-    drawPhotoCard(ctx, g.img, photo, W * 0.045, {
-      fit: spec.fit, zoom: 1 + 0.025 * outCubic(span(t, 0, T.outro[0]))
-    });
-    g.scanBox = photo; g.scanRadius = W * 0.045;
-    if (t < T.lock[1]) drawScan(ctx, g, t);
     ctx.restore();
-
-    // A large result card overlaps the photograph. Score and evidence stay together.
-    ctx.save();
-    ctx.globalAlpha = reveal * (1 - outro);
-    ctx.translate(0, (1 - reveal) * W * 0.04);
-    var py = H * (portrait ? 0.590 : 0.635), ph = H * (portrait ? 0.150 : 0.205);
-    ctx.shadowColor = rgba(C.ink, 0.15); ctx.shadowBlur = W * 0.035;
-    ctx.shadowOffsetY = W * 0.01;
-    roundRect(ctx, W * 0.08, py, W * 0.84, ph, W * 0.032);
-    ctx.fillStyle = C.card; ctx.fill(); ctx.shadowColor = "transparent";
-    ctx.textBaseline = "middle";
-    if (!comment) {
-      font(ctx, W * 0.115, 900, -3); ctx.fillStyle = g.band;
-      drawText(ctx, String(counted(t, T.score, spec.score)), W * 0.12, py + ph * 0.43, -3);
-      font(ctx, W * 0.025, 700, 0); ctx.fillStyle = C.ink2;
-      drawText(ctx, "OUT OF 100", W * 0.12, py + ph * 0.76, 0);
-    }
-    var rx = W * (comment ? 0.12 : 0.37), rw = W * (comment ? 0.75 : 0.50);
-    font(ctx, W * 0.024, 800, 1.1); ctx.fillStyle = C.accent;
-    var request = spec.hook === "next";
-    drawText(ctx, request ? "YOU PICK THE NEXT SCAN" : "INGREDIENT CHECK", rx, py + ph * 0.23, 1.1);
-    var reasons = request ? [{ text: "Brand + product name" }, { text: "Drop it in the comments ↓" }]
-      : spec.reasons.filter(function (r) { return r.text.trim(); }).slice(0, 2);
-    for (var i = 0; i < reasons.length; i++) {
-      var y = py + ph * (0.48 + i * 0.29);
-      var rowIn = outCubic(span(t, T.rows + i * T.rowStep, T.rows + i * T.rowStep + 0.22));
-      ctx.save(); ctx.globalAlpha *= rowIn;
-      if (!request) toneGlyph(ctx, reasons[i].tone, rx + W * 0.009, y, W * 0.010);
-      var fs = fitSize(ctx, reasons[i].text, rw - W * 0.035, W * (comment ? 0.040 : 0.030), 700, -0.2);
-      font(ctx, fs, 700, -0.2); ctx.fillStyle = C.ink;
-      drawText(ctx, reasons[i].text, rx + W * 0.035, y, -0.2);
+    // End the photo layer completely once the close arrives. Do not submit
+    // invisible card fills, borders or shadows to the browser's compositor.
+    if (outro < 1) {
+      ctx.save();
+      ctx.textBaseline = "alphabetic";
+      ctx.globalAlpha = 1 - outro;
+      centered(copy.opening[0], H * (portrait ? 0.170 : 0.185), W * 0.103, C.ink);
+      centered(copy.opening[1], H * (portrait ? 0.235 : 0.285), W * 0.103, C.accent);
+      drawPhotoCard(ctx, g.img, photo, W * 0.045, {
+        fit: spec.fit, zoom: 1 + 0.025 * outCubic(span(t, 0, T.outro[0]))
+      });
+      g.scanBox = photo; g.scanRadius = W * 0.045;
+      if (t < T.lock[1]) drawScan(ctx, g, t);
       ctx.restore();
     }
-    ctx.restore();
+
+    // A large result card overlaps the photograph. Score and evidence stay together.
+    if (reveal > 0 && outro < 1) {
+      ctx.save();
+      ctx.globalAlpha = reveal * (1 - outro);
+      ctx.translate(0, (1 - reveal) * W * 0.04);
+      var py = H * (portrait ? 0.590 : 0.635), ph = H * (portrait ? 0.150 : 0.205);
+      ctx.shadowColor = rgba(C.ink, 0.15); ctx.shadowBlur = W * 0.035;
+      ctx.shadowOffsetY = W * 0.01;
+      roundRect(ctx, W * 0.08, py, W * 0.84, ph, W * 0.032);
+      ctx.fillStyle = C.card; ctx.fill(); ctx.shadowColor = "transparent";
+      ctx.textBaseline = "middle";
+      if (!comment) {
+        font(ctx, W * 0.115, 900, -3); ctx.fillStyle = g.band;
+        drawText(ctx, String(counted(t, T.score, spec.score)), W * 0.12, py + ph * 0.43, -3);
+        font(ctx, W * 0.025, 700, 0); ctx.fillStyle = C.ink2;
+        drawText(ctx, "OUT OF 100", W * 0.12, py + ph * 0.76, 0);
+      }
+      var rx = W * (comment ? 0.12 : 0.37), rw = W * (comment ? 0.75 : 0.50);
+      font(ctx, W * 0.024, 800, 1.1); ctx.fillStyle = C.accent;
+      var request = spec.hook === "next";
+      drawText(ctx, request ? "YOU PICK THE NEXT SCAN" : "INGREDIENT CHECK", rx, py + ph * 0.23, 1.1);
+      var reasons = request ? [{ text: "Brand + product name" }, { text: "Drop it in the comments ↓" }]
+        : spec.reasons.filter(function (r) { return r.text.trim(); }).slice(0, 2);
+      for (var i = 0; i < reasons.length; i++) {
+        var y = py + ph * (0.48 + i * 0.29);
+        var rowIn = outCubic(span(t, T.rows + i * T.rowStep, T.rows + i * T.rowStep + 0.22));
+        ctx.save(); ctx.globalAlpha *= rowIn;
+        if (!request) toneGlyph(ctx, reasons[i].tone, rx + W * 0.009, y, W * 0.010);
+        var fs = fitSize(ctx, reasons[i].text, rw - W * 0.035, W * (comment ? 0.040 : 0.030), 700, -0.2);
+        font(ctx, fs, 700, -0.2); ctx.fillStyle = C.ink;
+        drawText(ctx, reasons[i].text, rx + W * 0.035, y, -0.2);
+        ctx.restore();
+      }
+      ctx.restore();
+    }
 
     ctx.save(); ctx.globalAlpha = outro; ctx.textBaseline = "alphabetic";
     centered(copy.close[0], H * (portrait ? 0.270 : 0.285), W * 0.118, C.ink);
