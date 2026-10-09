@@ -411,6 +411,43 @@ export default function Home() {
           </div>
         </section>
         <section
+          className="home-section home-wrap home-guides"
+          aria-labelledby="guides-heading"
+        >
+          <div className="section-intro">
+            <span className="home-kicker">The Optimally library</span>
+            <h2 id="guides-heading">
+              Better questions.
+              <br />
+              <span className="serif-word">Clearer food choices.</span>
+            </h2>
+            <p>
+              Explore the ideas behind the app and practical ways to understand
+              the food you buy.
+            </p>
+          </div>
+          <div className="home-guide-links">
+            <Link href="/guides/primal-food-scanning-app/">
+              <span>01 · Primal</span>
+              <h3>A whole-food approach, with reasons you can explore.</h3>
+              <span aria-hidden="true">↗</span>
+            </Link>
+            <Link href="/guides/ray-peat-food-scanning-app/">
+              <span>02 · Ray Peat</span>
+              <h3>Bring your interest in nutrition to the grocery shelf.</h3>
+              <span aria-hidden="true">↗</span>
+            </Link>
+            <Link href="/guides/best-food-scanner-apps/">
+              <span>03 · Food scanning</span>
+              <h3>Find the food scanner that fits the way you eat.</h3>
+              <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+          <Link className="home-text-link" href="/guides/">
+            Explore all the guides <Arrow />
+          </Link>
+        </section>
+        <section
           id="questions"
           className="home-section home-wrap questions-grid"
           aria-labelledby="questions-heading"

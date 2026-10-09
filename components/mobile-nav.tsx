@@ -38,6 +38,9 @@ export function MobileNav() {
         <Link href="/#questions" onClick={close}>
           Questions
         </Link>
+        <Link href="/guides/" onClick={close}>
+          Guides
+        </Link>
         <Link href="/support/" onClick={close}>
           Support
         </Link>

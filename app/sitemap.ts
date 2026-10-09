@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { SITE_URL as origin, BASE_PATH as base } from '@/lib/site'
-import { GUIDES } from '@/lib/guides'
+import { GUIDES, guideModifiedISO } from '@/lib/guides'
 import { PRODUCTS } from '@/lib/products'
 
 /**
@@ -22,7 +22,6 @@ import { PRODUCTS } from '@/lib/products'
    a static export has no server to regenerate a sitemap on. */
 export const dynamic = 'force-static'
 
-
 /* THE GENERATED PAGES WERE NEVER IN HERE.
    `/scan/<barcode>/` has produced ten real pages since 7 September and not one
    of them was ever submitted: the list below was hand-typed and only ever held
@@ -30,7 +29,14 @@ export const dynamic = 'force-static'
    on a site with no inbound links it is the difference between being found and
    not. Both generated sets are now derived from the same data the pages are
    built from, so a new guide or a new product cannot be left out by hand. */
-const STATIC = ['/', '/guides/', '/support/', '/contact/', '/privacy/', '/terms/']
+const STATIC = [
+  '/',
+  '/guides/',
+  '/support/',
+  '/contact/',
+  '/privacy/',
+  '/terms/',
+]
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date()
@@ -38,13 +44,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const statics = STATIC.map((path) => ({
     url: `${origin}${base}${path}`,
     lastModified: now,
-    changeFrequency: (path === '/' ? 'monthly' : 'yearly') as 'monthly' | 'yearly',
+    changeFrequency: (path === '/' ? 'monthly' : 'yearly') as
+      'monthly' | 'yearly',
     priority: path === '/' ? 1 : path === '/guides/' ? 0.9 : 0.6,
   }))
 
   const guides = GUIDES.map((g) => ({
     url: `${origin}${base}/guides/${g.slug}/`,
-    lastModified: now,
+    lastModified: guideModifiedISO(g),
     changeFrequency: 'monthly' as const,
     /* Above the legal pages and below the two indexes. These are the pages
        this site is actually trying to rank. */

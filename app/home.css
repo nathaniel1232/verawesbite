@@ -1019,3 +1019,12 @@ a:hover .arrow-icon {
     animation: none !important;
   }
 }
+
+/* Useful entry points into the guide library. */
+.home-guide-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-bottom: 26px; }
+.home-guide-links > a { display: flex; flex-direction: column; border-top: 1px solid #cad2c7; border-bottom: 1px solid #cad2c7; padding: 24px 0; text-decoration: none; color: var(--ink); }
+.home-guide-links > a > span:first-child { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--forest); font-weight: 650; }
+.home-guide-links h3 { font-size: 25px; line-height: 1.25; letter-spacing: -.035em; font-weight: 600; max-width: 25ch; margin: 22px 18px 28px 0; }
+.home-guide-links > a > span:last-child { font-size: 22px; color: var(--forest); margin-top: auto; }
+.home-guide-links > a:hover h3 { color: var(--forest); }
+@media (max-width: 760px) { .home-guide-links { grid-template-columns: 1fr; gap: 0; } .home-guide-links > a { border-bottom: 0; padding: 24px 0; } .home-guide-links > a:last-child { border-bottom: 1px solid #cad2c7; } .home-guide-links h3 { font-size: 24px; margin: 16px 0; } }

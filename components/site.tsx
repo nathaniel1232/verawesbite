@@ -30,6 +30,7 @@ export function SiteHeader() {
           <Link href="/#app">The app</Link>
           <Link href="/#approach">Our approach</Link>
           <Link href="/#story">Our story</Link>
+          <Link href="/guides/">Guides</Link>
           {/* Straight to the store, not to an anchor that scrolls to a
               button that goes to the store. The header CTA is the most-clicked
               thing on the page and it had one hop too many in it. */}
