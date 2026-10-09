@@ -1,371 +1,461 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { SiteHeader, SiteFooter, Phone, Check, AppStoreButton } from '@/components/site'
+import { SiteHeader, SiteFooter, AppStoreButton } from '@/components/site'
+import { AppTour } from '@/components/app-tour'
 import { asset } from '@/lib/asset'
-import { FACTS, EVIDENCE_LABEL, EVIDENCE_CAVEAT } from '@/lib/facts'
+import { CANONICAL_ORIGIN } from '@/lib/site'
+import './home.css'
 
+export const metadata: Metadata = {
+  title: { absolute: 'Optimally · Real food. A clearer way to eat.' },
+  description:
+    'Meet Optimally, the food guide built to make real, nourishing food easier to choose. Explore ingredients, whole-food meals, micronutrients, and the research behind our approach.',
+  alternates: { canonical: `${CANONICAL_ORIGIN}/` },
+  openGraph: {
+    title: 'Optimally · Real food. A clearer way to eat.',
+    description:
+      'Understand your food. Find your everyday staples. Build a way of eating that makes sense.',
+  },
+}
 
-/* RECAPTURED 14 SEPTEMBER 2026, AND THREE OF THE FOUR SHOWED A UI THAT NO
-   LONGER EXISTS.
-
-   The previous set was taken on 7 September against a five-tab layout reading
-   Scan / Today / List / Research / Settings. The app now reads Home / Explore
-   / List / Evidence / Settings, so every tab bar on this page was wrong.
-
-   The fourth screenshot was worse than stale. It showed a "Today" progress
-   screen, and progress is no longer a tab at all: ContentView's own comment
-   says the cards moved to the bottom of the Scan tab, and they did not.
-   `ProgressSections` is defined in ProgressTabView.swift and referenced from
-   nowhere in the app. The screen in that image cannot be reached. It has been
-   replaced by the swap shelf, which is a real screen, is in the App Store
-   description, and finishes the argument the other three start: here is the
-   problem, here is the evidence, here is what to buy instead.
-
-   Captured on an iPhone 17 Pro Max simulator, which is 440x956pt at 3x and so
-   exactly 1320x2868, then scaled to 1050 wide. Nothing is upscaled. Launched
-   with `-seedDemo -skipOnboarding -pro -country US`, so every product on
-   screen is one of the bundled fictional fixtures (GymFuel, CleanMacro,
-   Nordby, Bare Bar, Morning Co.) and no real brand appears, which is the rule
-   for this app's marketing art.
-
-   A caption each. Each line adds something the title does not already say, per
-   the house rule about subtitles that restate their heading. */
-const SHOTS = [
+const foundations = [
   {
-    src: '/shots/scan.jpg',
-    alt: 'Optimally home screen: a scan button, two suggested alternatives scoring 88 and 92, a product search, a barcode field and the most recent scan',
-    title: 'Scan or search',
-    desc: 'Point the camera at a barcode, or type a name in.',
+    n: '01',
+    title: 'Start with real food.',
+    text: 'Make familiar, minimally processed foods the foundation. Eggs, fish, meat, fruit, tolerated dairy, and roots are a good place to start.',
   },
   {
-    src: '/shots/verdict.jpg',
-    alt: 'Optimally scoring a Choc-Chip Protein Bar 14 out of 100, very bad, flagged ultra-processed and contains seed oils',
-    title: 'Read the verdict',
-    desc: 'The number, the band, and every line that moved it.',
+    n: '02',
+    title: 'Look beyond macros.',
+    text: 'Protein and energy matter. So do the vitamins and minerals your food contributes. Optimally helps bring them into the picture.',
   },
   {
-    src: '/shots/research.jpg',
-    alt: 'Optimally research screen headed "Why Optimally rates what it rates", listing seed oils, ultra-processing, the food matrix and sugar, each showing how many papers back it',
-    title: 'Check our work',
-    desc: 'Every flag traces to a published paper.',
-  },
-  {
-    src: '/shots/swaps.jpg',
-    alt: 'Optimally showing better products on the same shelf at 92, 88 and 88, above a breakdown rating sunflower oil and aspartame Very Bad',
-    title: 'Find something better',
-    desc: 'Higher scores on the same shelf, and every ingredient rated.',
+    n: '03',
+    title: 'Make room for you.',
+    text: 'Choose foods you enjoy and tolerate. Your allergies, preferences, appetite, and daily life still matter.',
   },
 ]
 
-/* The four bands, which are four equal quarters of the 0 to 100 range. The
-   figures are ScoreBand's own thresholds and BAND_LABEL's own names. */
-const BANDS = [
-  { key: 'bad', name: 'Very bad', range: 'Under 25' },
-  { key: 'poor', name: 'Poor', range: '25 to 49' },
-  { key: 'good', name: 'Good', range: '50 to 74' },
-  { key: 'excellent', name: 'Very optimal', range: '75 and over' },
+const questions = [
+  {
+    q: 'What is Optimally?',
+    a: 'Optimally is an iPhone food guide. Scan products, understand ingredients, explore whole-food meal ideas, and keep a food log. It brings food quality and nutrition into one place so everyday choices are easier to understand.',
+  },
+  {
+    q: 'Is this a strict Primal or Ray Peat diet?',
+    a: 'Optimally draws inspiration from Aajonus Vonderplanitz’s Primal Diet and Ray Peat’s separate writings, especially attention to food quality, animal foods, fruit, and dairy when tolerated. It combines those interests with evidence from other dietary patterns and safe food preparation. There is one Optimally approach, with room for your personal exclusions.',
+  },
+  {
+    q: 'Do I need to count every calorie?',
+    a: 'You can start by understanding what is in your food and finding a few meals you enjoy. The food log and nutrition tracking are there when you want more detail; the approach starts with food quality.',
+  },
+  {
+    q: 'What does a food score actually mean?',
+    a: 'A score summarises how a food fits Optimally’s criteria using the available ingredient and nutrition information. It is a guide to a food, not a diagnosis, a prediction about your health, or a complete judgement of your diet. Missing information and portion size matter.',
+  },
+  {
+    q: 'How does it handle allergies and intolerances?',
+    a: 'Your personal exclusions help shape suggestions and alerts. A database or photo can be incomplete, so always read the physical package and follow your own allergy guidance. A high food score never makes an allergen safe for you.',
+  },
 ]
+
+function Arrow() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      aria-hidden="true"
+      className="arrow-icon"
+    >
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  )
+}
 
 export default function Home() {
   return (
     <>
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
       <SiteHeader />
-
-      <main>
-        {/* ---------------- hero ---------------- */}
-        <section className="hero wrap">
-          <div className="hero-grid">
-            <div>
-              <span className="eyebrow">Seed-oil &amp; ultra-processed scanner</span>
-              <h1>Know what&rsquo;s really in your food.</h1>
-              <p className="lede muted">
-                Scan a barcode and get a score out of 100, built from the
-                ingredient list. The same ingredient gets the same rating
-                every time, and every flag links the study behind it.
-              </p>
-              {/* The scale itself, before any number on the page uses it. */}
-              <figure className="scale">
-                <div className="scale-bar" aria-hidden="true">
-                  {BANDS.map((b) => (
-                    <span key={b.key} className={b.key} />
-                  ))}
-                </div>
-                <ol className="scale-legend">
-                  {BANDS.map((b) => (
-                    <li key={b.key}>
-                      <b className={b.key}>{b.name}</b>
-                      <span>{b.range}</span>
-                    </li>
-                  ))}
-                </ol>
-              </figure>
-
-              <div className="cta-row" id="get">
-                <AppStoreButton />
-              </div>
-              <p className="purchase-note">
-                Paid subscription required. Eligible Apple IDs see any free
-                trial and the renewal price before purchase.
-              </p>
-            </div>
-
-            <Phone
-              src="/shots/verdict.jpg"
-              alt="Optimally scoring a Choc-Chip Protein Bar 14 out of 100, flagged ultra-processed and contains seed oils"
-              tilt
-              priority
-            />
-          </div>
-        </section>
-
-
-
-        {/* ---------------- what the food supply actually looks like ----------
-            THIS REPLACED THE LEDGER OF TEN SCANNED PRODUCTS, on instruction.
-
-            What is here instead has to clear a higher bar than the thing it
-            replaced, because "scary facts about processed food" is the exact
-            shape of the content that is usually invented. Every figure is a
-            named paper with a DOI that was resolved and checked before it was
-            written down, every observational study says so on its own card,
-            and the one genuinely quotable statistic with a shaky provenance
-            was left out. See the header of lib/facts.ts. */}
-        <section className="band wrap" id="why">
-          <div className="section-head" data-r>
-            <span className="eyebrow">Why this matters</span>
-            <h2>The evidence on ultra-processed food.</h2>
-            <p>
-              Eight findings, each one a source you can open. Where a study is
-              observational the card says so, because the difference between
-              association and cause is the whole argument.
+      <main id="main" className="home">
+        <section
+          className="intro-section home-wrap"
+          aria-labelledby="intro-heading"
+        >
+          <div className="intro-copy">
+            <span className="home-kicker">
+              <span className="live-dot" /> Your everyday food guide
+            </span>
+            <h1 id="intro-heading">
+              Real food.
+              <br />A clearer way
+              <br />
+              to <span className="serif-word">eat.</span>
+            </h1>
+            <p className="intro-lede">
+              Understand what&rsquo;s in your food.
+              <br className="desktop-break" /> Discover what nourishes you.
+              <br className="desktop-break" /> Make better choices, one meal at
+              a time.
             </p>
-          </div>
-
-          <ol className="facts" data-r>
-            {FACTS.map((f, i) => (
-              <li key={f.doi} className={i === 0 ? 'fact lead' : 'fact'}>
-                <b className="fig">{f.figure}</b>
-                <h3>{f.headline}</h3>
-                <p>{f.detail}</p>
-                <div className="fmeta">
-                  <span className="etag">{EVIDENCE_LABEL[f.evidence]}</span>
-                  {EVIDENCE_CAVEAT[f.evidence] ? (
-                    <span className="ecav">{EVIDENCE_CAVEAT[f.evidence]}</span>
-                  ) : null}
-                </div>
-                <a className="fcite" href={f.doi} rel="nofollow">
-                  {f.cite}
-                </a>
-              </li>
-            ))}
-          </ol>
-
-          <p className="ledger-note">
-            Ultra-processed here means NOVA group 4, the classification the ultra-processed
-            food studies above use. Optimally applies it as a hard cap rather than a
-            deduction: a NOVA-4 product cannot rate as Good however flattering
-            its nutrition panel is.{' '}
-            <Link href="/guides/">Read the guides</Link> for what that means
-            at the shelf.
-          </p>
-        </section>
-
-        {/* ---------------- how the number is made ---------------- */}
-        <section className="band wrap" id="method">
-          <div className="section-head" data-r>
-            <span className="eyebrow">The method</span>
-            <h2>How the number is made.</h2>
-          </div>
-
-          <ol className="steps" data-r>
-            <li>
-              <h3>Read the label</h3>
-              <p>
-                The barcode goes to Open Food Facts and comes back with the
-                ingredient list and the nutrition panel. No barcode, or it
-                won&rsquo;t read? Photograph the ingredients instead.
-              </p>
-            </li>
-            <li>
-              <h3>Rate every ingredient</h3>
-              <p>
-                Each one is matched against a bundled taxonomy and given a
-                rating. The rules are fixed, so the same ingredient
-                scores the same for you and for everyone else, every time it is
-                scanned.
-              </p>
-            </li>
-            <li>
-              <h3>Apply the rules</h3>
-              <p>
-                Industrial seed oils, degree of processing, flagged additives,
-                and what the nutrition panel says.
-              </p>
-            </li>
-            <li>
-              <h3>Land on a number</h3>
-              <p>
-                Out of 100, into one of the four fixed bands at the top of this
-                page. The thresholds never move: no curve, no comparison to
-                other users, and no grading a product against the rest
-                of its aisle.
-              </p>
-            </li>
-          </ol>
-        </section>
-
-        {/* ---------------- screenshots ---------------- */}
-        <section className="band wrap">
-          <div className="section-head" data-r>
-            <span className="eyebrow">Inside the app</span>
-            <h2>The four screens you will actually use.</h2>
-          </div>
-          <div className="shots" data-r>
-            {SHOTS.map((s) => (
-              <div className="shot" key={s.src}>
-                <Phone src={s.src} alt={s.alt} />
-                <h3>{s.title}</h3>
-                <p>{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ---------------- the difference ---------------- */}
-        <section className="band alt">
-          <div className="wrap">
-            <div className="section-head">
-              <span className="eyebrow">What it&rsquo;s looking for</span>
-              {/* THIS SAID "Two protein bars, eighty-two points apart." AND
-                  NOTHING UNDER IT SHOWED A SCORE. The eighty-two was the drop
-                  across a ledger of six fictional demo packs, 88 down to 6,
-                  that used to run above it; when that was replaced by the ten
-                  real audited products the heading stayed behind, citing an
-                  arithmetic nobody could check and two cards that render no
-                  numbers at all. The spread is demonstrated properly by the
-                  ledger now. This section's job is the smaller, true point
-                  the two photographs actually make. */}
-              <h2>Optimally reads the back of the pack.</h2>
-              <p>
-                Two bars off the same shelf, and their ingredient lists have
-                almost nothing in common.
-              </p>
+            <div className="intro-actions">
+              <AppStoreButton />
+              <a className="home-text-link" href="#app">
+                Meet the app <Arrow />
+              </a>
             </div>
-            <div className="compare" data-r>
-              <div className="cmp">
-                <div className="cmp-photo">
-                  <Image
-                    src={asset('/photos/clean-bar.jpg')}
-                    alt="A minimally packaged protein bar with three named ingredients"
-                    width={1000}
-                    height={750}
-                  />
-                </div>
-                <div className="cmp-body">
-                  <h3>Three ingredients you can name</h3>
-                  {/* These two photographs are stock and always were; the
-                      label saying so was dropped at some point. They sit right
-                      under ten real products with real audited scores, and
-                      without this a reader takes them for scans too. */}
-                  <div className="brandline">Illustration</div>
-                  <div className="cmp-tags">
-                    <span className="tagpill ok">WHOLE-FOOD BASE</span>
-                    <span className="tagpill ok">NO SEED OILS</span>
-                  </div>
-                </div>
-              </div>
-              <div className="cmp">
-                <div className="cmp-photo">
-                  <Image
-                    src={asset('/photos/processed-bar.jpg')}
-                    alt="A brightly packaged cereal bar on a supermarket shelf"
-                    width={1000}
-                    height={750}
-                  />
-                </div>
-                <div className="cmp-body">
-                  <h3>A long list, mostly not food</h3>
-                  <div className="brandline">Illustration</div>
-                  <div className="cmp-tags">
-                    <span className="tagpill no">ULTRA-PROCESSED</span>
-                    <span className="tagpill no">REFINED SYRUPS</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <p className="intro-note">Thoughtfully built for iPhone.</p>
           </div>
-        </section>
-
-        {/* ---------------- research ---------------- */}
-        <section className="band wrap">
-          <div className="split">
-            <div>
-              <span className="eyebrow">Receipts</span>
-              <h2>Every flag has a study behind it.</h2>
-              <p>
-                Each article states the claim, links the evidence, and prints
-                the exact rule it drives, read out of the scoring engine
-                itself.
-              </p>
-              <ul className="checks">
-                <li>
-                  <Check />
-                  <span>
-                    Peer-reviewed studies and regulator assessments, with anything
-                    weaker, such as an author’s own essay, labelled as exactly that.
-                  </span>
-                </li>
-                <li>
-                  <Check />
-                  <span>
-                    Animal-only findings are labelled as such, rather than
-                    quoted as if they were human trials.
-                  </span>
-                </li>
-                <li>
-                  <Check />
-                  <span>
-                    Shows how many of <em>your</em> scans each rule actually
-                    touched.
-                  </span>
-                </li>
-              </ul>
-            </div>
-            <div className="split-photo" data-r>
+          <div className="intro-visual">
+            <div className="food-photo">
               <Image
                 src={asset('/photos/wholefoods.jpg')}
-                alt="Eggs, butter, milk, honey, sardines and blueberries on a sunlit counter"
-                width={1000}
-                height={1250}
+                alt="Eggs, pasteurized milk, blueberries and sardines on a sunlit kitchen counter"
+                width={562}
+                height={1000}
+                priority
+                sizes="(max-width: 760px) 90vw, 44vw"
               />
+            </div>
+            <div
+              className="hero-device"
+              aria-label="A food result in the Optimally app"
+            >
+              <Image
+                src={asset('/shots/whole-food.jpg')}
+                alt="Optimally showing a whole-food scan with its food quality rating and explanation"
+                width={600}
+                height={1304}
+                priority
+                sizes="(max-width: 760px) 45vw, 260px"
+              />
+            </div>
+            <div className="visual-note">
+              <span className="note-leaf" aria-hidden="true">
+                ↗
+              </span>
+              <div>
+                <strong>Food, understood.</strong>
+                <span>A little clarity goes a long way.</span>
+              </div>
             </div>
           </div>
         </section>
-
-        {/* ---------------- the ask ----------------
-            The page used to end on a paragraph about research and run straight
-            into the footer. A reader who got all the way down had read every
-            argument the site makes and then had nothing to click: the only
-            download button below the fold was the one on a product page they
-            may never have opened. */}
-        <section className="band wrap">
-          <div className="trust cta-card" data-r>
-            <h2>Scan the next thing you pick up.</h2>
+        <div className="belief-strip">
+          <div className="home-wrap">
+            <span>Whole foods first</span>
+            <span className="strip-star" aria-hidden="true">
+              ✳
+            </span>
+            <span>Micronutrients matter</span>
+            <span className="strip-star" aria-hidden="true">
+              ✳
+            </span>
+            <span>Evidence you can explore</span>
+          </div>
+        </div>
+        <section
+          id="app"
+          className="home-section home-wrap"
+          aria-labelledby="app-heading"
+        >
+          <div className="section-intro" data-r>
+            <span className="home-kicker">A little help, every day</span>
+            <h2 id="app-heading">
+              From &ldquo;is this good?&rdquo;
+              <br />
+              to <span className="serif-word">understanding why.</span>
+            </h2>
             <p>
-              The score, the ingredient ratings and the studies behind each
-              flag, on whatever is in your hand in the shop.
+              At the shop, in the kitchen, or planning your next meal. Optimally
+              turns food information into something you can actually use.
             </p>
-            <div className="row">
-              <AppStoreButton />
+          </div>
+          <AppTour />
+        </section>
+        <section
+          id="approach"
+          className="approach-section"
+          aria-labelledby="approach-heading"
+        >
+          <div className="home-wrap approach-grid">
+            <div className="approach-heading" data-r>
+              <span className="home-kicker">The Optimally approach</span>
+              <h2 id="approach-heading">
+                Nourishment
+                <br />
+                comes <span className="serif-word">first.</span>
+              </h2>
+              <p>
+                A practical way to eat, inspired by Aajonus
+                Vonderplanitz&rsquo;s focus on animal foods and Ray Peat&rsquo;s
+                interest in nutrition, and informed by research across dietary
+                patterns.
+              </p>
+              <a className="home-text-link" href="#evidence">
+                Explore the thinking <Arrow />
+              </a>
             </div>
-            <p className="finelink">
-              Requires iOS. Paid subscription. Eligible Apple IDs see any free
-              trial and the renewal price before purchase.
+            <ol className="foundation-list" data-r>
+              {foundations.map((f) => (
+                <li key={f.n}>
+                  <span>{f.n}</span>
+                  <div>
+                    <h3>{f.title}</h3>
+                    <p>{f.text}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div className="home-wrap food-pair" data-r>
+            <figure>
+              <Image
+                src={asset('/photos/yogurt-berries.jpg')}
+                alt="A bowl of plain yogurt with berries"
+                width={800}
+                height={800}
+                sizes="(max-width: 600px) 90vw, 45vw"
+              />
+              <figcaption>
+                <strong>Simple everyday staples</strong>
+                <span>Fruit, eggs, fish, and dairy you tolerate.</span>
+              </figcaption>
+            </figure>
+            <figure>
+              <Image
+                src={asset('/photos/salmon-potatoes.jpg')}
+                alt="Cooked salmon with potatoes and carrots"
+                width={900}
+                height={600}
+                sizes="(max-width: 600px) 90vw, 45vw"
+              />
+              <figcaption>
+                <strong>Meals you want to come back to</strong>
+                <span>Protein, satisfying roots, and variety.</span>
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+        <section
+          id="story"
+          className="home-section home-wrap story-grid"
+          aria-labelledby="story-heading"
+        >
+          <div className="story-label">
+            <Image src={asset('/veramark.png')} alt="" width={60} height={60} />
+            <span className="home-kicker">Why I built Optimally</span>
+            <span className="story-line" />
+          </div>
+          <div className="story-copy" data-r>
+            <h2 id="story-heading">
+              Eating well should
+              <br />
+              be easier to <span className="serif-word">understand.</span>
+            </h2>
+            <blockquote>
+              &ldquo;I want to help people eat real, healthy food. Too often, we
+              don&rsquo;t realise what&rsquo;s in the modern foods we eat every
+              day.&rdquo;
+            </blockquote>
+            <p>
+              That is the reason behind Optimally. Food packaging makes
+              promises. Diet advice pulls in different directions. A simple
+              question like &ldquo;what should I eat?&rdquo; can become
+              unnecessarily complicated.
             </p>
+            <p>
+              I built Optimally to make the ingredients clearer, bring
+              nourishing foods back into focus, and give people a useful place
+              to start.
+            </p>
+            <div className="founder-signoff">
+              <span aria-hidden="true">O</span>
+              <div>
+                <strong>From the founder</strong>
+                <span>The idea behind Optimally</span>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section
+          id="evidence"
+          className="evidence-section"
+          aria-labelledby="evidence-heading"
+        >
+          <div className="home-wrap">
+            <div className="evidence-intro" data-r>
+              <div>
+                <span className="home-kicker">Curious by nature</span>
+                <h2 id="evidence-heading">
+                  Inspired by ideas.
+                  <br />
+                  <span className="serif-word">Informed by evidence.</span>
+                </h2>
+              </div>
+              <p>
+                Different diets ask useful questions. We take those questions
+                seriously, then look at what the research can actually tell us.
+              </p>
+            </div>
+            <div className="evidence-grid" data-r>
+              <article>
+                <span className="evidence-type perspective">
+                  Author perspective
+                </span>
+                <h3>Primal Diet</h3>
+                <p>
+                  Aajonus Vonderplanitz&rsquo;s approach centres on raw animal
+                  foods. It inspires our attention to animal foods and food
+                  quality; Optimally uses safe preparation rather than adopting
+                  his raw-food protocol.
+                </p>
+                <a href="https://aajonus.net/interview-on-talksportnet">
+                  Aajonus in his own words <Arrow />
+                </a>
+              </article>
+              <article>
+                <span className="evidence-type perspective">
+                  Author perspective
+                </span>
+                <h3>Ray Peat</h3>
+                <p>
+                  His interest in fruit, dairy, energy, and nutrient adequacy
+                  helps shape our food ideas. His essays are inspiration; they
+                  do not establish that a Peat-style diet improves health.
+                </p>
+                <a href="https://raypeat.com/articles/articles/milk.shtml">
+                  Read Peat&rsquo;s milk essay <Arrow />
+                </a>
+              </article>
+              <article>
+                <span className="evidence-type">Human trial</span>
+                <h3>Mediterranean</h3>
+                <p>
+                  The reanalysed PREDIMED trial found fewer major cardiovascular
+                  events in older, high-risk adults assigned a Mediterranean
+                  pattern with olive oil or nuts.
+                </p>
+                <a href="https://pubmed.ncbi.nlm.nih.gov/29897866/">
+                  PREDIMED · NEJM, 2018 <Arrow />
+                </a>
+              </article>
+              <article>
+                <span className="evidence-type">Human trials</span>
+                <h3>DASH</h3>
+                <p>
+                  DASH trials support a varied pattern rich in fruit,
+                  vegetables, and low-fat dairy for lowering blood pressure.
+                  That reinforces looking at the whole pattern and its
+                  nutrients.
+                </p>
+                <a href="https://www.nhlbi.nih.gov/health/dash/health-benefits">
+                  The research · NHLBI <Arrow />
+                </a>
+              </article>
+            </div>
+            <details className="evidence-detail">
+              <summary>
+                How we decide what belongs in the approach{' '}
+                <span aria-hidden="true">+</span>
+              </summary>
+              <div>
+                <p>
+                  Aajonus Vonderplanitz and Ray Peat offered distinct ideas.
+                  Their writing helps explain our inspirations, but does not
+                  prove this combined approach improves health. Our everyday
+                  foundation is properly cooked meat and eggs, and pasteurised
+                  dairy: raw animal foods can carry harmful germs.{' '}
+                  <a href="https://www.cdc.gov/food-safety/foods/safer-food-choices.html">
+                    Read CDC&rsquo;s food preparation guidance.
+                  </a>
+                </p>
+                <p>
+                  We favour practical ideas that fit the human evidence. In
+                  Hall&rsquo;s controlled 2019 trial, 20 adults ate more and
+                  gained weight on the ultra-processed menu than on the
+                  minimally processed menu over two weeks each. It supports the
+                  food-first direction; it does not show that all packaged food
+                  is harmful.{' '}
+                  <a href="https://www.nih.gov/news-events/news-releases/nih-study-finds-heavily-processed-foods-cause-overeating-weight-gain">
+                    Read the NIH study summary.
+                  </a>
+                </p>
+                <p>
+                  We favour whole fruit over making juice or added sugar a daily
+                  foundation. Unsaturated fats remain part of a varied diet.
+                  Peat&rsquo;s views on sugar and polyunsaturated fats are not a
+                  reason to override human evidence.{' '}
+                  <a href="https://www.who.int/news-room/fact-sheets/detail/healthy-diet">
+                    Read WHO&rsquo;s healthy diet guidance.
+                  </a>
+                </p>
+                <p>
+                  These studies tested their own dietary patterns, not
+                  Optimally. Our approach is a product philosophy informed by
+                  research, and has not been clinically shown to be the best
+                  diet. Food scores use the app&rsquo;s own criteria; source
+                  links let you examine the reasoning.
+                </p>
+              </div>
+            </details>
+            <p className="evidence-footnote">
+              The full diet matters more than a single food. Your needs and
+              tolerances matter too.
+            </p>
+          </div>
+        </section>
+        <section
+          id="questions"
+          className="home-section home-wrap questions-grid"
+          aria-labelledby="questions-heading"
+        >
+          <div>
+            <span className="home-kicker">A few things you might wonder</span>
+            <h2 id="questions-heading">
+              Let&rsquo;s make it
+              <br />
+              <span className="serif-word">clear.</span>
+            </h2>
+            <Link className="home-text-link" href="/support/">
+              More help <Arrow />
+            </Link>
+          </div>
+          <div className="questions-list">
+            {questions.map((q) => (
+              <details key={q.q}>
+                <summary>
+                  {q.q}
+                  <span aria-hidden="true">+</span>
+                </summary>
+                <p>{q.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+        <section
+          className="closing-section home-wrap"
+          aria-labelledby="closing-heading"
+        >
+          <div className="closing-card" data-r>
+            <Image src={asset('/veramark.png')} alt="" width={58} height={58} />
+            <span className="home-kicker">One meal at a time</span>
+            <h2 id="closing-heading">
+              A little more clarity.
+              <br />A little more{' '}
+              <span className="serif-word">nourishment.</span>
+            </h2>
+            <p>Meet your everyday companion for understanding food.</p>
+            <AppStoreButton />
+            <span className="closing-note">Optimally for iPhone</span>
           </div>
         </section>
       </main>
-
       <SiteFooter />
     </>
   )

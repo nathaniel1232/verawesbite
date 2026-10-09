@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { SiteHeader, SiteFooter, AppStoreButton } from '@/components/site'
 import { GUIDES, KIND_LABEL, guideBySlug, type GuideSection } from '@/lib/guides'
 import { PRODUCTS, BAND_LABEL, productByCode } from '@/lib/products'
-import { OFFER_SHORT } from '@/lib/app'
 import { CANONICAL_ORIGIN } from '@/lib/site'
 
 export function generateStaticParams() {
@@ -129,7 +128,6 @@ export default async function GuidePage({
           <div className="ginline">
             <p>{g.cta}</p>
             <AppStoreButton />
-            <span className="gfine">{OFFER_SHORT}</span>
           </div>
 
           {g.sections.map((s: GuideSection) => (

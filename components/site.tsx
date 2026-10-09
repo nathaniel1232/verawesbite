@@ -3,6 +3,7 @@ import Image from 'next/image'
 import type { ReactNode } from 'react'
 import { asset } from '@/lib/asset'
 import { APP_STORE_URL } from '@/lib/app'
+import { MobileNav } from '@/components/mobile-nav'
 
 export const CONTACT_EMAIL = 'nathanielfiska@gmail.com'
 export const EFFECTIVE_DATE = '28 July 2026'
@@ -16,16 +17,19 @@ export function SiteHeader() {
     <header className="header">
       <div className="wrap bar">
         <Link className="brand" href="/">
-          <Image src={asset('/veramark.png')} alt="" width={30} height={30} priority />
+          <Image
+            src={asset('/veramark.png')}
+            alt=""
+            width={30}
+            height={30}
+            priority
+          />
           Optimally
         </Link>
-        <nav className="navlinks">
-          {/* The #how and #why sections were removed with the pricing one;
-              a nav link to an anchor that no longer exists just does nothing
-              when clicked. */}
-          <Link href="/#method">How it works</Link>
-          <Link href="/guides/">Guides</Link>
-          <Link href="/support/">Support</Link>
+        <nav className="navlinks" aria-label="Main navigation">
+          <Link href="/#app">The app</Link>
+          <Link href="/#approach">Our approach</Link>
+          <Link href="/#story">Our story</Link>
           {/* Straight to the store, not to an anchor that scrolls to a
               button that goes to the store. The header CTA is the most-clicked
               thing on the page and it had one hop too many in it. */}
@@ -33,6 +37,7 @@ export function SiteHeader() {
             Get Optimally
           </a>
         </nav>
+        <MobileNav />
       </div>
     </header>
   )
@@ -57,12 +62,13 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="copyright">
-          © 2026 Optimally. Product data from Open Food Facts, used under the ODbL.
+          © 2026 Optimally. Product data from Open Food Facts, used under the
+          ODbL.
         </div>
         <div className="disclaimer">
-          Optimally&rsquo;s scores are an information tool, not medical advice. Always
-          check the physical packaging for allergen information. Only the label
-          in your hand is authoritative.
+          Optimally&rsquo;s scores are an information tool, not medical advice.
+          Always check the physical packaging for allergen information. Only the
+          label in your hand is authoritative.
         </div>
       </div>
     </footer>

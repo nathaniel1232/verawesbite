@@ -54,18 +54,11 @@ export default function Support() {
         expires.
       </p>
 
-      <h3>Is there a free version?</h3>
+      <h3>Where can I see the current plans?</h3>
       <p>
-        No. Optimally is a paid subscription, and after the introductory questions
-        you&rsquo;ll be asked to subscribe before you can scan. We&rsquo;d rather
-        say that plainly here than have you find out after downloading. If a free
-        trial is offered to you, its length and the price afterwards are shown
-        before anything is charged, and cancelling during it costs you nothing.
-      </p>
-      <p>
-        The reason is boring but real: subscribers are the only people Optimally
-        answers to. No ads and no brand money is only credible if nobody else is
-        paying the bills.
+        The App Store listing and the purchase screen in your version of the app
+        show the current options. Before confirming a purchase, check the price,
+        billing period, and any trial terms shown by Apple.
       </p>
 
       <h3>I paid but the app still isn&rsquo;t unlocked</h3>
@@ -85,14 +78,6 @@ export default function Support() {
         <a href="https://reportaproblem.apple.com">reportaproblem.apple.com</a>{' '}
         with the Apple ID you purchased with. If the reason is that Optimally did
         something wrong, email us too, so we can fix it.
-      </p>
-
-      <h3>I have a creator code</h3>
-      <p>
-        Enter it on the subscribe screen via{' '}
-        <strong>&ldquo;Have a creator code?&rdquo;</strong>, or in{' '}
-        <strong>Settings &rarr; Redeem a creator code</strong> once you&rsquo;re
-        in. Codes are not case-sensitive.
       </p>
 
       <h2>Scanning</h2>
