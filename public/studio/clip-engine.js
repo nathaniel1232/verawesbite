@@ -426,7 +426,7 @@
   function normalise(raw) {
     var s = {};
     var r = raw || {};
-    s.format    = ["tier", "metrics", "ring", "versus", "card"].indexOf(r.format) >= 0 ? r.format : "tier";
+    s.format    = ["tier", "metrics", "ring", "versus", "card", "cta"].indexOf(r.format) >= 0 ? r.format : "tier";
     s.aspect    = ASPECTS[r.aspect] ? r.aspect : "1:1";
     s.score     = clamp(Math.round(+r.score), 0, 100);
     if (isNaN(s.score)) s.score = 0;
@@ -444,7 +444,8 @@
        claim back. */
     s.trust     = r.trust === undefined ? false : !!r.trust;
     s.intensity = r.intensity === undefined ? 1 : clamp01(+r.intensity);
-    s.duration  = clamp(+r.duration || 3.0, 1.5, 12);
+    s.duration  = clamp(+r.duration || (s.format === "cta" && r.duration === undefined ? 6.0 : 3.0), 1.5, 12);
+    s.hook      = ["keep", "swap", "next"].indexOf(r.hook) >= 0 ? r.hook : "buy";
     s.hold      = Math.max(0, +r.hold || 0);
     s.seed      = r.seed !== undefined ? (+r.seed | 0) : hashString((s.name || "optimally") + s.score);
     s.reasons   = (r.reasons || []).slice(0, 4).map(function (x) {
@@ -485,7 +486,8 @@
       method: g("method"), intensity: g("intensity"),
       duration: g("duration") || g("seconds"), hold: g("hold"), seed: g("seed"),
       wordmark: Q.has("wordmark") ? g("wordmark") !== "0" : undefined,
-      trust: Q.has("trust") ? g("trust") !== "0" : undefined
+      trust: Q.has("trust") ? g("trust") !== "0" : undefined,
+      hook: g("hook")
     };
     if (Q.has("reasons")) {
       /* BOTH CONVENTIONS, BECAUSE BOTH EXIST IN THE REPO.
@@ -619,6 +621,13 @@
       T.band     = [1.70, 1.86];
       T.foot     = [1.92, 2.08];
       T.end      =  3.00;
+    } else if (spec.format === "cta") {
+      T.light    = [0.76, 0.86];
+      T.reveal   = [1.05, 1.55];
+      T.score    = [1.15, 1.95];
+      T.rows     = 1.72; T.rowStep = 0.10;
+      T.outro    = [3.50, 3.90];
+      T.end      = 6.00;
     } else { // ring
       T.light    = [0.76, 0.86];
       T.settle   = [0.78, 1.34];
@@ -2209,9 +2218,117 @@
     drawTrust(ctx, g, outCubic(span(t, T.foot[0], T.foot[1])), false);
   }
 
+  /* ================================================================== *
+   *  FORMAT: cta — curiosity, answer, invitation
+   *
+   *  The question is on frame zero. A real scan and the supplied score and
+   *  reason lines answer it; the closing screen gives one clear next step.
+   *  All motion is driven by the clip time so preview and export agree.
+   * ================================================================== */
+  function renderCTA(ctx, g, t) {
+    var T = g.T, W = g.W, H = g.H, spec = g.spec;
+    var portrait = H / W > 1.5;
+    var outro = outCubic(span(t, T.outro[0], T.outro[1]));
+    var reveal = outCubic(span(t, T.reveal[0], T.reveal[1]));
+    var photo = g.ctaPhoto;
+    var comment = spec.hook !== "buy";
+    var copy = {
+      buy: { opening: ["Would you", "buy this?"], close: ["What’s in", "yours?"],
+        prompt: "Scan your next shop.", button: "Get Optimally  →" },
+      keep: { opening: ["Keep it", "or swap it?"], close: ["Keep it", "or swap it?"],
+        prompt: "Comment KEEP or SWAP.", button: "Scan yours with Optimally  →" },
+      swap: { opening: ["What’s your", "go-to snack?"], close: ["Drop your", "go-to swap."],
+        prompt: "What would you eat instead?", button: "Find swaps in Optimally  →" },
+      next: { opening: ["What should", "I scan next?"], close: ["Name the", "next product."],
+        prompt: "Comment a brand + product.", button: "Scan it yourself  →" }
+    }[spec.hook];
+    drawStage(ctx, g, t);
+
+    function centered(text, y, size, color, weight) {
+      var fs = fitSize(ctx, text, W * 0.84, size, weight || 900, -1.5);
+      font(ctx, fs, weight || 900, -1.5);
+      ctx.fillStyle = color; ctx.textAlign = "center";
+      ctx.fillText(text, W / 2, y); ctx.textAlign = "left";
+    }
+    // Identity stays visible even when the video is cut before its end card.
+    ctx.save();
+    ctx.textBaseline = "middle";
+    var mark = markAt(C.accent, W * 0.043);
+    if (mark) ctx.drawImage(mark, W * 0.08, H * 0.075 - W * 0.022, W * 0.043, W * 0.043);
+    font(ctx, W * 0.030, 800, -0.5); ctx.fillStyle = C.accent;
+    drawText(ctx, "Optimally", W * 0.137, H * 0.075, -0.5);
+    ctx.textBaseline = "alphabetic";
+    ctx.globalAlpha = 1 - outro;
+    centered(copy.opening[0], H * (portrait ? 0.170 : 0.185), W * 0.103, C.ink);
+    centered(copy.opening[1], H * (portrait ? 0.235 : 0.285), W * 0.103, C.accent);
+    drawPhotoCard(ctx, g.img, photo, W * 0.045, {
+      fit: spec.fit, zoom: 1 + 0.025 * outCubic(span(t, 0, T.outro[0]))
+    });
+    g.scanBox = photo; g.scanRadius = W * 0.045;
+    if (t < T.lock[1]) drawScan(ctx, g, t);
+    ctx.restore();
+
+    // A large result card overlaps the photograph. Score and evidence stay together.
+    ctx.save();
+    ctx.globalAlpha = reveal * (1 - outro);
+    ctx.translate(0, (1 - reveal) * W * 0.04);
+    var py = H * (portrait ? 0.590 : 0.635), ph = H * (portrait ? 0.150 : 0.205);
+    ctx.shadowColor = rgba(C.ink, 0.15); ctx.shadowBlur = W * 0.035;
+    ctx.shadowOffsetY = W * 0.01;
+    roundRect(ctx, W * 0.08, py, W * 0.84, ph, W * 0.032);
+    ctx.fillStyle = C.card; ctx.fill(); ctx.shadowColor = "transparent";
+    ctx.textBaseline = "middle";
+    if (!comment) {
+      font(ctx, W * 0.115, 900, -3); ctx.fillStyle = g.band;
+      drawText(ctx, String(counted(t, T.score, spec.score)), W * 0.12, py + ph * 0.43, -3);
+      font(ctx, W * 0.025, 700, 0); ctx.fillStyle = C.ink2;
+      drawText(ctx, "OUT OF 100", W * 0.12, py + ph * 0.76, 0);
+    }
+    var rx = W * (comment ? 0.12 : 0.37), rw = W * (comment ? 0.75 : 0.50);
+    font(ctx, W * 0.024, 800, 1.1); ctx.fillStyle = C.accent;
+    var request = spec.hook === "next";
+    drawText(ctx, request ? "YOU PICK THE NEXT SCAN" : "INGREDIENT CHECK", rx, py + ph * 0.23, 1.1);
+    var reasons = request ? [{ text: "Brand + product name" }, { text: "Drop it in the comments ↓" }]
+      : spec.reasons.filter(function (r) { return r.text.trim(); }).slice(0, 2);
+    for (var i = 0; i < reasons.length; i++) {
+      var y = py + ph * (0.48 + i * 0.29);
+      var rowIn = outCubic(span(t, T.rows + i * T.rowStep, T.rows + i * T.rowStep + 0.22));
+      ctx.save(); ctx.globalAlpha *= rowIn;
+      if (!request) toneGlyph(ctx, reasons[i].tone, rx + W * 0.009, y, W * 0.010);
+      var fs = fitSize(ctx, reasons[i].text, rw - W * 0.035, W * (comment ? 0.040 : 0.030), 700, -0.2);
+      font(ctx, fs, 700, -0.2); ctx.fillStyle = C.ink;
+      drawText(ctx, reasons[i].text, rx + W * 0.035, y, -0.2);
+      ctx.restore();
+    }
+    ctx.restore();
+
+    ctx.save(); ctx.globalAlpha = outro; ctx.textBaseline = "alphabetic";
+    centered(copy.close[0], H * (portrait ? 0.270 : 0.285), W * 0.118, C.ink);
+    centered(copy.close[1], H * (portrait ? 0.355 : 0.405), W * 0.140, C.accent);
+    centered(copy.prompt, H * (portrait ? 0.435 : 0.495), W * (comment ? 0.039 : 0.036), C.ink2, 700);
+    var bx = W * 0.08, by = H * (portrait ? 0.510 : 0.570);
+    var bw = W * 0.84, bh = W * 0.115;
+    roundRect(ctx, bx, by, bw, bh, bh / 2); ctx.fillStyle = C.accent; ctx.fill();
+    ctx.textBaseline = "middle";
+    centered(copy.button, by + bh / 2, W * 0.045, "#FFFFFF", 800);
+    var sy = by + bh + W * 0.080;
+    drawAppStoreBadge(ctx, W * 0.08, sy - W * 0.031, W * 0.066);
+    font(ctx, W * 0.025, 700, 0); ctx.fillStyle = C.ink2;
+    drawText(ctx, "Search on the App Store", W * 0.17, sy - W * 0.013, 0);
+    font(ctx, W * 0.032, 800, -0.5); ctx.fillStyle = C.ink;
+    drawText(ctx, "Optimally: Food Scanner", W * 0.17, sy + W * 0.025, -0.5);
+    ctx.restore();
+
+    if (spec.brand) {
+      ctx.save(); ctx.textBaseline = "middle";
+      centered(String(spec.brand), H * (portrait ? 0.800 : 0.905), W * 0.021, C.ink2, 700);
+      ctx.restore();
+    }
+  }
+
   var RENDERERS = {
     tier: renderTier, metrics: renderMetrics, ring: renderRing,
-    versus: renderVersus, card: renderCard
+    versus: renderVersus, card: renderCard, cta: renderCTA
   };
 
   /* ================================================================== *
@@ -2285,7 +2402,9 @@
       // How dark the ground is right now. Every format opens dark (see
       // `stageWash`) and only `tier` stays that way.
       stageDark: 1,
-      img: null, imgB: null, quietHUD: false
+      img: null, imgB: null, quietHUD: spec.format === "cta",
+      ctaPhoto: { x: W * 0.08, y: H * (H / W > 1.5 ? 0.285 : 0.335),
+                  w: W * 0.84, h: H * (H / W > 1.5 ? 0.420 : 0.455) }
     };
     g.lattice0 = buildLattice(scanRect, spec.seed, tall ? 66 : 54);
     g.lattice = g.lattice0;
@@ -2299,6 +2418,7 @@
     ]).then(function () {
       reshape(g.img);
       g.lattice0 = buildLattice(scanRect, spec.seed, tall ? 66 : 54);
+      if (spec.format === "cta") g.lattice0 = buildLattice(g.ctaPhoto, spec.seed, 54);
       g.lattice = g.lattice0;
       if (spec.format === "versus") {
         // Two panels, two clouds, two seeds. One lattice reused would put the
@@ -2339,7 +2459,7 @@
     create: create,
     specFromQuery: specFromQuery,
     normalise: normalise,
-    FORMATS: ["tier", "metrics", "ring", "versus", "card"],
+    FORMATS: ["tier", "metrics", "ring", "versus", "card", "cta"],
     ASPECTS: Object.keys(ASPECTS),
     TIERS: TIERS,
     BAND_LABEL: BAND_LABEL,

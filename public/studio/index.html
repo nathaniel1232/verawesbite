@@ -7,7 +7,7 @@
 <title>Optimally Clip Studio</title>
 
 <link rel="stylesheet" href="satoshi.css">
-<script src="clip-engine.js?v=2026-09-08.4f585a9"></script>
+<script src="clip-engine.js?v=2026-10-09.2a3f2a8"></script>
 
 <style>
   /* CONTRAST, BECAUSE THE FIRST VERSION FAILED IT BADLY.
@@ -198,6 +198,12 @@
     <h2>Format</h2>
     <div class="seg" id="formats"></div>
     <div class="seg" id="aspects" style="margin-top:6px"></div>
+    <div id="ctaControls" hidden style="margin-top:14px">
+      <div class="field"><label for="hook">Opening hook</label>
+        <select id="hook"><option value="buy">Would you buy this?</option><option value="keep">Keep it or swap it?</option><option value="swap">Your go-to swap</option><option value="next">What should I scan next?</option></select>
+      </div>
+      <p class="note">“Would you buy this?” reveals the scan result, then holds the download invitation. The other hooks invite comments about choices, snack swaps, or what to scan next.</p>
+    </div>
 
     <h2>Product</h2>
     <div class="field"><label>Barcode</label>
@@ -355,6 +361,13 @@ var K = OptimallyClip;
 var DEMO = "demo/";
 
 var PRESETS = {
+  "Would you buy this?": {
+    format: "cta", duration: 6, hook: "buy", score: 18, name: "TRAIL BAR",
+    brand: "DEMO SCAN · FICTIONAL PRODUCT", fit: "cover", method: "barcode",
+    image: DEMO + "OnboardingBadProduct.jpg",
+    reasons: [{ tone: "bad", text: "Ultra-processed (NOVA 4)" },
+              { tone: "warn", text: "Aspartame, flagged additive" }]
+  },
   /* THE SAME FOUR THE CAPTURE SCRIPT SHIPS, and for the same reason: every
      number is one the engine really produced. `flagged` and `clean` are the
      app's own onboarding reveals, so somebody who installs after seeing a
@@ -391,7 +404,7 @@ var PRESETS = {
 var S = {
   format: "tier", aspect: "1:1", score: 18, name: "TRAIL BAR", brand: "",
   image: "", fit: "cover", tiers: "looksmax", method: "barcode",
-  wordmark: true, trust: false, intensity: 1, duration: 3.0, hold: 0, barcode: "",
+  wordmark: true, trust: false, intensity: 1, duration: 3.0, hold: 0, barcode: "", hook: "buy",
   reasons: [{ tone: "bad", text: "Made with industrial seed oils" },
             { tone: "bad", text: "Ultra-processed (NOVA 4)" },
             { tone: "warn", text: "Aspartame, flagged additive" }],
@@ -439,7 +452,13 @@ function bind(id, key, cast) {
 
 function boot() {
   segment($("formats"), K.FORMATS, function () { return S.format; },
-          function (v) { S.format = v; });
+          function (v) {
+            if (v === "cta" && S.format !== "cta") S.duration = 6;
+            else if (S.format === "cta" && S.duration === 6) S.duration = 3;
+            S.format = v;
+            $("duration").value = S.duration;
+            $("durOut").textContent = S.duration.toFixed(1) + "s";
+          });
   segment($("aspects"), K.ASPECTS, function () { return S.aspect; },
           function (v) { S.aspect = v; });
   segment($("fits"), ["cover", "contain"], function () { return S.fit; },
@@ -477,6 +496,7 @@ function boot() {
   bind("method", "method");
   bind("hold", "hold", parseFloat);
   bind("intensity", "intensity", parseFloat);
+  bind("hook", "hook");
   $("duration").addEventListener("input", function () {
     S.duration = parseFloat(this.value);
     $("durOut").textContent = S.duration.toFixed(1) + "s";
@@ -525,13 +545,13 @@ function boot() {
   var Q0 = new URLSearchParams(location.search);
   var KNOWN = ["format", "aspect", "score", "name", "brand", "fit", "tiers",
                "method", "intensity", "duration", "hold", "wordmark", "trust", "barcode",
-               "reasons", "metrics", "bname", "bscore"];
+               "reasons", "metrics", "bname", "bscore", "hook"];
   if (!KNOWN.some(function (k) { return Q0.has(k); })) {
     applyPreset(PRESETS["Trail bar (18)"]);
   } else {
     var q = K.specFromQuery(location.search);
     ["format", "aspect", "score", "name", "brand", "fit", "tiers", "method",
-     "intensity", "duration", "hold", "wordmark", "trust"]
+     "intensity", "duration", "hold", "wordmark", "trust", "hook"]
       .forEach(function (k) { S[k] = q[k]; });
     /* Not through `specFromQuery`. A barcode is not something the clip
        renders — the engine has no such field and should not grow one — it is
@@ -551,6 +571,7 @@ function boot() {
 }
 
 function syncControls() {
+  $("hook").value = S.hook;
   $("name").value = S.name; $("brand").value = S.brand;
   $("method").value = S.method; $("hold").value = S.hold; $("intensity").value = S.intensity;
   $("barcode").value = S.barcode || "";
@@ -568,6 +589,8 @@ function syncControls() {
 
 function applyPreset(p) {
   S.format = p.format || S.format;
+  S.duration = p.duration || (S.format === "cta" ? 6 : 3);
+  S.hook = p.hook || "buy";
   S.score = p.score; S.name = p.name || ""; S.brand = p.brand || "";
   S.image = p.image || ""; S.fit = p.fit || "cover"; S.method = p.method || "barcode";
   S.barcode = ""; $("barcode").value = ""; $("offOut").hidden = true;
@@ -869,7 +892,7 @@ function spec() {
     format: S.format, aspect: S.aspect, score: S.score, name: S.name, brand: S.brand,
     image: S.image, fit: S.fit, tiers: S.tiers, method: S.method,
     wordmark: S.wordmark, trust: S.trust, intensity: S.intensity,
-    duration: S.duration, hold: S.hold,
+    duration: S.duration, hold: S.hold, hook: S.hook,
     reasons: S.reasons.filter(function (r) { return r.text.trim(); }),
     metrics: S.metrics.filter(function (m) { return m.label.trim(); })
   };
@@ -886,6 +909,7 @@ function rebuild() {
 }
 
 function rebuildNow() {
+  $("ctaControls").hidden = S.format !== "cta";
   var canvas = $("canvas");
   clip = K.create(canvas, spec(), { scale: 0.5 });
   // The backing store is half size; CSS decides how big it looks.
@@ -1515,12 +1539,12 @@ function exportPoster() {
 
 function copyLink() {
   var q = new URLSearchParams();
-  ["format", "aspect", "score", "name", "brand", "fit", "tiers", "method"].forEach(function (k) {
+  ["format", "aspect", "score", "name", "brand", "fit", "tiers", "method", "hook"].forEach(function (k) {
     if (S[k] !== "" && S[k] !== undefined) q.set(k, S[k]);
   });
   if (!S.wordmark) q.set("wordmark", "0");
   if (S.trust) q.set("trust", "1");
-  if (+S.duration !== 3.0) q.set("duration", S.duration);
+  if (+S.duration !== (S.format === "cta" ? 6 : 3)) q.set("duration", S.duration);
   if (+S.hold) q.set("hold", S.hold);
   if (+S.intensity !== 1) q.set("intensity", S.intensity);
   if (S.barcode) q.set("barcode", S.barcode);
@@ -1559,7 +1583,7 @@ function copyLink() {
  * the stamp, compare it to the last deploy, and the question is closed before
  * anybody reads any code. `sync.py` writes it; unstamped means running from
  * source. */
-var BUILD = "2026-09-08.4f585a9";
+var BUILD = "2026-10-09.2a3f2a8";
 function showBuild() {
   var b = /^__/.test(BUILD) ? "dev (unstamped, running from source)" : BUILD;
   $("build").textContent = "build " + b;
