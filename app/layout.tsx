@@ -7,6 +7,9 @@ import { StoreLinkLocaliser } from '@/components/store-link'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  verification: {
+    google: 'mhTplW7OST76pf1G5XCAxCUChy-YCVfARLoHZkP-sWc',
+  },
   /* NO EM DASHES, INCLUDING HERE. These are user-visible: the title shows in
      the browser tab and the og: pair is what every link preview renders. The
      house rule applies to them like any other copy. */
