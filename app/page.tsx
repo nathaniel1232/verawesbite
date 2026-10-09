@@ -52,7 +52,7 @@ const questions = [
   },
   {
     q: 'What does a food score actually mean?',
-    a: 'A score summarises how a food fits Optimally’s criteria using the available ingredient and nutrition information. It is a guide to a food, not a diagnosis, a prediction about your health, or a complete judgement of your diet. Missing information and portion size matter.',
+    a: 'A score summarises how a food fits Optimally’s criteria using the available ingredient and nutrition information. Being minimally processed does not automatically earn the highest score: fruit can be a useful snack while contributing less protein and a narrower range of vitamins and minerals than our most nourishing staples. The score is a guide, not a diagnosis or a complete judgement of your diet. Missing information and portion size matter.',
   },
   {
     q: 'How does it handle allergies and intolerances?',
@@ -127,8 +127,8 @@ export default function Home() {
               aria-label="A food result in the Optimally app"
             >
               <Image
-                src={asset('/shots/whole-food.jpg')}
-                alt="Optimally showing a whole-food scan with its food quality rating and explanation"
+                src={asset('/shots/apple-calibrated.jpg')}
+                alt="Optimally showing an apple rated 86 with its food quality explanation"
                 width={600}
                 height={1304}
                 priority
